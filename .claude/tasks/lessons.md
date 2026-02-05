@@ -22,3 +22,12 @@
 1. Avoid Windows-specific commands like `timeout`, `nul` redirections
 2. Use cross-platform alternatives or just avoid unnecessary commands
 3. If a command doesn't need output, use `2>&1` to stderr or just ignore it
+
+### Lesson 3: Use Project's Task Management Files
+**Context:** Used system plan folder instead of project's `.claude/tasks/todo.md`.
+**Mistake:** CLAUDE.md specifies that plans should go to `.claude/tasks/todo.md`, not the system's plan folder.
+
+**Rule:**
+1. Always use `.claude/tasks/todo.md` for task planning and progress tracking
+2. Use `.claude/tasks/lessons.md` for capturing lessons after corrections
+3. Follow the project's Task Management guidelines in CLAUDE.md

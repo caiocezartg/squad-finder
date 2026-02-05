@@ -4,7 +4,7 @@
     "types": ["bun-types"],
     "baseUrl": ".",
     "outDir": "dist",
-    "rootDir": "src",
+    "noEmit": true,
     "paths": {
       "@/*": ["src/*"],
       "@domain/*": ["src/domain/*"],
@@ -15,6 +15,6 @@
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "drizzle.config.ts"],
   "exclude": ["node_modules", "dist"]
 }
