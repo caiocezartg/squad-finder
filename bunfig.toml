@@ -1,0 +1,11 @@
+[install]
+# Use exact versions for reproducible installs
+exact = true
+
+[install.lockfile]
+# Save lockfile in binary format for better performance
+save = true
+
+[run]
+# Silence the bun install output when running scripts
+silent = false
