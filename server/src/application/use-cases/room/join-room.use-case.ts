@@ -1,6 +1,12 @@
 import type { RoomMember } from '@domain/entities/room-member.entity';
 import type { IRoomRepository } from '@domain/repositories/room.repository';
 import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository';
+import {
+  RoomNotFoundError,
+  RoomNotWaitingError,
+  UserAlreadyInRoomError,
+  RoomFullError,
+} from '@application/errors';
 
 export interface JoinRoomInput {
   readonly roomId: string;
@@ -13,34 +19,6 @@ export interface JoinRoomOutput {
 
 export interface IJoinRoomUseCase {
   execute(input: JoinRoomInput): Promise<JoinRoomOutput>;
-}
-
-export class RoomNotFoundError extends Error {
-  constructor(roomId: string) {
-    super(`Room with id "${roomId}" not found`);
-    this.name = 'RoomNotFoundError';
-  }
-}
-
-export class RoomNotWaitingError extends Error {
-  constructor(roomId: string, status: string) {
-    super(`Room "${roomId}" is not accepting players (status: ${status})`);
-    this.name = 'RoomNotWaitingError';
-  }
-}
-
-export class UserAlreadyInRoomError extends Error {
-  constructor(userId: string, roomId: string) {
-    super(`User "${userId}" is already in room "${roomId}"`);
-    this.name = 'UserAlreadyInRoomError';
-  }
-}
-
-export class RoomFullError extends Error {
-  constructor(roomId: string) {
-    super(`Room "${roomId}" is full`);
-    this.name = 'RoomFullError';
-  }
 }
 
 export class JoinRoomUseCase implements IJoinRoomUseCase {

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { JoinRoomUseCase } from './join-room.use-case';
 import {
-  JoinRoomUseCase,
   RoomNotFoundError,
   RoomNotWaitingError,
   UserAlreadyInRoomError,
   RoomFullError,
-} from './join-room.use-case';
+} from '@application/errors';
 import {
   createMockRoom,
   createMockRoomRepository,

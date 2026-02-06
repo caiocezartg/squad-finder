@@ -1,11 +1,20 @@
 // Types
-export { Game } from "./types/index.js";
-export type { User, Room, RoomMember } from "./types/index.js";
+export type { RoomStatus, User, Game, Room, RoomMember } from './types/index.js';
 
 // Schemas
 export {
-  gameSchema,
-  createRoomSchema,
+  roomStatusSchema,
   userSchema,
-} from "./schemas/index.js";
-export type { CreateRoomInput, UserInput } from "./schemas/index.js";
+  gameSchema,
+  roomSchema,
+  roomMemberSchema,
+  createRoomInputSchema,
+} from './schemas/index.js';
+
+export type {
+  UserDto,
+  GameDto,
+  RoomDto,
+  RoomMemberDto,
+  CreateRoomInput,
+} from './schemas/index.js';

@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import websocket from '@fastify/websocket';
 import { env } from '@config/env';
+import errorHandlerPlugin from '@infrastructure/plugins/error-handler.plugin';
 import databasePlugin from '@infrastructure/plugins/database.plugin';
 import authPlugin from '@infrastructure/plugins/auth.plugin';
 import wsPlugin from '@infrastructure/websocket/ws.plugin';
@@ -14,6 +15,8 @@ async function buildServer() {
       level: env.LOG_LEVEL,
     },
   });
+
+  await fastify.register(errorHandlerPlugin);
 
   await fastify.register(cors, {
     origin: env.CORS_ORIGIN,

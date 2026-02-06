@@ -1,5 +1,6 @@
-import { pgTable, uuid, varchar, timestamp, boolean, integer, pgEnum, text } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, timestamp, integer, pgEnum, text } from 'drizzle-orm/pg-core';
 import { user } from './auth';
+import { games } from './games';
 
 export const roomStatusEnum = pgEnum('room_status', ['waiting', 'playing', 'finished']);
 
@@ -10,9 +11,11 @@ export const rooms = pgTable('rooms', {
   hostId: text('host_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
+  gameId: uuid('game_id')
+    .notNull()
+    .references(() => games.id, { onDelete: 'restrict' }),
   status: roomStatusEnum('status').notNull().default('waiting'),
-  maxPlayers: integer('max_players').notNull().default(10),
-  isPrivate: boolean('is_private').notNull().default(false),
+  maxPlayers: integer('max_players').notNull().default(5),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

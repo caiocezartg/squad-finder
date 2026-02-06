@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { CreateRoomInput, Room, UpdateRoomInput } from '@domain/entities/room.entity';
 import type { IRoomRepository } from '@domain/repositories/room.repository';
 import type { Database } from '@infrastructure/database/drizzle';
@@ -19,9 +19,9 @@ function mapRowToEntity(row: RoomRow): Room {
     code: row.code,
     name: row.name,
     hostId: row.hostId,
+    gameId: row.gameId,
     status: row.status,
     maxPlayers: row.maxPlayers,
-    isPrivate: row.isPrivate,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -53,10 +53,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
   }
 
   async findAvailable(): Promise<Room[]> {
-    const result = await this.db
-      .select()
-      .from(rooms)
-      .where(and(eq(rooms.status, 'waiting'), eq(rooms.isPrivate, false)));
+    const result = await this.db.select().from(rooms).where(eq(rooms.status, 'waiting'));
     return result.map(mapRowToEntity);
   }
 
@@ -69,8 +66,8 @@ export class DrizzleRoomRepository implements IRoomRepository {
         code,
         name: input.name,
         hostId: input.hostId,
-        maxPlayers: input.maxPlayers ?? 10,
-        isPrivate: input.isPrivate ?? false,
+        gameId: input.gameId,
+        maxPlayers: input.maxPlayers ?? 5,
       })
       .returning();
 
@@ -86,7 +83,6 @@ export class DrizzleRoomRepository implements IRoomRepository {
       name: string;
       status: 'waiting' | 'playing' | 'finished';
       maxPlayers: number;
-      isPrivate: boolean;
       updatedAt: Date;
     }> = {
       updatedAt: new Date(),
@@ -100,9 +96,6 @@ export class DrizzleRoomRepository implements IRoomRepository {
     }
     if (input.maxPlayers !== undefined) {
       updateData.maxPlayers = input.maxPlayers;
-    }
-    if (input.isPrivate !== undefined) {
-      updateData.isPrivate = input.isPrivate;
     }
 
     const result = await this.db.update(rooms).set(updateData).where(eq(rooms.id, id)).returning();
