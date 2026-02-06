@@ -1,14 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { env } from "@/env";
+import { signIn, useSession } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
 function HomePage() {
-  const handleDiscordSignIn = () => {
-    window.location.href = `${env.VITE_API_URL}/api/auth/discord`;
+  const { data: session, isPending } = useSession();
+
+  const handleDiscordSignIn = async () => {
+    await signIn.social({
+      provider: "discord",
+      callbackURL: window.location.origin,
+    });
   };
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  if (session?.user) {
+    return (
+      <div className="flex flex-col items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+            Welcome, {session.user.name}!
+          </h1>
+          {session.user.image && (
+            <img
+              src={session.user.image}
+              alt="Avatar"
+              className="w-20 h-20 rounded-full mx-auto"
+            />
+          )}
+          <p className="text-gray-600">{session.user.email}</p>
+          <pre className="text-left bg-gray-100 p-4 rounded overflow-auto text-sm">
+            {JSON.stringify(session, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-16 sm:px-6 lg:px-8">

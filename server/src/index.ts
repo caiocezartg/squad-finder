@@ -4,6 +4,7 @@ import helmet from '@fastify/helmet';
 import websocket from '@fastify/websocket';
 import { env } from '@config/env';
 import databasePlugin from '@infrastructure/plugins/database.plugin';
+import authPlugin from '@infrastructure/plugins/auth.plugin';
 import wsPlugin from '@infrastructure/websocket/ws.plugin';
 import { registerRoutes } from '@interface/routes';
 
@@ -30,6 +31,7 @@ async function buildServer() {
   });
 
   await fastify.register(databasePlugin);
+  await fastify.register(authPlugin);
   await fastify.register(wsPlugin);
   await registerRoutes(fastify);
 

@@ -7,6 +7,14 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+
+  // Better Auth
+  BETTER_AUTH_SECRET: z.string().min(32),
+  BETTER_AUTH_URL: z.string().url().default('http://localhost:3000'),
+
+  // Discord OAuth
+  DISCORD_CLIENT_ID: z.string(),
+  DISCORD_CLIENT_SECRET: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;

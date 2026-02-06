@@ -8,6 +8,17 @@ Ready for next task.
 
 ## Completed Tasks
 
+### Database & Better Auth Integration (2026-02-05)
+- [x] Docker Compose for PostgreSQL
+- [x] Better Auth schema (user, session, account tables)
+- [x] room_members schema with unique constraint
+- [x] Better Auth config with Discord OAuth
+- [x] DrizzleRoomRepository implementation
+- [x] DrizzleRoomMemberRepository implementation
+- [x] Updated DrizzleUserRepository for Better Auth user table
+- [x] Auth plugin for Fastify
+- [x] All 23 tests still passing
+
 ### Unit Testing + Use Cases (2026-02-05)
 - [x] Test infrastructure: mocks directory, path aliases
 - [x] RoomMember entity + IRoomMemberRepository
