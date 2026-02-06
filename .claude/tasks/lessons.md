@@ -31,3 +31,11 @@
 1. Always use `.claude/tasks/todo.md` for task planning and progress tracking
 2. Use `.claude/tasks/lessons.md` for capturing lessons after corrections
 3. Follow the project's Task Management guidelines in CLAUDE.md
+
+### Lesson 4: No Co-Authored-By in Commits
+**Context:** Added "Co-Authored-By: Claude" to commit messages.
+**Mistake:** User does not want co-author attribution on commits.
+
+**Rule:**
+1. Never add "Co-Authored-By" lines to commit messages
+2. Keep commit messages focused on the changes only

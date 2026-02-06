@@ -1,4 +1,5 @@
 import { defineWorkspace } from 'vitest/config'
+import path from 'path'
 
 export default defineWorkspace([
   {
@@ -8,7 +9,7 @@ export default defineWorkspace([
       root: './client',
       environment: 'jsdom',
       include: ['src/**/*.{test,spec}.{ts,tsx}'],
-      exclude: ['node_modules', 'dist'],
+      exclude: ['**/node_modules/**', 'dist'],
       setupFiles: ['./src/test/setup.ts'],
       globals: true,
     },
@@ -19,8 +20,16 @@ export default defineWorkspace([
       root: './server',
       environment: 'node',
       include: ['src/**/*.{test,spec}.ts'],
-      exclude: ['node_modules', 'dist'],
+      exclude: ['**/node_modules/**', 'dist'],
       globals: true,
+      alias: {
+        '@test': path.resolve(__dirname, './server/src/test'),
+        '@domain': path.resolve(__dirname, './server/src/domain'),
+        '@application': path.resolve(__dirname, './server/src/application'),
+        '@infrastructure': path.resolve(__dirname, './server/src/infrastructure'),
+        '@interface': path.resolve(__dirname, './server/src/interface'),
+        '@config': path.resolve(__dirname, './server/src/config'),
+      },
     },
   },
   {
@@ -28,8 +37,8 @@ export default defineWorkspace([
       name: 'packages',
       root: './packages',
       environment: 'node',
-      include: ['**/src/**/*.{test,spec}.ts'],
-      exclude: ['node_modules', 'dist'],
+      include: ['shared/src/**/*.{test,spec}.ts'],
+      exclude: ['**/node_modules/**', 'dist'],
       globals: true,
     },
   },

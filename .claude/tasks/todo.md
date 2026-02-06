@@ -1,15 +1,29 @@
 # SquadFinder - Task Progress
 
-## Current Task: Rename project references
+## Current Task: None
 
-- [x] Change database name from `entra_pra_jogar` to `squad_finder` in drizzle.config.ts
-- [x] Update "Entra Pra Jogar" to "SquadFinder" in client routes
-- [x] Fix server tsconfig to include drizzle.config.ts
-- [x] Run checks and commit changes
+Ready for next task.
 
 ---
 
 ## Completed Tasks
+
+### Unit Testing + Use Cases (2026-02-05)
+- [x] Test infrastructure: mocks directory, path aliases
+- [x] RoomMember entity + IRoomMemberRepository
+- [x] Room use cases: CreateRoom, GetRoomByCode, JoinRoom, LeaveRoom, GetAvailableRooms
+- [x] User use cases: GetUser, CreateUser, UpdateUser
+- [x] 23 tests passing
+
+### Server Startup Fixes (2026-02-05)
+- [x] Add --env-file flag to load environment variables
+- [x] Simplify logger config (remove pino-pretty)
+- [x] Verify server and client both work correctly
+
+### Rename to SquadFinder (2026-02-05)
+- [x] Change database name from `entra_pra_jogar` to `squad_finder`
+- [x] Update "Entra Pra Jogar" to "SquadFinder" in client routes
+- [x] Fix server tsconfig to include drizzle.config.ts
 
 ### Project Scaffolding (2026-02-05)
 - [x] Set up Bun monorepo with workspaces

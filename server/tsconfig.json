@@ -12,7 +12,8 @@
       "@infrastructure/*": ["src/infrastructure/*"],
       "@interface/*": ["src/interface/*"],
       "@config/*": ["src/config/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@test/*": ["src/test/*"]
     }
   },
   "include": ["src/**/*.ts", "drizzle.config.ts"],
