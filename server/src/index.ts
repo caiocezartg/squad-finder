@@ -8,23 +8,10 @@ import wsPlugin from '@infrastructure/websocket/ws.plugin';
 import { registerRoutes } from '@interface/routes';
 
 async function buildServer() {
-  const loggerConfig =
-    env.NODE_ENV === 'development'
-      ? {
-          level: env.LOG_LEVEL,
-          transport: {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-            },
-          },
-        }
-      : {
-          level: env.LOG_LEVEL,
-        }
-
   const fastify = Fastify({
-    logger: loggerConfig,
+    logger: {
+      level: env.LOG_LEVEL,
+    },
   });
 
   await fastify.register(cors, {
