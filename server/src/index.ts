@@ -6,6 +6,7 @@ import { env } from '@config/env';
 import errorHandlerPlugin from '@infrastructure/plugins/error-handler.plugin';
 import databasePlugin from '@infrastructure/plugins/database.plugin';
 import authPlugin from '@infrastructure/plugins/auth.plugin';
+import swaggerPlugin from '@infrastructure/plugins/swagger.plugin';
 import wsPlugin from '@infrastructure/websocket/ws.plugin';
 import { registerRoutes } from '@interface/routes';
 
@@ -39,6 +40,7 @@ async function buildServer() {
     },
   });
 
+  await fastify.register(swaggerPlugin);
   await fastify.register(databasePlugin);
   await fastify.register(authPlugin);
   await fastify.register(wsPlugin);

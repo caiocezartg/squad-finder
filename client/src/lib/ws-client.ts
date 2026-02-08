@@ -137,7 +137,7 @@ export class WebSocketClient {
     const delay = this.reconnectInterval * Math.pow(2, this.reconnectAttempts - 1)
 
     console.log(
-      `Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+      `Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`
     )
 
     this.reconnectTimeoutId = setTimeout(() => {

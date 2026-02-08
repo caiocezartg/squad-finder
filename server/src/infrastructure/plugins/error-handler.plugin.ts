@@ -21,9 +21,9 @@ function parseError(error: FastifyError | Error): ParsedError {
       response: {
         error: 'VALIDATION_ERROR',
         message: 'Request validation failed',
-        details: error.errors.map((e) => ({
-          field: e.path.join('.'),
-          message: e.message,
+        details: error.issues.map((issue) => ({
+          field: issue.path.join('.'),
+          message: issue.message,
         })),
       },
     };

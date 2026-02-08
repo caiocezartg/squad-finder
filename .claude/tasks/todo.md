@@ -19,6 +19,16 @@
 
 ## Completed Tasks
 
+### Swagger API Documentation with Scalar (2026-02-08)
+- [x] Install `fastify-type-provider-zod@6`, `@fastify/swagger@9`, `@scalar/fastify-api-reference`
+- [x] Update Zod to v4 across all packages (server, client, schemas)
+- [x] Fix `ZodError.errors` → `ZodError.issues` in error handler (Zod v4 breaking change)
+- [x] Create `swagger.plugin.ts` (validator/serializer compilers + OpenAPI config + Scalar UI)
+- [x] Add Zod route schemas to all endpoints (health, games, rooms, users)
+- [x] Define response schemas, error schemas, security schemes (session cookie)
+- [x] Scalar UI available at `/reference`
+- [x] All 23 tests passing, typecheck pass, lint pass
+
 ### Turborepo Package Restructuring (2026-02-07)
 - [x] Create `packages/typescript-config/` with `base.json`, `react.json`, `server.json`
 - [x] Create `packages/types/` — pure TS types (domain, API, WS) as `@squadfinder/types`

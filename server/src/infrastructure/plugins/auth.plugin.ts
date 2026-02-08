@@ -19,6 +19,7 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
   fastify.route({
     method: ['GET', 'POST'],
     url: '/api/auth/*',
+    schema: { hide: true },
     async handler(request: FastifyRequest, reply: FastifyReply) {
       try {
         const url = new URL(request.url, `http://${request.headers.host}`);
@@ -51,9 +52,9 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
     },
   });
 
-  // Session hook for non-auth routes
+  // Session hook for API routes only
   fastify.addHook('preHandler', async (request: FastifyRequest) => {
-    if (request.url.startsWith('/api/auth')) return;
+    if (!request.url.startsWith('/api/') || request.url.startsWith('/api/auth')) return;
 
     const session = await auth.api.getSession({
       headers: request.headers as Record<string, string>,
