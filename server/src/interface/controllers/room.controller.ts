@@ -9,6 +9,10 @@ import { JoinRoomUseCase } from '@application/use-cases/room/join-room.use-case'
 import { LeaveRoomUseCase } from '@application/use-cases/room/leave-room.use-case';
 import { RoomNotFoundError, InvalidGameError, NotRoomMemberError } from '@application/errors';
 import { createRoomRequestSchema, roomCodeParamSchema } from '@application/dtos';
+import {
+  broadcastRoomCreated,
+  broadcastRoomDeleted,
+} from '@infrastructure/websocket/handlers/room.handler';
 
 export class RoomController {
   async list(request: FastifyRequest, reply: FastifyReply): Promise<void> {
@@ -64,6 +68,9 @@ export class RoomController {
       userId,
     });
 
+    // Broadcast to lobby subscribers
+    broadcastRoomCreated(result.room);
+
     await reply.status(201).send({ room: result.room });
   }
 
@@ -103,6 +110,9 @@ export class RoomController {
       throw new RoomNotFoundError(params.code);
     }
 
+    // Check if user is host before leaving (room will be deleted if host leaves)
+    const isHost = room.hostId === userId;
+
     const useCase = new LeaveRoomUseCase(roomRepository, roomMemberRepository);
     const result = await useCase.execute({
       roomId: room.id,
@@ -111,6 +121,11 @@ export class RoomController {
 
     if (!result.success) {
       throw new NotRoomMemberError(userId, room.id);
+    }
+
+    // If host left, the room was deleted - broadcast to lobby
+    if (isHost) {
+      broadcastRoomDeleted(room.id, room.code);
     }
 
     await reply.send({

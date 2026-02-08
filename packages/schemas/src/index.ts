@@ -56,8 +56,8 @@ export type RoomMemberDto = z.infer<typeof roomMemberSchema>;
 
 // Create room input schema
 export const createRoomInputSchema = z.object({
-  name: z.string().min(1).max(100),
-  gameId: z.string().uuid(),
+  name: z.string().min(1, 'Room name is required').max(100, 'Room name too long'),
+  gameId: z.string().uuid('Invalid game ID'),
   maxPlayers: z.number().int().min(2).max(20).optional(),
 });
 

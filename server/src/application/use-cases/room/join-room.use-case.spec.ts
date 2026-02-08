@@ -3,7 +3,6 @@ import { JoinRoomUseCase } from './join-room.use-case';
 import {
   RoomNotFoundError,
   RoomNotWaitingError,
-  UserAlreadyInRoomError,
   RoomFullError,
 } from '@application/errors';
 import {
@@ -83,7 +82,7 @@ describe('JoinRoomUseCase', () => {
       expect(mockRoomMemberRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw UserAlreadyInRoomError if user already in room', async () => {
+    it('should return existing member if user already in room (idempotent)', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 5 });
       const existingMember = createMockRoomMember({
         roomId: 'room-1',
@@ -93,13 +92,12 @@ describe('JoinRoomUseCase', () => {
       mockRoomRepository.findById.mockResolvedValue(room);
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(existingMember);
 
-      await expect(
-        useCase.execute({
-          roomId: 'room-1',
-          userId: 'user-1',
-        }),
-      ).rejects.toThrow(UserAlreadyInRoomError);
+      const result = await useCase.execute({
+        roomId: 'room-1',
+        userId: 'user-1',
+      });
 
+      expect(result.roomMember).toEqual(existingMember);
       expect(mockRoomMemberRepository.create).not.toHaveBeenCalled();
     });
 

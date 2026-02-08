@@ -39,3 +39,46 @@
 **Rule:**
 1. Never add "Co-Authored-By" lines to commit messages
 2. Keep commit messages focused on the changes only
+
+## Session: 2026-02-06
+
+### Lesson 5: Always Use DTOs with Zod for Runtime Validation
+**Context:** Created controllers that use raw `request.body as Type` casting without Zod validation.
+**Mistake:** Skipped DTOs and Zod validation, violating CLAUDE.md requirement: "Use Zod for runtime validation (DTOs/Env vars)".
+
+**Rule:**
+1. Every controller input MUST have a corresponding DTO with Zod schema
+2. DTOs belong in Interface Adapters layer (e.g., `@interface/dtos/`)
+3. Validate all inputs before passing to use cases
+4. Never trust raw request data - always validate
+
+### Lesson 6: Follow Clean Architecture Layers Strictly
+**Context:** Rushed to create routes with inline logic and schemas.
+**Mistake:** Mixed concerns - put logic in routes, skipped proper layer separation.
+
+**Rule:**
+1. **Routes:** Only define endpoints and wire to controllers (no business logic)
+2. **Controllers:** Handle HTTP layer, use DTOs for validation, call use cases
+3. **Use Cases:** Pure business logic orchestration
+4. **Repositories:** Data access only
+5. Create proper error handlers for consistent error responses
+
+### Lesson 7: Document Business Rules Explicitly
+**Context:** Created features without documenting the business rules.
+**Mistake:** Business rules were implicit, leading to confusion and inconsistency.
+
+**Rule:**
+1. Create `.claude/rules/business-rules.md` for domain-specific rules
+2. Document all business rules before implementation
+3. Reference business rules in use case implementations
+4. Update rules as requirements change
+
+### Lesson 8: Always Consult CLAUDE.md Before Implementation
+**Context:** Started coding without reviewing CLAUDE.md guidelines.
+**Mistake:** Missed critical requirements (DTOs, error handlers, lessons.md updates).
+
+**Rule:**
+1. Re-read CLAUDE.md at the start of every session
+2. Check lessons.md for patterns to avoid
+3. Verify Clean Architecture layers before creating files
+4. Ask: "What does CLAUDE.md say about this?"

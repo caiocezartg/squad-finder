@@ -1,0 +1,18 @@
+{
+  "name": "@squadfinder/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api": "./src/api.ts",
+    "./ws": "./src/ws.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@squadfinder/typescript-config": "workspace:*",
+    "typescript": "^5.6.0"
+  }
+}

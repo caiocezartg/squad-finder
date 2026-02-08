@@ -44,6 +44,9 @@ coverage/
 # Bun
 bun.lockb
 
+# Turborepo
+.turbo/
+
 # Temporary files
 tmp/
 temp/

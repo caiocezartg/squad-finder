@@ -5,19 +5,45 @@ SquadFinder is a real-time web application connecting gamers to complete full te
 - **Goal:** Users login via Discord, find or create rooms, and get access to a Discord invite link once the lobby is full.
 
 ## Build & Run Commands
+
+### Infrastructure
+- **Start PostgreSQL:** `docker compose up -d`
+- **Stop PostgreSQL:** `docker compose down`
+
 ### Frontend (`/client`)
 - **Install Dependencies:** `bun install`
 - **Start Dev Server:** `bun dev`
 - **Build:** `bun run build`
-- **Lint:** `bun run lint`
-- **Type Check:** `bun run tsc --noEmit`
+- **Preview Build:** `bun run preview`
+- **Type Check:** `bun run typecheck`
+- **Run Tests:** `bun run test`
 
 ### Backend (`/server`)
 - **Install Dependencies:** `bun install`
-- **Start Dev Server:** `bun dev` (Leverage `bun --watch` inside the script)
-- **Database Migration:** `bunx drizzle-kit push` or `bunx drizzle-kit migrate`
-- **Studio (DB GUI):** `bunx drizzle-kit studio`
-- **Run Tests:** `bun test` (Using Bun's native test runner) or `bun run test` (if using Vitest)
+- **Start Dev Server:** `bun dev` (loads `../.env` and watches for changes)
+- **Build:** `bun run build`
+- **Start Production:** `bun run start`
+- **Type Check:** `bun run typecheck`
+- **Run Tests:** `bun run test`
+
+### Database (from `/server`)
+- **Push Schema:** `bun run db:push` (sync schema to database)
+- **Generate Migration:** `bun run db:generate`
+- **Run Migrations:** `bun run db:migrate`
+- **Open Studio:** `bun run db:studio` (GUI for database)
+
+### Root (from `/`)
+- **Start All Dev Servers:** `bun run dev` (client + server in parallel)
+- **Start Client Only:** `bun run dev:client`
+- **Start Server Only:** `bun run dev:server`
+- **Build All:** `bun run build`
+- **Type Check All:** `bun run typecheck`
+- **Lint:** `bun run lint`
+- **Lint & Fix:** `bun run lint:fix`
+- **Format:** `bun run format`
+- **Run Tests:** `bun run test`
+- **Run Tests (Watch):** `bun run test:watch`
+- **Database:** `bun run db:push`, `bun run db:migrate`, `bun run db:studio`
 
 ## Tech Stack
 - **Runtime & Package Manager:** Bun (v1.1+)
@@ -36,8 +62,8 @@ SquadFinder is a real-time web application connecting gamers to complete full te
 - **Formatting:** Prettier default settings. 2 spaces indentation.
 - **Imports:** Absolute imports (e.g., `@/domain/...`) preferred over relative.
 - **Bun Specifics:**
-  - Use `Bun.env` for environment variables.
-  - Use Bun's native test runner (`bun:test`) for unit tests if possible for speed.
+  - Use `Bun.env` or `process.env` for environment variables.
+  - Use Vitest for unit tests (`bun run test` in both client and server).
 
 ### Backend: Clean Architecture (SOLID)
 The backend must strictly follow Clean Architecture principles.

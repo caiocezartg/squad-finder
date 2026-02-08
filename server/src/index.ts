@@ -13,6 +13,12 @@ async function buildServer() {
   const fastify = Fastify({
     logger: {
       level: env.LOG_LEVEL,
+      ...(env.NODE_ENV !== 'production' && {
+        transport: {
+          target: 'pino-pretty',
+          options: { colorize: true },
+        },
+      }),
     },
   });
 

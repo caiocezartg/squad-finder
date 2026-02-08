@@ -43,3 +43,23 @@ export type RoomMember = {
   userId: string;
   joinedAt: Date;
 };
+
+// API Response Types
+export type {
+  RoomsResponse,
+  RoomResponse,
+  GamesResponse,
+  CreateRoomResponse,
+} from './api';
+
+// WebSocket Payload Types
+export type {
+  Player,
+  RoomCreatedPayload,
+  RoomDeletedPayload,
+  RoomJoinedPayload,
+  PlayerJoinedPayload,
+  PlayerLeftPayload,
+  RoomReadyPayload,
+  WsErrorPayload,
+} from './ws';

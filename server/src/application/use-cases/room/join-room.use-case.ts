@@ -4,7 +4,6 @@ import type { IRoomMemberRepository } from '@domain/repositories/room-member.rep
 import {
   RoomNotFoundError,
   RoomNotWaitingError,
-  UserAlreadyInRoomError,
   RoomFullError,
 } from '@application/errors';
 
@@ -37,12 +36,13 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       throw new RoomNotWaitingError(input.roomId, room.status);
     }
 
+    // If user is already a member, return their existing membership (idempotent)
     const existingMember = await this.roomMemberRepository.findByRoomAndUser(
       input.roomId,
       input.userId,
     );
     if (existingMember) {
-      throw new UserAlreadyInRoomError(input.userId, input.roomId);
+      return { roomMember: existingMember };
     }
 
     const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId);

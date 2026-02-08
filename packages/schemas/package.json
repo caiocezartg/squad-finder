@@ -1,14 +1,10 @@
 {
-  "name": "@squadfinder/shared",
+  "name": "@squadfinder/schemas",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./types": "./src/types/index.ts",
-    "./schemas": "./src/schemas/index.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
@@ -17,6 +13,7 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@squadfinder/typescript-config": "workspace:*",
     "typescript": "^5.6.0"
   }
 }

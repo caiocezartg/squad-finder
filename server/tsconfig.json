@@ -1,10 +1,7 @@
 {
-  "extends": "../tsconfig.base.json",
+  "extends": "@squadfinder/typescript-config/server.json",
   "compilerOptions": {
-    "types": ["bun-types"],
     "baseUrl": ".",
-    "outDir": "dist",
-    "noEmit": true,
     "paths": {
       "@/*": ["src/*"],
       "@domain/*": ["src/domain/*"],
@@ -12,7 +9,6 @@
       "@infrastructure/*": ["src/infrastructure/*"],
       "@interface/*": ["src/interface/*"],
       "@config/*": ["src/config/*"],
-      "@shared/*": ["src/shared/*"],
       "@test/*": ["src/test/*"]
     }
   },

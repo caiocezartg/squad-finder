@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import type { WebSocket } from '@fastify/websocket';
 import fp from 'fastify-plugin';
 import { wsIncomingMessageSchema, type PongMessage, type WsClient } from './types';
@@ -6,15 +6,39 @@ import {
   handleJoinRoom,
   handleLeaveRoom,
   handleDisconnect,
+  handleSubscribeLobby,
+  handleUnsubscribeLobby,
   sendError,
   setClientData,
 } from './handlers/room.handler';
 
 async function wsPlugin(fastify: FastifyInstance): Promise<void> {
-  fastify.get('/ws', { websocket: true }, (socket: WebSocket) => {
+  fastify.get('/ws', { websocket: true }, async (socket: WebSocket, request: FastifyRequest) => {
+    // Debug: log cookies and session state
+    fastify.log.info({
+      cookies: request.headers.cookie,
+      hasSession: !!request.session,
+      sessionUser: request.session?.user?.id,
+    }, 'WebSocket connection attempt');
+
+    // Session is already populated by auth.plugin.ts preHandler hook
+    const session = request.session;
+
+    if (!session?.user?.id) {
+      fastify.log.warn('WebSocket auth failed - no session');
+      sendError(socket, 'UNAUTHORIZED', 'Authentication required');
+      socket.close(4001, 'Unauthorized');
+      return;
+    }
+
+    fastify.log.info({ userId: session.user.id }, 'WebSocket authenticated');
+
     const client: WsClient = {
-      userId: '',
+      userId: session.user.id,
+      userName: session.user.name,
+      userImage: session.user.image ?? null,
       roomCode: null,
+      isInLobby: false,
       send: (message: unknown) => {
         if (socket.readyState === socket.OPEN) {
           socket.send(JSON.stringify(message));
@@ -24,7 +48,9 @@ async function wsPlugin(fastify: FastifyInstance): Promise<void> {
 
     setClientData(socket, client);
 
-    socket.on('message', (rawData: Buffer | ArrayBuffer | Buffer[]) => {
+    const db = fastify.db;
+
+    socket.on('message', async (rawData: Buffer | ArrayBuffer | Buffer[]) => {
       try {
         const data: unknown = JSON.parse(rawData.toString());
         const result = wsIncomingMessageSchema.safeParse(data);
@@ -38,10 +64,16 @@ async function wsPlugin(fastify: FastifyInstance): Promise<void> {
 
         switch (message.type) {
           case 'join_room':
-            handleJoinRoom(socket, message);
+            await handleJoinRoom(socket, message, db);
             break;
           case 'leave_room':
-            handleLeaveRoom(socket, message);
+            await handleLeaveRoom(socket, message, db);
+            break;
+          case 'subscribe_lobby':
+            handleSubscribeLobby(socket);
+            break;
+          case 'unsubscribe_lobby':
+            handleUnsubscribeLobby(socket);
             break;
           case 'ping': {
             const pongMessage: PongMessage = {
@@ -52,7 +84,8 @@ async function wsPlugin(fastify: FastifyInstance): Promise<void> {
             break;
           }
         }
-      } catch {
+      } catch (error) {
+        fastify.log.error(error, 'WebSocket message handling error');
         sendError(socket, 'PARSE_ERROR', 'Failed to parse message');
       }
     });
