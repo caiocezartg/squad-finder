@@ -82,3 +82,16 @@
 2. Check lessons.md for patterns to avoid
 3. Verify Clean Architecture layers before creating files
 4. Ask: "What does CLAUDE.md say about this?"
+
+## Session: 2026-02-11
+
+### Lesson 9: Always Use Base UI as Foundation for UI Components
+**Context:** Built a custom FAQ accordion with manual `useState`, `grid-template-rows` animation, and custom open/close logic instead of using `@base-ui-components/react` which is already a project dependency.
+**Mistake:** Reinvented the wheel — lost built-in accessibility (aria attributes, keyboard navigation, focus management) and animation support (`--accordion-panel-height`, `data-starting-style`/`data-ending-style`) that Base UI provides out of the box.
+
+**Rule:**
+1. Before building ANY interactive UI component, check if Base UI has a primitive for it (Accordion, Collapsible, Dialog, Popover, Tooltip, Select, Menu, Tabs, etc.)
+2. Always use Base UI headless components as the foundation, then style with Tailwind CSS
+3. Use Base UI's `data-*` attributes (`data-panel-open`, `data-starting-style`, `data-ending-style`) for state-driven styling instead of manual state + conditional classes
+4. Only build custom components when Base UI does not cover the use case
+5. Reference docs via Context7: `@base-ui-components/react`

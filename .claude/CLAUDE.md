@@ -48,7 +48,7 @@ SquadFinder is a real-time web application connecting gamers to complete full te
 ## Tech Stack
 - **Runtime & Package Manager:** Bun (v1.1+)
 - **Language:** TypeScript (Strict mode)
-- **Frontend:** React, Vite, TanStack Router, TanStack Query, Tailwind CSS
+- **Frontend:** React, Vite, TanStack Router, TanStack Query, Tailwind CSS, Base UI (`@base-ui-components/react`)
 - **Backend:** Fastify
 - **Database:** PostgreSQL, Drizzle ORM.
 - **Auth:** Better Auth (Discord OAuth).
@@ -64,6 +64,12 @@ SquadFinder is a real-time web application connecting gamers to complete full te
 - **Bun Specifics:**
   - Use `Bun.env` or `process.env` for environment variables.
   - Use Vitest for unit tests (`bun run test` in both client and server).
+
+### Frontend: Base UI First
+For any interactive UI component (accordion, dialog, popover, tooltip, select, menu, tabs, collapsible, etc.), always use **Base UI** (`@base-ui-components/react`) as the headless foundation:
+1. Check if Base UI has a primitive for the component before building custom logic
+2. Style with Tailwind CSS using Base UI's `data-*` attributes (`data-panel-open`, `data-starting-style`, `data-ending-style`, etc.)
+3. Only build fully custom components when Base UI does not cover the use case
 
 ### Backend: Clean Architecture (SOLID)
 The backend must strictly follow Clean Architecture principles.
