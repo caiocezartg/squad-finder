@@ -52,9 +52,11 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
     },
   });
 
-  // Session hook for API routes only
+  // Session hook for API and WebSocket routes
+  const sessionRoutes = ['/api/', '/ws'];
   fastify.addHook('preHandler', async (request: FastifyRequest) => {
-    if (!request.url.startsWith('/api/') || request.url.startsWith('/api/auth')) return;
+    if (!sessionRoutes.some((prefix) => request.url.startsWith(prefix))) return;
+    if (request.url.startsWith('/api/auth')) return;
 
     const session = await auth.api.getSession({
       headers: request.headers as Record<string, string>,

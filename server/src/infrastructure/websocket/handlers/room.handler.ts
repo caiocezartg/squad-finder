@@ -112,6 +112,7 @@ export async function handleJoinRoom(
       return {
         id: member.userId,
         name: user?.name ?? 'Unknown',
+        image: user?.avatarUrl ?? null,
         isHost: member.userId === room.hostId,
       };
     }),
@@ -137,6 +138,7 @@ export async function handleJoinRoom(
       player: {
         id: client.userId,
         name: client.userName,
+        image: client.userImage,
         isHost: client.userId === room.hostId,
       },
     },

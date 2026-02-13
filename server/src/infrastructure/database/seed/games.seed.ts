@@ -1,14 +1,14 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import pg from 'pg';
-import { games } from '../schema/games';
+import { drizzle } from 'drizzle-orm/node-postgres'
+import pg from 'pg'
+import { games } from '../schema/games'
 
-const { Pool } = pg;
+const { Pool } = pg
 
 const GAMES_DATA = [
   {
     name: 'Roblox',
     slug: 'roblox',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2ekt.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coabhb.webp',
     minPlayers: 2,
     maxPlayers: 50,
   },
@@ -22,132 +22,132 @@ const GAMES_DATA = [
   {
     name: 'Counter-Strike 2',
     slug: 'cs2',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co6v4m.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coaczd.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
   {
     name: 'Fortnite',
     slug: 'fortnite',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co3wk8.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coaxt6.webp',
     minPlayers: 2,
     maxPlayers: 4,
   },
   {
     name: 'Dota 2',
     slug: 'dota2',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co8dj1.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/cobfk4.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
   {
     name: 'League of Legends',
     slug: 'lol',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co49wj.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co49wj.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
   {
     name: 'PUBG: Battlegrounds',
     slug: 'pubg',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co7ozj.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coaam4.webp',
     minPlayers: 2,
     maxPlayers: 4,
   },
   {
     name: 'Free Fire',
     slug: 'freefire',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2r95.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co52c7.webp',
     minPlayers: 2,
     maxPlayers: 4,
   },
   {
     name: 'Valorant',
     slug: 'valorant',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2mvt.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2mvt.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
   {
     name: 'Call of Duty: Warzone',
     slug: 'warzone',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co83hb.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coa8id.webp',
     minPlayers: 2,
     maxPlayers: 4,
   },
   {
     name: 'Apex Legends',
     slug: 'apex',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1wkt.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coa93z.webp',
     minPlayers: 2,
     maxPlayers: 3,
   },
   {
     name: 'GTA Online',
     slug: 'gtaonline',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co2lbd.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co4rq1.webp',
     minPlayers: 2,
     maxPlayers: 30,
   },
   {
     name: 'Rocket League',
     slug: 'rocketleague',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5w0w.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co5w0w.webp',
     minPlayers: 2,
     maxPlayers: 4,
   },
   {
     name: 'Rainbow Six Siege',
     slug: 'r6siege',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co8hn9.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co9yqs.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
   {
     name: 'Among Us',
     slug: 'amongus',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co7pe5.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co6kqt.webp',
     minPlayers: 4,
     maxPlayers: 15,
   },
   {
-    name: 'Overwatch 2',
+    name: 'Overwatch',
     slug: 'overwatch2',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co5tkd.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/cobfow.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
   {
     name: 'World of Warcraft',
     slug: 'wow',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1rk4.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co2l7z.webp',
     minPlayers: 2,
     maxPlayers: 40,
   },
   {
-    name: 'EA Sports FC 25',
+    name: 'EA Sports FC',
     slug: 'fc25',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co91vy.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/coa5wx.webp',
     minPlayers: 2,
     maxPlayers: 22,
   },
   {
     name: 'Dead by Daylight',
     slug: 'dbd',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co7ymu.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co5zky.webp',
     minPlayers: 2,
     maxPlayers: 5,
   },
-];
+]
 
 async function seed() {
   const databaseUrl =
-    process.env['DATABASE_URL'] || 'postgresql://postgres:postgres@localhost:5432/squad_finder';
+    process.env['DATABASE_URL'] || 'postgresql://postgres:postgres@localhost:5432/squad_finder'
 
-  const pool = new Pool({ connectionString: databaseUrl });
-  const db = drizzle(pool);
+  const pool = new Pool({ connectionString: databaseUrl })
+  const db = drizzle(pool)
 
-  console.log('Seeding games...');
+  console.log('Seeding games...')
 
   for (const game of GAMES_DATA) {
     await db
@@ -162,15 +162,15 @@ async function seed() {
           maxPlayers: game.maxPlayers,
           updatedAt: new Date(),
         },
-      });
-    console.log(`  ✓ ${game.name}`);
+      })
+    console.log(`  ✓ ${game.name}`)
   }
 
-  console.log('Done seeding games!');
-  await pool.end();
+  console.log('Done seeding games!')
+  await pool.end()
 }
 
 seed().catch((error) => {
-  console.error('Seed failed:', error);
-  process.exit(1);
-});
+  console.error('Seed failed:', error)
+  process.exit(1)
+})

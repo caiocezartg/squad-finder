@@ -4,6 +4,7 @@ import type { Room } from './index';
 export type Player = {
   id: string;
   name: string;
+  image: string | null;
   isHost: boolean;
 };
 

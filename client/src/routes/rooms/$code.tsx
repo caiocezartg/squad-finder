@@ -1,194 +1,333 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
-import { useSession } from '@/lib/auth-client'
-import { api } from '@/lib/api'
-import { useWebSocket } from '@/hooks/use-websocket'
-import { useMessageLog } from '@/hooks/use-message-log'
-import { useRoomsCache } from '@/hooks/use-rooms-cache'
-import { RoomHeader } from '@/components/rooms/room-header'
-import { PlayersList } from '@/components/rooms/players-list'
-import { WebSocketLog } from '@/components/rooms/web-socket-log'
-import { AlertBox } from '@/components/ui/alert-box'
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@/lib/auth-client";
+import { api } from "@/lib/api";
+import { useWebSocket } from "@/hooks/use-websocket";
+import { useRoomsCache } from "@/hooks/use-rooms-cache";
+import { useTimeAgo } from "@/hooks/use-time-ago";
+import { PlayerSlot } from "@/components/rooms/player-slot";
+import { DiscordLinkCard } from "@/components/rooms/discord-link-card";
+import { AlertBox } from "@/components/ui/alert-box";
 import type {
-  Room,
   RoomResponse,
+  GamesResponse,
   Player,
   RoomJoinedPayload,
   PlayerJoinedPayload,
   PlayerLeftPayload,
-  RoomReadyPayload,
   RoomDeletedPayload,
   WsErrorPayload,
-} from '@/types'
+} from "@/types";
 
-export const Route = createFileRoute('/rooms/$code')({
+export const Route = createFileRoute("/rooms/$code")({
   component: RoomLobbyPage,
-})
+});
 
 function RoomLobbyPage() {
-  const { code } = Route.useParams()
-  const { data: session, isPending: sessionPending } = useSession()
-  const navigate = useNavigate()
-  const { removeRoom } = useRoomsCache()
-  const { messages, addMessage } = useMessageLog()
+  const { code } = Route.useParams();
+  const { data: session, isPending: sessionPending } = useSession();
+  const navigate = useNavigate();
+  const { removeRoom } = useRoomsCache();
+  const queryClient = useQueryClient();
 
-  const [room, setRoom] = useState<Room | null>(null)
-  const [players, setPlayers] = useState<Player[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isRoomReady, setIsRoomReady] = useState(false)
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isRoomReady, setIsRoomReady] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
+
+  // Fetch room data
+  const {
+    data: roomData,
+    isLoading: roomLoading,
+    error: roomError,
+  } = useQuery({
+    queryKey: ["room", code],
+    queryFn: () => api.get<RoomResponse>(`/api/rooms/${code}`),
+  });
+
+  const room = roomData?.room ?? null;
+
+  const timeAgo = useTimeAgo(room?.createdAt);
+
+  // Fetch games for cover image
+  const { data: gamesData } = useQuery({
+    queryKey: ["games"],
+    queryFn: () => api.get<GamesResponse>("/api/games"),
+    staleTime: 60_000,
+  });
+
+  const game = gamesData?.games?.find((g) => g.id === room?.gameId);
 
   // WebSocket connection
-  const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
+  const wsUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws`;
   const { isConnected, send, on } = useWebSocket({
     url: wsUrl,
     autoConnect: true,
-  })
-
-  // Fetch room data
-  useEffect(() => {
-    async function fetchRoom() {
-      try {
-        const data = await api.get<RoomResponse>(`/api/rooms/${code}`)
-        setRoom(data.room)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load room')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchRoom()
-  }, [code])
+  });
 
   // WebSocket event handlers
   useEffect(() => {
-    const unsubscribeJoined = on('room_joined', (raw) => {
-      const data = raw as RoomJoinedPayload
-      addMessage(`Joined room! ${data.players.length} players in room`)
-      setPlayers(data.players)
-    })
+    const unsubscribeJoined = on("room_joined", (raw) => {
+      const data = raw as RoomJoinedPayload;
+      setPlayers(data.players);
+    });
 
-    const unsubscribePlayerJoined = on('player_joined', (raw) => {
-      const data = raw as PlayerJoinedPayload
-      addMessage(`Player joined: ${data.player.name}`)
+    const unsubscribePlayerJoined = on("player_joined", (raw) => {
+      const data = raw as PlayerJoinedPayload;
       setPlayers((prev) => {
-        if (prev.some((p) => p.id === data.player.id)) return prev
-        return [...prev, data.player]
-      })
-    })
+        if (prev.some((p) => p.id === data.player.id)) return prev;
+        return [...prev, data.player];
+      });
+    });
 
-    const unsubscribePlayerLeft = on('player_left', (raw) => {
-      const data = raw as PlayerLeftPayload
-      addMessage(`Player left: ${data.playerId}`)
-      setPlayers((prev) => prev.filter((p) => p.id !== data.playerId))
-    })
+    const unsubscribePlayerLeft = on("player_left", (raw) => {
+      const data = raw as PlayerLeftPayload;
+      setPlayers((prev) => prev.filter((p) => p.id !== data.playerId));
+    });
 
-    const unsubscribeRoomReady = on('room_ready', (raw) => {
-      const data = raw as RoomReadyPayload
-      addMessage(`ROOM READY! ${data.message}`)
-      setIsRoomReady(true)
-    })
+    const unsubscribeRoomReady = on("room_ready", () => {
+      setIsRoomReady(true);
+    });
 
-    const unsubscribeError = on('error', (raw) => {
-      const data = raw as WsErrorPayload
-      addMessage(`Error: ${data.code} - ${data.message}`)
-      setError(data.message)
-    })
+    const unsubscribeError = on("error", (raw) => {
+      const data = raw as WsErrorPayload;
+      setError(data.message);
+    });
 
-    const unsubscribeRoomDeleted = on('room_deleted', (raw) => {
-      const data = raw as RoomDeletedPayload
-      addMessage(`Room deleted: ${data.roomCode}`)
-      removeRoom(data.roomId)
-    })
+    const unsubscribeRoomDeleted = on("room_deleted", (raw) => {
+      const data = raw as RoomDeletedPayload;
+      removeRoom(data.roomId);
+      navigate({ to: "/rooms" });
+    });
 
     return () => {
-      unsubscribeJoined()
-      unsubscribePlayerJoined()
-      unsubscribePlayerLeft()
-      unsubscribeRoomReady()
-      unsubscribeError()
-      unsubscribeRoomDeleted()
-    }
-  }, [on, addMessage, removeRoom])
+      unsubscribeJoined();
+      unsubscribePlayerJoined();
+      unsubscribePlayerLeft();
+      unsubscribeRoomReady();
+      unsubscribeError();
+      unsubscribeRoomDeleted();
+    };
+  }, [on, removeRoom, navigate]);
 
   // Join room via WebSocket when connected
   useEffect(() => {
     if (isConnected && room) {
-      addMessage(`Connected! Joining room ${code}...`)
-      send('join_room', { roomCode: code })
+      send("join_room", { roomCode: code });
     }
-  }, [isConnected, room, code, send, addMessage])
+  }, [isConnected, room, code, send]);
 
   const handleLeaveRoom = async () => {
     try {
-      const isHost = room?.hostId === session?.user?.id
-
-      send('leave_room', { roomCode: code })
-      await api.post(`/api/rooms/${code}/leave`, {})
-
-      // If host leaves, room is deleted - update cache directly
+      const isHost = room?.hostId === session?.user?.id;
+      send("leave_room", { roomCode: code });
+      await api.post(`/api/rooms/${code}/leave`, {});
       if (isHost && room) {
-        removeRoom(room.id)
+        removeRoom(room.id);
       }
-
-      navigate({ to: '/rooms' })
+      await queryClient.invalidateQueries({ queryKey: ["rooms"] });
+      navigate({ to: "/rooms" });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to leave room')
+      setError(err instanceof Error ? err.message : "Failed to leave room");
     }
-  }
+  };
 
-  if (sessionPending || loading) {
+  const handleCopyCode = async () => {
+    await navigator.clipboard.writeText(code);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  };
+
+  // Build empty slots
+  const maxPlayers = room?.maxPlayers ?? 5;
+  const emptySlots = Math.max(0, maxPlayers - players.length);
+
+  if (sessionPending || roomLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">Loading...</p>
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="card h-48 animate-pulse mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="card h-16 animate-pulse" />
+          ))}
+        </div>
       </div>
-    )
+    );
   }
 
   if (!session?.user) {
     return (
-      <div className="flex flex-col items-center justify-center px-4 py-16">
-        <p className="text-gray-600">Please sign in to view this room.</p>
+      <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
+        <p className="text-muted">Please sign in to view this room.</p>
       </div>
-    )
+    );
   }
 
-  if (error && !room) {
+  if (roomError || (error && !room)) {
     return (
-      <div className="flex flex-col items-center justify-center px-4 py-16">
-        <p className="text-red-600">{error}</p>
-        <button onClick={() => navigate({ to: '/rooms' })} className="btn-primary mt-4">
+      <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
+        <p className="text-danger mb-4">
+          {roomError instanceof Error ? roomError.message : error}
+        </p>
+        <Link to="/rooms" className="btn-ghost">
           Back to Rooms
-        </button>
+        </Link>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <RoomHeader room={room} code={code} isConnected={isConnected} />
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Room Header with game cover background */}
+      <div className="relative rounded-2xl overflow-hidden mb-8">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          {game?.coverUrl ? (
+            <img
+              src={game.coverUrl}
+              alt=""
+              className="w-full h-full object-cover scale-110 blur-sm"
+            />
+          ) : (
+            <div className="w-full h-full bg-surface-light" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/85 to-background/70" />
+        </div>
 
-      {error && <AlertBox type="error" message={error} onClose={() => setError(null)} />}
+        {/* Header content */}
+        <div className="relative px-6 py-8 sm:px-8 sm:py-10">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                {game && (
+                  <span className="badge-accent text-[10px]">{game.name}</span>
+                )}
+                <span className="badge-muted text-[10px]">{timeAgo}</span>
+                {/* Connection indicator */}
+                <span
+                  className={`size-2 rounded-full ${isConnected ? "bg-accent" : "bg-danger"}`}
+                />
+              </div>
+              <h1 className="font-heading text-2xl font-bold sm:text-3xl">
+                {room?.name}
+              </h1>
+              <div className="flex items-center gap-3 mt-2">
+                <button
+                  onClick={handleCopyCode}
+                  className="flex items-center gap-1.5 text-sm text-muted hover:text-offwhite transition-colors"
+                >
+                  <span className="font-mono font-bold text-offwhite">
+                    {code}
+                  </span>
+                  <svg
+                    className="size-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  {codeCopied && (
+                    <span className="text-xs text-accent">Copied!</span>
+                  )}
+                </button>
+                <span className="text-sm text-muted">
+                  {players.length}/{maxPlayers} players
+                </span>
+              </div>
+            </div>
 
-      {isRoomReady && <AlertBox type="success" message="Room is full! Ready to play!" />}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PlayersList players={players} maxPlayers={room?.maxPlayers} />
-        <WebSocketLog messages={messages} />
+            {/* Game cover thumbnail */}
+            {game?.coverUrl && (
+              <img
+                src={game.coverUrl}
+                alt={game.name}
+                className="hidden sm:block w-20 h-28 rounded-lg object-cover border border-border shadow-lg"
+              />
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Actions */}
-      <div className="mt-6 flex gap-4">
-        <button onClick={handleLeaveRoom} className="btn bg-red-500 text-white hover:bg-red-600">
-          Leave Room
-        </button>
-        <button
-          onClick={() => navigate({ to: '/rooms' })}
-          className="btn bg-gray-500 text-white hover:bg-gray-600"
-        >
-          Back to Rooms
-        </button>
+      {error && (
+        <div className="mb-6">
+          <AlertBox
+            type="error"
+            message={error}
+            onClose={() => setError(null)}
+          />
+        </div>
+      )}
+
+      {/* Room Ready Banner */}
+      {isRoomReady && (
+        <div className="mb-6 rounded-xl border border-accent/30 bg-accent/5 p-4 text-center">
+          <p className="font-heading text-lg font-bold text-accent">
+            Room is full! Your squad is ready!
+          </p>
+        </div>
+      )}
+
+      {/* Main content grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Players - takes 2 columns */}
+        <div className="lg:col-span-2">
+          <div className="card p-5">
+            <h2 className="font-heading text-sm font-bold text-muted mb-4 uppercase tracking-wider">
+              Players ({players.length}/{maxPlayers})
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {players.map((player, i) => (
+                <PlayerSlot key={player.id} player={player} index={i} />
+              ))}
+              {Array.from({ length: emptySlots }).map((_, i) => (
+                <PlayerSlot key={`empty-${i}`} index={players.length + i} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-4">
+          {/* Discord Link */}
+          {isRoomReady && room?.discordLink && (
+            <DiscordLinkCard
+              discordLink={room.discordLink}
+              isRoomReady={isRoomReady}
+            />
+          )}
+
+          {/* Actions */}
+          <div className="card p-5 space-y-3">
+            <h2 className="font-heading text-sm font-bold text-muted uppercase tracking-wider">
+              Actions
+            </h2>
+            <button
+              onClick={handleLeaveRoom}
+              className="btn-danger w-full gap-2"
+            >
+              <svg
+                className="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16,17 21,12 16,7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Leave Room
+            </button>
+            <Link to="/rooms" className="btn-ghost w-full">
+              Back to Rooms
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
-  )
+  );
 }

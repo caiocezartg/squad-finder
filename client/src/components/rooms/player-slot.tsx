@@ -1,0 +1,58 @@
+import * as motion from "motion/react-client";
+import type { Player } from "@/types";
+
+interface PlayerSlotProps {
+  player?: Player;
+  index: number;
+}
+
+export function PlayerSlot({ player, index }: PlayerSlotProps) {
+  if (!player) {
+    return (
+      <div className="flex items-center gap-3 rounded-xl border border-dashed border-border-light p-3 opacity-40">
+        <div className="size-10 rounded-full bg-surface-light border border-border flex items-center justify-center">
+          <svg
+            className="size-4 text-muted"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+        <span className="text-sm text-muted">Waiting for player...</span>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      className="flex items-center gap-3 rounded-xl border border-border bg-surface-hover/50 p-3"
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+    >
+      {player.image ? (
+        <img
+          src={player.image}
+          alt={player.name}
+          className="size-10 rounded-full border border-accent/20 object-cover shrink-0"
+        />
+      ) : (
+        <div className="size-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-sm font-bold text-accent shrink-0">
+          {player.name.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-offwhite truncate">
+          {player.name}
+        </p>
+      </div>
+      {player.isHost && (
+        <span className="badge-accent text-[10px] shrink-0">Host</span>
+      )}
+    </motion.div>
+  );
+}

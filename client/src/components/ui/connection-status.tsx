@@ -11,27 +11,26 @@ export function ConnectionStatus({
 }: ConnectionStatusProps) {
   if (!isConnected) {
     return (
-      <div className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-        Disconnected
-      </div>
+      <span className="inline-flex items-center gap-1.5 text-xs text-danger">
+        <span className="size-1.5 rounded-full bg-danger" />
+        {showLabel && "Disconnected"}
+      </span>
     );
   }
 
-  if (isSubscribed === undefined) {
+  if (isSubscribed !== undefined && !isSubscribed) {
     return (
-      <div className="inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-        {showLabel ? "Connected" : null}
-      </div>
-    );
-  }
-
-  if (isSubscribed) {
-    return (
-      <span className="text-xs text-green-600 font-normal">(live)</span>
+      <span className="inline-flex items-center gap-1.5 text-xs text-yellow-400">
+        <span className="size-1.5 rounded-full bg-yellow-400 animate-pulse" />
+        {showLabel && "Connecting..."}
+      </span>
     );
   }
 
   return (
-    <span className="text-xs text-yellow-600 font-normal">(connecting...)</span>
+    <span className="inline-flex items-center gap-1.5 text-xs text-accent">
+      <span className="size-1.5 rounded-full bg-accent" />
+      {showLabel && "Live"}
+    </span>
   );
 }

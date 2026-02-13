@@ -1,18 +1,18 @@
-import type { Room, Game } from './index';
+import type { Room, Game } from './index'
 
 // API Response Types
 export type RoomsResponse = {
-  rooms: Room[];
-};
+  rooms: Room[]
+}
 
 export type RoomResponse = {
-  room: Room;
-};
+  room: Room
+}
 
 export type GamesResponse = {
-  games: Game[];
-};
+  games: Game[]
+}
 
 export type CreateRoomResponse = {
-  room: Room;
-};
+  room: Room
+}

@@ -38,6 +38,9 @@ export const roomSchema = z.object({
   gameId: z.string().uuid(),
   status: roomStatusSchema,
   maxPlayers: z.number().int(),
+  discordLink: z.string().url().nullable(),
+  memberCount: z.number().int().optional(),
+  isMember: z.boolean().optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 });
@@ -59,6 +62,7 @@ export const createRoomInputSchema = z.object({
   name: z.string().min(1, 'Room name is required').max(100, 'Room name too long'),
   gameId: z.string().uuid('Invalid game ID'),
   maxPlayers: z.number().int().min(2).max(20).optional(),
+  discordLink: z.string().url('Invalid Discord link'),
 });
 
 export type CreateRoomInput = z.infer<typeof createRoomInputSchema>;

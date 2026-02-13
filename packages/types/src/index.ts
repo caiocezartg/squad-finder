@@ -32,6 +32,9 @@ export type Room = {
   gameId: string;
   status: RoomStatus;
   maxPlayers: number;
+  discordLink: string | null;
+  memberCount?: number;
+  isMember?: boolean;
   createdAt: Date;
   updatedAt: Date;
 };

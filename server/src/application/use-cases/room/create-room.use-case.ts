@@ -6,6 +6,7 @@ export interface CreateRoomInput {
   readonly hostId: string;
   readonly gameId: string;
   readonly maxPlayers?: number;
+  readonly discordLink: string;
 }
 
 export interface CreateRoomOutput {
@@ -25,6 +26,7 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
       hostId: input.hostId,
       gameId: input.gameId,
       maxPlayers: input.maxPlayers,
+      discordLink: input.discordLink,
     });
 
     return { room };

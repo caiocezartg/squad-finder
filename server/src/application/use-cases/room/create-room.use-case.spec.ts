@@ -26,6 +26,7 @@ describe('CreateRoomUseCase', () => {
         hostId: 'host-123',
         gameId: 'game-123',
         maxPlayers: 5,
+        discordLink: 'https://discord.gg/test',
       });
 
       expect(result.room.name).toBe('My Room');
@@ -37,6 +38,7 @@ describe('CreateRoomUseCase', () => {
         hostId: 'host-123',
         gameId: 'game-123',
         maxPlayers: 5,
+        discordLink: 'https://discord.gg/test',
       });
       expect(mockRoomRepository.create).toHaveBeenCalledOnce();
     });
@@ -49,6 +51,7 @@ describe('CreateRoomUseCase', () => {
         name: 'Test Room',
         hostId: 'host-123',
         gameId: 'game-123',
+        discordLink: 'https://discord.gg/test',
       });
 
       expect(result.room.code).toMatch(/^[A-Z0-9]{6}$/);
@@ -62,6 +65,7 @@ describe('CreateRoomUseCase', () => {
         name: 'Test Room',
         hostId: 'host-123',
         gameId: 'game-123',
+        discordLink: 'https://discord.gg/test',
       });
 
       // Use case passes values as-is, repository handles defaults
@@ -70,6 +74,7 @@ describe('CreateRoomUseCase', () => {
         hostId: 'host-123',
         gameId: 'game-123',
         maxPlayers: undefined,
+        discordLink: 'https://discord.gg/test',
       });
     });
 
@@ -82,11 +87,13 @@ describe('CreateRoomUseCase', () => {
         hostId: 'host-123',
         gameId: 'game-123',
         maxPlayers: 10,
+        discordLink: 'https://discord.gg/test',
       });
 
       expect(mockRoomRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           maxPlayers: 10,
+          discordLink: 'https://discord.gg/test',
         }),
       );
     });

@@ -55,6 +55,7 @@ export const roomJoinedMessageSchema = baseWsMessageSchema.extend({
       z.object({
         id: z.string().uuid(),
         name: z.string(),
+        image: z.string().nullable(),
         isHost: z.boolean(),
       })
     ),
@@ -67,6 +68,7 @@ export const playerJoinedMessageSchema = baseWsMessageSchema.extend({
     player: z.object({
       id: z.string().uuid(),
       name: z.string(),
+      image: z.string().nullable(),
       isHost: z.boolean(),
     }),
   }),
