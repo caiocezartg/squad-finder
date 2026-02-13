@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  VITE_API_URL: z.string().url().optional().default("http://localhost:3000"),
+  VITE_API_URL: z.url().optional().default("http://localhost:3000"),
 });
 
 function validateEnv() {
@@ -12,7 +12,7 @@ function validateEnv() {
   const result = envSchema.safeParse(env);
 
   if (!result.success) {
-    console.error("Invalid environment variables:", result.error.flatten());
+    console.error("Invalid environment variables:", z.treeifyError(result.error));
     throw new Error("Invalid environment variables");
   }
 

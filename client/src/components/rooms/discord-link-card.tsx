@@ -18,7 +18,11 @@ export function DiscordLinkCard({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!isRoomReady) return null;
+  const isValidDiscordLink =
+    discordLink.startsWith("https://discord.gg/") ||
+    discordLink.startsWith("https://discord.com/invite/");
+
+  if (!isRoomReady || !isValidDiscordLink) return null;
 
   return (
     <motion.div

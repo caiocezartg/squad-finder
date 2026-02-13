@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRoomsCache } from "./use-rooms-cache";
-import type { RoomCreatedPayload, RoomDeletedPayload } from "@/types";
+import { parseWsPayload } from "@/lib/ws-validators";
+import {
+  roomCreatedPayloadSchema,
+  roomDeletedPayloadSchema,
+} from "@squadfinder/schemas/ws";
 import type { WebSocketEventHandler } from "@/lib/ws-client";
 
 export interface UseLobbyEventsOptions {
@@ -29,12 +33,14 @@ export function useLobbyEvents({
     });
 
     const unsubscribeCreated = on("room_created", (raw) => {
-      const data = raw as RoomCreatedPayload;
+      const data = parseWsPayload(roomCreatedPayloadSchema, raw);
+      if (!data) return;
       addRoom(data.room);
     });
 
     const unsubscribeDeleted = on("room_deleted", (raw) => {
-      const data = raw as RoomDeletedPayload;
+      const data = parseWsPayload(roomDeletedPayloadSchema, raw);
+      if (!data) return;
       removeRoom(data.roomId);
     });
 

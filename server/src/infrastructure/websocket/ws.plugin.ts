@@ -14,9 +14,7 @@ import {
 
 async function wsPlugin(fastify: FastifyInstance): Promise<void> {
   fastify.get('/ws', { websocket: true }, async (socket: WebSocket, request: FastifyRequest) => {
-    // Debug: log cookies and session state
     fastify.log.info({
-      cookies: request.headers.cookie,
       hasSession: !!request.session,
       sessionUser: request.session?.user?.id,
     }, 'WebSocket connection attempt');

@@ -9,16 +9,15 @@ import { useTimeAgo } from "@/hooks/use-time-ago";
 import { PlayerSlot } from "@/components/rooms/player-slot";
 import { DiscordLinkCard } from "@/components/rooms/discord-link-card";
 import { AlertBox } from "@/components/ui/alert-box";
-import type {
-  RoomResponse,
-  GamesResponse,
-  Player,
-  RoomJoinedPayload,
-  PlayerJoinedPayload,
-  PlayerLeftPayload,
-  RoomDeletedPayload,
-  WsErrorPayload,
-} from "@/types";
+import { parseWsPayload } from "@/lib/ws-validators";
+import {
+  roomJoinedPayloadSchema,
+  playerJoinedPayloadSchema,
+  playerLeftPayloadSchema,
+  errorPayloadSchema,
+  roomDeletedPayloadSchema,
+} from "@squadfinder/schemas/ws";
+import type { RoomResponse, GamesResponse, Player } from "@/types";
 
 export const Route = createFileRoute("/rooms/$code")({
   component: RoomLobbyPage,
@@ -69,12 +68,14 @@ function RoomLobbyPage() {
   // WebSocket event handlers
   useEffect(() => {
     const unsubscribeJoined = on("room_joined", (raw) => {
-      const data = raw as RoomJoinedPayload;
+      const data = parseWsPayload(roomJoinedPayloadSchema, raw);
+      if (!data) return;
       setPlayers(data.players);
     });
 
     const unsubscribePlayerJoined = on("player_joined", (raw) => {
-      const data = raw as PlayerJoinedPayload;
+      const data = parseWsPayload(playerJoinedPayloadSchema, raw);
+      if (!data) return;
       setPlayers((prev) => {
         if (prev.some((p) => p.id === data.player.id)) return prev;
         return [...prev, data.player];
@@ -82,7 +83,8 @@ function RoomLobbyPage() {
     });
 
     const unsubscribePlayerLeft = on("player_left", (raw) => {
-      const data = raw as PlayerLeftPayload;
+      const data = parseWsPayload(playerLeftPayloadSchema, raw);
+      if (!data) return;
       setPlayers((prev) => prev.filter((p) => p.id !== data.playerId));
     });
 
@@ -91,12 +93,14 @@ function RoomLobbyPage() {
     });
 
     const unsubscribeError = on("error", (raw) => {
-      const data = raw as WsErrorPayload;
+      const data = parseWsPayload(errorPayloadSchema, raw);
+      if (!data) return;
       setError(data.message);
     });
 
     const unsubscribeRoomDeleted = on("room_deleted", (raw) => {
-      const data = raw as RoomDeletedPayload;
+      const data = parseWsPayload(roomDeletedPayloadSchema, raw);
+      if (!data) return;
       removeRoom(data.roomId);
       navigate({ to: "/rooms" });
     });

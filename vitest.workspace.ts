@@ -37,7 +37,7 @@ export default defineWorkspace([
       name: 'packages',
       root: './packages',
       environment: 'node',
-      include: ['shared/src/**/*.{test,spec}.ts'],
+      include: ['*/src/**/*.{test,spec}.ts'],
       exclude: ['**/node_modules/**', 'dist'],
       globals: true,
     },
