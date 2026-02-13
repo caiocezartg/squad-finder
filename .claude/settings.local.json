@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run typecheck:*)",
+      "Bash(bun test:*)",
+      "WebFetch(domain:turborepo.dev)",
+      "Bash(bun add:*)",
+      "Bash(bun run test:*)",
+      "Bash(bun run lint:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

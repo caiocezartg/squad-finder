@@ -1,23 +1,33 @@
 # SquadFinder - Task Progress
 
-## Current Task: Phase 3 - WebSocket Real-time
-
-### Tasks
-- [ ] Add WebSocket authentication via session cookie
-- [ ] Update room handler to validate room exists in database
-- [ ] Fetch real player data (name, avatar, isHost) from database
-- [ ] Add `room_ready` message type for full rooms
-- [ ] Emit `room_ready` when room reaches maxPlayers
-- [ ] Test WebSocket flow end-to-end
-
-### Files to Modify
-- `server/src/infrastructure/websocket/ws.plugin.ts` - Add auth
-- `server/src/infrastructure/websocket/handlers/room.handler.ts` - DB integration
-- `server/src/infrastructure/websocket/types.ts` - Add room_ready type
-
----
-
 ## Completed Tasks
+
+### Frontend Redesign with Dark Theme (2026-02-08)
+- [x] Add `discordLink` field to Room entity (domain, DB schema, types, schemas, repository, controller, use case)
+- [x] Update mock room factory and all 23 tests pass
+- [x] Install `@base-ui-components/react` and `motion` (motion.dev)
+- [x] Add Google Fonts (Exo 2 for headings, Plus Jakarta Sans for body)
+- [x] Dark theme Tailwind config (background #0A0A0B, accent #00FFA2, custom color palette)
+- [x] Redesigned `globals.css` with `.btn-accent`, `.btn-ghost`, `.btn-danger`, `.card`, `.card-hover`, `.badge-accent`, `.input-field`
+- [x] Root layout: glassmorphism navbar with `backdrop-blur-xl`, user dropdown menu, Discord sign-in
+- [x] Landing page: Hero with animated heading (Motion), How It Works 3-step cards, Popular Games grid (TanStack Query), CTA banner
+- [x] Rooms page: search by game/room name, filter chips (All, Has Space, Almost Full), sort (Newest/Oldest), responsive 3-column grid
+- [x] Create Room modal: Base UI Dialog with fields for name, game, max players, Discord link
+- [x] Room lobby: game cover blurred background header, player slots grid with empty placeholders, Discord link card with copy button
+- [x] Updated AlertBox (dark theme with icons) and ConnectionStatus (minimal dot indicator)
+- [x] New components: `HeroSection`, `HowItWorks`, `PopularGames`, `CTABanner`, `RoomFilters`, `CreateRoomModal`, `EmptyState`, `PlayerSlot`, `DiscordLinkCard`
+- [x] New hooks: `useTimeAgo` (relative time with auto-refresh)
+- [x] Rooms page now public (no auth required to view, only to create/join)
+- [x] All 23 tests passing, typecheck pass, lint pass (0 errors, 0 warnings)
+
+### Phase 3 - WebSocket Real-time (2026-02-07)
+- [x] Add WebSocket authentication via session cookie (`ws.plugin.ts` checks `request.session`)
+- [x] Update room handler to validate room exists in database (`DrizzleRoomRepository.findByCode()`)
+- [x] Fetch real player data (name, avatar, isHost) from database (`DrizzleUserRepository`)
+- [x] Add `room_ready` message type for full rooms (`roomReadyMessageSchema` in `types.ts`)
+- [x] Emit `room_ready` when room reaches maxPlayers (`handleJoinRoom` broadcasts when full)
+- [x] Lobby subscription system (`subscribe_lobby`, `room_created`, `room_deleted` broadcasts)
+- [x] Test WebSocket flow end-to-end
 
 ### Swagger API Documentation with Scalar (2026-02-08)
 - [x] Install `fastify-type-provider-zod@6`, `@fastify/swagger@9`, `@scalar/fastify-api-reference`
