@@ -101,6 +101,58 @@ describe('JoinRoomUseCase', () => {
       expect(mockRoomMemberRepository.create).not.toHaveBeenCalled();
     });
 
+    it('should set completedAt when last player joins', async () => {
+      const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 3 });
+      const expectedMember = createMockRoomMember({
+        roomId: 'room-1',
+        userId: 'user-3',
+      });
+
+      mockRoomRepository.findById.mockResolvedValue(room);
+      mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null);
+      // First call (before create): 2 members, room not full yet
+      // Second call (after create): 3 members, room is now full
+      mockRoomMemberRepository.countByRoomId
+        .mockResolvedValueOnce(2)
+        .mockResolvedValueOnce(3);
+      mockRoomMemberRepository.create.mockResolvedValue(expectedMember);
+      mockRoomRepository.update.mockResolvedValue(
+        createMockRoom({ ...room, completedAt: new Date() }),
+      );
+
+      const result = await useCase.execute({
+        roomId: 'room-1',
+        userId: 'user-3',
+      });
+
+      expect(result.roomMember).toEqual(expectedMember);
+      expect(mockRoomRepository.update).toHaveBeenCalledWith('room-1', {
+        completedAt: expect.any(Date),
+      });
+    });
+
+    it('should not set completedAt when room is not full after join', async () => {
+      const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 5 });
+      const expectedMember = createMockRoomMember({
+        roomId: 'room-1',
+        userId: 'user-2',
+      });
+
+      mockRoomRepository.findById.mockResolvedValue(room);
+      mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null);
+      mockRoomMemberRepository.countByRoomId
+        .mockResolvedValueOnce(1)
+        .mockResolvedValueOnce(2);
+      mockRoomMemberRepository.create.mockResolvedValue(expectedMember);
+
+      await useCase.execute({
+        roomId: 'room-1',
+        userId: 'user-2',
+      });
+
+      expect(mockRoomRepository.update).not.toHaveBeenCalled();
+    });
+
     it('should throw RoomNotWaitingError if room status is not waiting', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'playing', maxPlayers: 5 });
 

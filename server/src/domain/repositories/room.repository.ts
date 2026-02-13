@@ -7,6 +7,7 @@ export interface IRoomRepository {
   findAll(): Promise<Room[]>;
   findAvailable(): Promise<Room[]>;
   create(input: CreateRoomInput): Promise<Room>;
+  findExpiredRooms(beforeDate: Date): Promise<Room[]>;
   update(id: string, input: UpdateRoomInput): Promise<Room | null>;
   delete(id: string): Promise<boolean>;
 }

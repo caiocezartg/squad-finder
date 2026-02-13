@@ -1,8 +1,9 @@
-import { eq } from 'drizzle-orm';
+import { eq, count, lte } from 'drizzle-orm';
 import type { CreateRoomInput, Room, UpdateRoomInput } from '@domain/entities/room.entity';
 import type { IRoomRepository } from '@domain/repositories/room.repository';
 import type { Database } from '@infrastructure/database/drizzle';
 import { rooms, type RoomRow } from '@infrastructure/database/schema/rooms';
+import { roomMembers } from '@infrastructure/database/schema/room-members';
 
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -22,6 +23,8 @@ function mapRowToEntity(row: RoomRow): Room {
     gameId: row.gameId,
     status: row.status,
     maxPlayers: row.maxPlayers,
+    discordLink: row.discordLink,
+    completedAt: row.completedAt,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   };
@@ -53,7 +56,28 @@ export class DrizzleRoomRepository implements IRoomRepository {
   }
 
   async findAvailable(): Promise<Room[]> {
-    const result = await this.db.select().from(rooms).where(eq(rooms.status, 'waiting'));
+    const result = await this.db
+      .select({
+        room: rooms,
+        memberCount: count(roomMembers.id),
+      })
+      .from(rooms)
+      .leftJoin(roomMembers, eq(rooms.id, roomMembers.roomId))
+      .where(eq(rooms.status, 'waiting'))
+      .groupBy(rooms.id);
+
+    return result.map((row) => ({
+      ...mapRowToEntity(row.room),
+      memberCount: row.memberCount,
+    }));
+  }
+
+  async findExpiredRooms(beforeDate: Date): Promise<Room[]> {
+    const result = await this.db
+      .select()
+      .from(rooms)
+      .where(lte(rooms.completedAt, beforeDate));
+
     return result.map(mapRowToEntity);
   }
 
@@ -68,6 +92,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
         hostId: input.hostId,
         gameId: input.gameId,
         maxPlayers: input.maxPlayers ?? 5,
+        discordLink: input.discordLink ?? null,
       })
       .returning();
 
@@ -83,6 +108,8 @@ export class DrizzleRoomRepository implements IRoomRepository {
       name: string;
       status: 'waiting' | 'playing' | 'finished';
       maxPlayers: number;
+      discordLink: string;
+      completedAt: Date;
       updatedAt: Date;
     }> = {
       updatedAt: new Date(),
@@ -96,6 +123,12 @@ export class DrizzleRoomRepository implements IRoomRepository {
     }
     if (input.maxPlayers !== undefined) {
       updateData.maxPlayers = input.maxPlayers;
+    }
+    if (input.discordLink !== undefined) {
+      updateData.discordLink = input.discordLink;
+    }
+    if (input.completedAt !== undefined) {
+      updateData.completedAt = input.completedAt;
     }
 
     const result = await this.db.update(rooms).set(updateData).where(eq(rooms.id, id)).returning();

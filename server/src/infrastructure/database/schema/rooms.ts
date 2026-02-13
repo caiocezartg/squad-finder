@@ -16,6 +16,8 @@ export const rooms = pgTable('rooms', {
     .references(() => games.id, { onDelete: 'restrict' }),
   status: roomStatusEnum('status').notNull().default('waiting'),
   maxPlayers: integer('max_players').notNull().default(5),
+  discordLink: text('discord_link'),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

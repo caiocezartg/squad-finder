@@ -55,6 +55,14 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       userId: input.userId,
     });
 
+    // Set completedAt when room reaches max players (triggers auto-deletion after 5 min)
+    const newMemberCount = await this.roomMemberRepository.countByRoomId(input.roomId);
+    if (newMemberCount >= room.maxPlayers) {
+      await this.roomRepository.update(input.roomId, {
+        completedAt: new Date(),
+      });
+    }
+
     return { roomMember };
   }
 }

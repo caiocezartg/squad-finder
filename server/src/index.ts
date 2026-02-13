@@ -8,6 +8,7 @@ import databasePlugin from '@infrastructure/plugins/database.plugin';
 import authPlugin from '@infrastructure/plugins/auth.plugin';
 import swaggerPlugin from '@infrastructure/plugins/swagger.plugin';
 import wsPlugin from '@infrastructure/websocket/ws.plugin';
+import roomCleanupPlugin from '@infrastructure/plugins/room-cleanup.plugin';
 import { registerRoutes } from '@interface/routes';
 
 async function buildServer() {
@@ -44,6 +45,7 @@ async function buildServer() {
   await fastify.register(databasePlugin);
   await fastify.register(authPlugin);
   await fastify.register(wsPlugin);
+  await fastify.register(roomCleanupPlugin);
   await registerRoutes(fastify);
 
   return fastify;
