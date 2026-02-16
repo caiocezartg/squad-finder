@@ -8,6 +8,7 @@ export const wsMessageTypeSchema = z.enum([
   'room_left',
   'player_joined',
   'player_left',
+  'viewer_left',
   'room_ready',
   'game_start',
   'game_end',
@@ -74,6 +75,14 @@ export const playerLeftMessageSchema = baseWsMessageSchema.extend({
   type: z.literal('player_left'),
   payload: z.object({
     playerId: z.string(),
+  }),
+})
+
+export const viewerLeftMessageSchema = baseWsMessageSchema.extend({
+  type: z.literal('viewer_left'),
+  payload: z.object({
+    playerId: z.string(),
+    roomCode: z.string().length(6),
   }),
 })
 
@@ -145,6 +154,7 @@ export const wsIncomingMessageSchema = z.discriminatedUnion('type', [
 export const roomJoinedPayloadSchema = roomJoinedMessageSchema.shape.payload
 export const playerJoinedPayloadSchema = playerJoinedMessageSchema.shape.payload
 export const playerLeftPayloadSchema = playerLeftMessageSchema.shape.payload
+export const viewerLeftPayloadSchema = viewerLeftMessageSchema.shape.payload
 export const roomReadyPayloadSchema = roomReadyMessageSchema.shape.payload
 export const errorPayloadSchema = errorMessageSchema.shape.payload
 export const roomCreatedPayloadSchema = roomCreatedMessageSchema.shape.payload
@@ -157,6 +167,7 @@ export type LeaveRoomMessage = z.infer<typeof leaveRoomMessageSchema>
 export type RoomJoinedMessage = z.infer<typeof roomJoinedMessageSchema>
 export type PlayerJoinedMessage = z.infer<typeof playerJoinedMessageSchema>
 export type PlayerLeftMessage = z.infer<typeof playerLeftMessageSchema>
+export type ViewerLeftMessage = z.infer<typeof viewerLeftMessageSchema>
 export type RoomReadyMessage = z.infer<typeof roomReadyMessageSchema>
 export type ErrorMessage = z.infer<typeof errorMessageSchema>
 export type PingMessage = z.infer<typeof pingMessageSchema>

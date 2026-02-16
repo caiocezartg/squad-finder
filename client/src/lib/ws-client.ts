@@ -42,6 +42,11 @@ export class WebSocketClient {
     this.ws = new WebSocket(this.url)
 
     this.ws.onopen = () => {
+      // Connection succeeded, clear any pending reconnect timer.
+      if (this.reconnectTimeoutId) {
+        clearTimeout(this.reconnectTimeoutId)
+        this.reconnectTimeoutId = null
+      }
       this.reconnectAttempts = 0
       this.onOpenCallback?.()
     }
@@ -128,6 +133,10 @@ export class WebSocketClient {
   }
 
   private scheduleReconnect(): void {
+    if (this.reconnectTimeoutId) {
+      return
+    }
+
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached')
       return
@@ -141,6 +150,7 @@ export class WebSocketClient {
     )
 
     this.reconnectTimeoutId = setTimeout(() => {
+      this.reconnectTimeoutId = null
       this.connect()
     }, delay)
   }

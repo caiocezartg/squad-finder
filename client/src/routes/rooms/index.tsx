@@ -1,13 +1,14 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useSession } from '@/lib/auth-client'
+import { signIn, useSession } from '@/lib/auth-client'
 import { api } from '@/lib/api'
 import { useWebSocket } from '@/hooks/use-websocket'
 import { useLobbyEvents } from '@/hooks/use-lobby-events'
 import { RoomCard } from '@/components/rooms/room-card'
 import { RoomFilters } from '@/components/rooms/room-filters'
 import { CreateRoomModal } from '@/components/rooms/create-room-modal'
+import { JoinRoomAuthModal } from '@/components/rooms/join-room-auth-modal'
 import { EmptyState } from '@/components/rooms/empty-state'
 import { Pagination } from '@/components/ui/pagination'
 import { usePagination } from '@/hooks/use-pagination'
@@ -24,9 +25,12 @@ function RoomsPage() {
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [joinAuthModalOpen, setJoinAuthModalOpen] = useState(false)
+  const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('newest')
+  const autoJoinCodeRef = useRef<string | null>(null)
   const queryClient = useQueryClient()
 
   // WebSocket for real-time room list updates
@@ -78,12 +82,43 @@ function RoomsPage() {
     },
   })
 
+  useEffect(() => {
+    if (!session?.user) return
+
+    const params = new URLSearchParams(window.location.search)
+    const joinCode = params.get('join')
+
+    if (!joinCode || autoJoinCodeRef.current === joinCode) {
+      return
+    }
+
+    autoJoinCodeRef.current = joinCode
+    joinRoomMutation.mutate(joinCode, {
+      onSettled: () => {
+        const nextParams = new URLSearchParams(window.location.search)
+        nextParams.delete('join')
+        const searchString = nextParams.toString()
+        const nextUrl = `${window.location.pathname}${searchString ? `?${searchString}` : ''}`
+        window.history.replaceState({}, '', nextUrl)
+      },
+    })
+  }, [session?.user, joinRoomMutation])
+
+  const handleSignInToJoin = () => {
+    if (!pendingJoinCode) return
+
+    signIn.social({
+      provider: 'discord',
+      callbackURL: `${window.location.origin}/rooms?join=${encodeURIComponent(pendingJoinCode)}`,
+    })
+  }
+
   const loading = roomsLoading || gamesLoading
   const roomCount = roomsData?.rooms?.length ?? 0
 
   const gamesMap = useMemo(
     () => new Map<string, Game>((gamesData?.games ?? []).map((g) => [g.id, g])),
-    [gamesData?.games],
+    [gamesData?.games]
   )
 
   // Filter and sort rooms
@@ -223,6 +258,10 @@ function RoomsPage() {
                 onJoin={(code) => {
                   if (room.isMember) {
                     navigate({ to: '/rooms/$code', params: { code } })
+                  } else if (!session?.user) {
+                    setError(null)
+                    setPendingJoinCode(code)
+                    setJoinAuthModalOpen(true)
                   } else {
                     joinRoomMutation.mutate(code)
                   }
@@ -256,6 +295,18 @@ function RoomsPage() {
           onOpenChange={setModalOpen}
         />
       )}
+
+      <JoinRoomAuthModal
+        open={joinAuthModalOpen}
+        roomCode={pendingJoinCode}
+        onOpenChange={(open) => {
+          setJoinAuthModalOpen(open)
+          if (!open) {
+            setPendingJoinCode(null)
+          }
+        }}
+        onSignIn={handleSignInToJoin}
+      />
     </div>
   )
 }

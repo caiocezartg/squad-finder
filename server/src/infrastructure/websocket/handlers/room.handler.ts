@@ -1,8 +1,8 @@
-import type { WebSocket } from '@fastify/websocket';
-import type { Database } from '@infrastructure/database/drizzle';
-import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository';
-import { DrizzleRoomMemberRepository } from '@infrastructure/repositories/drizzle-room-member.repository';
-import { DrizzleUserRepository } from '@infrastructure/repositories/drizzle-user.repository';
+import type { WebSocket } from '@fastify/websocket'
+import type { Database } from '@infrastructure/database/drizzle'
+import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository'
+import { DrizzleRoomMemberRepository } from '@infrastructure/repositories/drizzle-room-member.repository'
+import { DrizzleUserRepository } from '@infrastructure/repositories/drizzle-user.repository'
 import type {
   JoinRoomMessage,
   LeaveRoomMessage,
@@ -10,44 +10,45 @@ import type {
   RoomJoinedMessage,
   PlayerJoinedMessage,
   PlayerLeftMessage,
+  ViewerLeftMessage,
   RoomReadyMessage,
   ErrorMessage,
   LobbySubscribedMessage,
   RoomCreatedMessage,
   RoomDeletedMessage,
-} from '../types';
-import type { Room } from '@domain/entities/room.entity';
+} from '../types'
+import type { Room } from '@domain/entities/room.entity'
 
-type RoomClients = Map<string, Set<WebSocket>>;
+type RoomClients = Map<string, Set<WebSocket>>
 
 // In-memory map for tracking WebSocket connections per room
-const rooms: RoomClients = new Map();
-const clientData: WeakMap<WebSocket, WsClient> = new WeakMap();
+const rooms: RoomClients = new Map()
+const clientData: WeakMap<WebSocket, WsClient> = new WeakMap()
 
 // Track lobby subscribers (users viewing the room list)
-const lobbySubscribers: Set<WebSocket> = new Set();
+const lobbySubscribers: Set<WebSocket> = new Set()
 
 export function setClientData(socket: WebSocket, data: WsClient): void {
-  clientData.set(socket, data);
+  clientData.set(socket, data)
 }
 
 export function getClientData(socket: WebSocket): WsClient | undefined {
-  return clientData.get(socket);
+  return clientData.get(socket)
 }
 
 function sendToSocket(socket: WebSocket, message: unknown): void {
   if (socket.readyState === socket.OPEN) {
-    socket.send(JSON.stringify(message));
+    socket.send(JSON.stringify(message))
   }
 }
 
 function broadcastToRoom(roomCode: string, message: unknown, excludeSocket?: WebSocket): void {
-  const roomSockets = rooms.get(roomCode);
-  if (!roomSockets) return;
+  const roomSockets = rooms.get(roomCode)
+  if (!roomSockets) return
 
   for (const socket of roomSockets) {
     if (socket !== excludeSocket) {
-      sendToSocket(socket, message);
+      sendToSocket(socket, message)
     }
   }
 }
@@ -60,63 +61,68 @@ export function sendError(socket: WebSocket, code: string, message: string): voi
       code,
       message,
     },
-  };
-  sendToSocket(socket, errorMessage);
+  }
+  sendToSocket(socket, errorMessage)
 }
 
 export async function handleJoinRoom(
   socket: WebSocket,
   message: JoinRoomMessage,
-  db: Database,
+  db: Database
 ): Promise<void> {
-  const { roomCode } = message.payload;
-  const client = getClientData(socket);
+  const { roomCode } = message.payload
+  const client = getClientData(socket)
 
   if (!client) {
-    sendError(socket, 'INVALID_CLIENT', 'Client not initialized');
-    return;
+    sendError(socket, 'INVALID_CLIENT', 'Client not initialized')
+    return
   }
 
-  const roomRepository = new DrizzleRoomRepository(db);
-  const roomMemberRepository = new DrizzleRoomMemberRepository(db);
-  const userRepository = new DrizzleUserRepository(db);
+  if (!client.userId) {
+    sendError(socket, 'UNAUTHORIZED', 'Authentication required')
+    return
+  }
+
+  const roomRepository = new DrizzleRoomRepository(db)
+  const roomMemberRepository = new DrizzleRoomMemberRepository(db)
+  const userRepository = new DrizzleUserRepository(db)
 
   // Validate room exists
-  const room = await roomRepository.findByCode(roomCode);
+  const room = await roomRepository.findByCode(roomCode)
   if (!room) {
-    sendError(socket, 'ROOM_NOT_FOUND', `Room "${roomCode}" not found`);
-    return;
+    sendError(socket, 'ROOM_NOT_FOUND', `Room "${roomCode}" not found`)
+    return
   }
 
   // Validate user is a member of the room
-  const membership = await roomMemberRepository.findByRoomAndUser(room.id, client.userId);
+  const membership = await roomMemberRepository.findByRoomAndUser(room.id, client.userId)
   if (!membership) {
-    sendError(socket, 'NOT_ROOM_MEMBER', 'You are not a member of this room');
-    return;
+    sendError(socket, 'NOT_ROOM_MEMBER', 'You are not a member of this room')
+    return
   }
 
   // Add socket to room
-  let roomSockets = rooms.get(roomCode);
+  let roomSockets = rooms.get(roomCode)
   if (!roomSockets) {
-    roomSockets = new Set();
-    rooms.set(roomCode, roomSockets);
+    roomSockets = new Set()
+    rooms.set(roomCode, roomSockets)
   }
-  roomSockets.add(socket);
-  client.roomCode = roomCode;
+  roomSockets.add(socket)
+  client.roomCode = roomCode
 
   // Fetch all room members with user data
-  const members = await roomMemberRepository.findByRoomId(room.id);
+  const members = await roomMemberRepository.findByRoomId(room.id)
   const players = await Promise.all(
     members.map(async (member) => {
-      const user = await userRepository.findById(member.userId);
+      const user = await userRepository.findById(member.userId)
       return {
         id: member.userId,
         name: user?.name ?? 'Unknown',
         image: user?.avatarUrl ?? null,
         isHost: member.userId === room.hostId,
-      };
-    }),
-  );
+      }
+    })
+  )
 
   // Send room_joined to the joining client
   const joinedMessage: RoomJoinedMessage = {
@@ -127,8 +133,8 @@ export async function handleJoinRoom(
       roomCode: room.code,
       players,
     },
-  };
-  sendToSocket(socket, joinedMessage);
+  }
+  sendToSocket(socket, joinedMessage)
 
   // Broadcast player_joined to other clients in the room
   const playerJoinedMessage: PlayerJoinedMessage = {
@@ -137,16 +143,16 @@ export async function handleJoinRoom(
     payload: {
       player: {
         id: client.userId,
-        name: client.userName,
+        name: client.userName ?? 'Unknown',
         image: client.userImage,
         isHost: client.userId === room.hostId,
       },
     },
-  };
-  broadcastToRoom(roomCode, playerJoinedMessage, socket);
+  }
+  broadcastToRoom(roomCode, playerJoinedMessage, socket)
 
   // Check if room is now full
-  const memberCount = await roomMemberRepository.countByRoomId(room.id);
+  const memberCount = await roomMemberRepository.countByRoomId(room.id)
   if (memberCount >= room.maxPlayers) {
     const roomReadyMessage: RoomReadyMessage = {
       type: 'room_ready',
@@ -156,31 +162,36 @@ export async function handleJoinRoom(
         roomCode: room.code,
         message: 'Room is full! Time to play!',
       },
-    };
-    broadcastToRoom(roomCode, roomReadyMessage);
+    }
+    broadcastToRoom(roomCode, roomReadyMessage)
   }
 }
 
 export async function handleLeaveRoom(
   socket: WebSocket,
   message: LeaveRoomMessage,
-  _db: Database,
+  _db: Database
 ): Promise<void> {
-  const { roomCode } = message.payload;
-  const client = getClientData(socket);
+  const { roomCode } = message.payload
+  const client = getClientData(socket)
 
   if (!client) {
-    sendError(socket, 'INVALID_CLIENT', 'Client not initialized');
-    return;
+    sendError(socket, 'INVALID_CLIENT', 'Client not initialized')
+    return
+  }
+
+  if (!client.userId) {
+    sendError(socket, 'UNAUTHORIZED', 'Authentication required')
+    return
   }
 
   // Remove socket from room
-  const roomSockets = rooms.get(roomCode);
+  const roomSockets = rooms.get(roomCode)
   if (roomSockets) {
-    roomSockets.delete(socket);
+    roomSockets.delete(socket)
 
     if (roomSockets.size === 0) {
-      rooms.delete(roomCode);
+      rooms.delete(roomCode)
     } else {
       // Broadcast player_left to remaining clients
       const playerLeftMessage: PlayerLeftMessage = {
@@ -189,54 +200,56 @@ export async function handleLeaveRoom(
         payload: {
           playerId: client.userId,
         },
-      };
-      broadcastToRoom(roomCode, playerLeftMessage);
+      }
+      broadcastToRoom(roomCode, playerLeftMessage)
     }
   }
 
-  client.roomCode = null;
+  client.roomCode = null
 }
 
 export function handleDisconnect(socket: WebSocket): void {
-  const client = getClientData(socket);
+  const client = getClientData(socket)
 
   // Remove from lobby subscribers
   if (client?.isInLobby) {
-    lobbySubscribers.delete(socket);
+    lobbySubscribers.delete(socket)
   }
 
-  if (!client?.roomCode) return;
+  if (!client?.roomCode) return
+  if (!client.userId) return
 
-  const roomSockets = rooms.get(client.roomCode);
+  const roomSockets = rooms.get(client.roomCode)
   if (roomSockets) {
-    roomSockets.delete(socket);
+    roomSockets.delete(socket)
 
     if (roomSockets.size === 0) {
-      rooms.delete(client.roomCode);
-    } else {
-      // Broadcast player_left to remaining clients
-      const playerLeftMessage: PlayerLeftMessage = {
-        type: 'player_left',
-        timestamp: Date.now(),
-        payload: {
-          playerId: client.userId,
-        },
-      };
-      broadcastToRoom(client.roomCode, playerLeftMessage);
+      rooms.delete(client.roomCode)
+      return
     }
+
+    const viewerLeftMessage: ViewerLeftMessage = {
+      type: 'viewer_left',
+      timestamp: Date.now(),
+      payload: {
+        playerId: client.userId,
+        roomCode: client.roomCode,
+      },
+    }
+    broadcastToRoom(client.roomCode, viewerLeftMessage)
   }
 }
 
 // Lobby subscription handlers
 export function handleSubscribeLobby(socket: WebSocket): void {
-  const client = getClientData(socket);
+  const client = getClientData(socket)
   if (!client) {
-    sendError(socket, 'INVALID_CLIENT', 'Client not initialized');
-    return;
+    sendError(socket, 'INVALID_CLIENT', 'Client not initialized')
+    return
   }
 
-  lobbySubscribers.add(socket);
-  client.isInLobby = true;
+  lobbySubscribers.add(socket)
+  client.isInLobby = true
 
   const message: LobbySubscribedMessage = {
     type: 'lobby_subscribed',
@@ -244,23 +257,23 @@ export function handleSubscribeLobby(socket: WebSocket): void {
     payload: {
       message: 'Subscribed to room list updates',
     },
-  };
-  sendToSocket(socket, message);
+  }
+  sendToSocket(socket, message)
 }
 
 export function handleUnsubscribeLobby(socket: WebSocket): void {
-  const client = getClientData(socket);
-  if (!client) return;
+  const client = getClientData(socket)
+  if (!client) return
 
-  lobbySubscribers.delete(socket);
-  client.isInLobby = false;
+  lobbySubscribers.delete(socket)
+  client.isInLobby = false
 }
 
 // Broadcast to all lobby subscribers
 function broadcastToLobby(message: unknown): void {
   for (const socket of lobbySubscribers) {
     if (socket.readyState === socket.OPEN) {
-      sendToSocket(socket, message);
+      sendToSocket(socket, message)
     }
   }
 }
@@ -271,8 +284,8 @@ export function broadcastRoomCreated(room: Room): void {
     type: 'room_created',
     timestamp: Date.now(),
     payload: { room },
-  };
-  broadcastToLobby(message);
+  }
+  broadcastToLobby(message)
 }
 
 // Called when a room is deleted (from HTTP controller)
@@ -284,16 +297,16 @@ export function broadcastRoomDeleted(roomId: string, roomCode: string): void {
       roomId,
       roomCode,
     },
-  };
+  }
 
   // Broadcast to lobby subscribers (users viewing room list)
-  broadcastToLobby(message);
+  broadcastToLobby(message)
 
   // Also broadcast to room members (users inside the room)
-  const roomSockets = rooms.get(roomCode);
+  const roomSockets = rooms.get(roomCode)
   if (roomSockets) {
     for (const socket of roomSockets) {
-      sendToSocket(socket, message);
+      sendToSocket(socket, message)
     }
   }
 }
