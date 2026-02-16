@@ -9,7 +9,10 @@ import { RoomCard } from '@/components/rooms/room-card'
 import { RoomFilters } from '@/components/rooms/room-filters'
 import { CreateRoomModal } from '@/components/rooms/create-room-modal'
 import { EmptyState } from '@/components/rooms/empty-state'
+import { Pagination } from '@/components/ui/pagination'
+import { usePagination } from '@/hooks/use-pagination'
 import { AlertBox } from '@/components/ui/alert-box'
+import { Plus } from 'lucide-react'
 import type { RoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@/types'
 
 export const Route = createFileRoute('/rooms/')({
@@ -61,9 +64,6 @@ function RoomsPage() {
       setModalOpen(false)
       navigate({ to: '/rooms/$code', params: { code: result.room.code } })
     },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : 'Failed to create room')
-    },
   })
 
   // Join room mutation
@@ -78,15 +78,17 @@ function RoomsPage() {
     },
   })
 
-  const rooms = useMemo(() => roomsData?.rooms ?? [], [roomsData])
-  const games = useMemo(() => gamesData?.games ?? [], [gamesData])
   const loading = roomsLoading || gamesLoading
+  const roomCount = roomsData?.rooms?.length ?? 0
 
-  const gamesMap = useMemo(() => new Map<string, Game>(games.map((g) => [g.id, g])), [games])
+  const gamesMap = useMemo(
+    () => new Map<string, Game>((gamesData?.games ?? []).map((g) => [g.id, g])),
+    [gamesData?.games],
+  )
 
   // Filter and sort rooms
   const filteredRooms = useMemo(() => {
-    let result = [...rooms]
+    let result = [...(roomsData?.rooms ?? [])]
 
     // Search by game name or room name
     if (search.trim()) {
@@ -115,7 +117,27 @@ function RoomsPage() {
     }
 
     return result
-  }, [rooms, search, filter, sort, gamesMap])
+  }, [roomsData?.rooms, search, filter, sort, gamesMap])
+
+  const {
+    currentPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    hasPreviousPage,
+    hasNextPage,
+    goToPage,
+    nextPage,
+    previousPage,
+    pageRange,
+  } = usePagination({ totalItems: filteredRooms.length })
+
+  const paginatedRooms = filteredRooms.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    goToPage(page)
+    document.getElementById('rooms-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   if (loading) {
     return (
@@ -136,21 +158,12 @@ function RoomsPage() {
         <div>
           <h1 className="font-heading text-2xl font-bold sm:text-3xl">Explore Rooms</h1>
           <p className="mt-1 text-sm text-muted">
-            {rooms.length} room{rooms.length !== 1 ? 's' : ''} available
+            {roomCount} room{roomCount !== 1 ? 's' : ''} available
           </p>
         </div>
         {session?.user && (
           <button onClick={() => setModalOpen(true)} className="btn-accent gap-2">
-            <svg
-              className="size-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            <Plus className="size-4" />
             Create Room
           </button>
         )}
@@ -165,11 +178,20 @@ function RoomsPage() {
       {/* Filters */}
       <RoomFilters
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={(v) => {
+          setSearch(v)
+          goToPage(1)
+        }}
         filter={filter}
-        onFilterChange={setFilter}
+        onFilterChange={(v) => {
+          setFilter(v)
+          goToPage(1)
+        }}
         sort={sort}
-        onSortChange={setSort}
+        onSortChange={(v) => {
+          setSort(v)
+          goToPage(1)
+        }}
       />
 
       {/* Room cards grid */}
@@ -191,31 +213,44 @@ function RoomsPage() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredRooms.map((room) => (
-            <RoomCard
-              key={room.id}
-              room={room}
-              game={gamesMap.get(room.gameId)}
-              onJoin={(code) => {
-                if (room.isMember) {
-                  navigate({ to: '/rooms/$code', params: { code } })
-                } else {
-                  joinRoomMutation.mutate(code)
-                }
-              }}
-              isLoading={!room.isMember && joinRoomMutation.isPending}
-              currentMembers={room.memberCount}
-            />
-          ))}
-        </div>
+        <>
+          <div id="rooms-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedRooms.map((room) => (
+              <RoomCard
+                key={room.id}
+                room={room}
+                game={gamesMap.get(room.gameId)}
+                onJoin={(code) => {
+                  if (room.isMember) {
+                    navigate({ to: '/rooms/$code', params: { code } })
+                  } else {
+                    joinRoomMutation.mutate(code)
+                  }
+                }}
+                isLoading={!room.isMember && joinRoomMutation.isPending}
+                currentMembers={room.memberCount}
+              />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageRange={pageRange}
+            hasPreviousPage={hasPreviousPage}
+            hasNextPage={hasNextPage}
+            onPageChange={handlePageChange}
+            onPreviousPage={previousPage}
+            onNextPage={nextPage}
+          />
+        </>
       )}
 
       {/* Create room modal */}
       {session?.user && (
         <CreateRoomModal
-          games={games}
-          onSubmit={(data) => createRoomMutation.mutate(data)}
+          games={gamesData?.games ?? []}
+          onSubmit={(data) => createRoomMutation.mutateAsync(data)}
           isLoading={createRoomMutation.isPending}
           open={modalOpen}
           onOpenChange={setModalOpen}
