@@ -1,18 +1,18 @@
-import type { FastifyInstance } from 'fastify';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { HealthController } from '@interface/controllers/health.controller';
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+import { HealthController } from '@interface/controllers/health.controller'
 
 const healthResponse = z.object({
   status: z.enum(['ok', 'error']),
   timestamp: z.string(),
   uptime: z.number(),
   version: z.string(),
-});
+})
 
 export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
-  const controller = new HealthController();
+  const app = fastify.withTypeProvider<ZodTypeProvider>()
+  const controller = new HealthController()
 
   app.get('/health', {
     schema: {
@@ -24,7 +24,7 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     handler: controller.check.bind(controller),
-  });
+  })
 
   app.get('/health/ready', {
     schema: {
@@ -37,5 +37,5 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     handler: controller.readiness.bind(controller),
-  });
+  })
 }

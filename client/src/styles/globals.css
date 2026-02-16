@@ -93,6 +93,14 @@
     @apply badge bg-surface-light text-muted border border-border;
   }
 
+  .input-field-error {
+    @apply input-field border-danger/50 focus:border-danger/70 focus:ring-danger/20;
+  }
+
+  .field-error {
+    @apply mt-1 text-xs text-danger;
+  }
+
   .section-label {
     @apply text-xs font-semibold uppercase tracking-widest text-accent;
   }

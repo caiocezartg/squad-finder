@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm';
-import type { CreateUserInput, UpdateUserInput, User } from '@domain/entities/user.entity';
-import type { IUserRepository } from '@domain/repositories/user.repository';
-import type { Database } from '@infrastructure/database/drizzle';
-import { user, type UserRow } from '@infrastructure/database/schema/auth';
+import { eq } from 'drizzle-orm'
+import type { CreateUserInput, UpdateUserInput, User } from '@domain/entities/user.entity'
+import type { IUserRepository } from '@domain/repositories/user.repository'
+import type { Database } from '@infrastructure/database/drizzle'
+import { user, type UserRow } from '@infrastructure/database/schema/auth'
 
 function mapRowToEntity(row: UserRow): User {
   return {
@@ -12,27 +12,27 @@ function mapRowToEntity(row: UserRow): User {
     avatarUrl: row.image, // Better Auth uses 'image', domain uses 'avatarUrl'
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-  };
+  }
 }
 
 export class DrizzleUserRepository implements IUserRepository {
   constructor(private readonly db: Database) {}
 
   async findById(id: string): Promise<User | null> {
-    const result = await this.db.select().from(user).where(eq(user.id, id)).limit(1);
-    const row = result[0];
-    return row ? mapRowToEntity(row) : null;
+    const result = await this.db.select().from(user).where(eq(user.id, id)).limit(1)
+    const row = result[0]
+    return row ? mapRowToEntity(row) : null
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const result = await this.db.select().from(user).where(eq(user.email, email)).limit(1);
-    const row = result[0];
-    return row ? mapRowToEntity(row) : null;
+    const result = await this.db.select().from(user).where(eq(user.email, email)).limit(1)
+    const row = result[0]
+    return row ? mapRowToEntity(row) : null
   }
 
   async findAll(): Promise<User[]> {
-    const result = await this.db.select().from(user);
-    return result.map(mapRowToEntity);
+    const result = await this.db.select().from(user)
+    return result.map(mapRowToEntity)
   }
 
   async create(input: CreateUserInput): Promise<User> {
@@ -44,35 +44,35 @@ export class DrizzleUserRepository implements IUserRepository {
         name: input.name,
         image: input.avatarUrl ?? null,
       })
-      .returning();
+      .returning()
 
-    const row = result[0];
+    const row = result[0]
     if (!row) {
-      throw new Error('Failed to create user');
+      throw new Error('Failed to create user')
     }
-    return mapRowToEntity(row);
+    return mapRowToEntity(row)
   }
 
   async update(id: string, input: UpdateUserInput): Promise<User | null> {
     const updateData: Partial<{ name: string; image: string | null; updatedAt: Date }> = {
       updatedAt: new Date(),
-    };
+    }
 
     if (input.name !== undefined) {
-      updateData.name = input.name;
+      updateData.name = input.name
     }
     if (input.avatarUrl !== undefined) {
-      updateData.image = input.avatarUrl;
+      updateData.image = input.avatarUrl
     }
 
-    const result = await this.db.update(user).set(updateData).where(eq(user.id, id)).returning();
+    const result = await this.db.update(user).set(updateData).where(eq(user.id, id)).returning()
 
-    const row = result[0];
-    return row ? mapRowToEntity(row) : null;
+    const row = result[0]
+    return row ? mapRowToEntity(row) : null
   }
 
   async delete(id: string): Promise<boolean> {
-    const result = await this.db.delete(user).where(eq(user.id, id)).returning({ id: user.id });
-    return result.length > 0;
+    const result = await this.db.delete(user).where(eq(user.id, id)).returning({ id: user.id })
+    return result.length > 0
   }
 }

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -8,7 +8,7 @@ export const user = pgTable('user', {
   image: text('image'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+})
 
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
@@ -21,7 +21,7 @@ export const session = pgTable('session', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
-});
+})
 
 export const account = pgTable('account', {
   id: text('id').primaryKey(),
@@ -39,7 +39,7 @@ export const account = pgTable('account', {
   password: text('password'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+})
 
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
@@ -48,9 +48,9 @@ export const verification = pgTable('verification', {
   expiresAt: timestamp('expires_at').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+})
 
-export type UserRow = typeof user.$inferSelect;
-export type NewUserRow = typeof user.$inferInsert;
-export type SessionRow = typeof session.$inferSelect;
-export type AccountRow = typeof account.$inferSelect;
+export type UserRow = typeof user.$inferSelect
+export type NewUserRow = typeof user.$inferInsert
+export type SessionRow = typeof session.$inferSelect
+export type AccountRow = typeof account.$inferSelect

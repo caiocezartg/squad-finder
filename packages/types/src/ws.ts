@@ -1,44 +1,44 @@
-import type { Room } from './index';
+import type { Room } from './index'
 
 // Player in a room lobby
 export type Player = {
-  id: string;
-  name: string;
-  image: string | null;
-  isHost: boolean;
-};
+  id: string
+  name: string
+  image: string | null
+  isHost: boolean
+}
 
 // WebSocket Event Payloads
 export type RoomCreatedPayload = {
-  room: Room;
-};
+  room: Room
+}
 
 export type RoomDeletedPayload = {
-  roomId: string;
-  roomCode: string;
-};
+  roomId: string
+  roomCode: string
+}
 
 export type RoomJoinedPayload = {
-  roomId: string;
-  roomCode: string;
-  players: Player[];
-};
+  roomId: string
+  roomCode: string
+  players: Player[]
+}
 
 export type PlayerJoinedPayload = {
-  player: Player;
-};
+  player: Player
+}
 
 export type PlayerLeftPayload = {
-  playerId: string;
-};
+  playerId: string
+}
 
 export type RoomReadyPayload = {
-  roomId: string;
-  roomCode: string;
-  message: string;
-};
+  roomId: string
+  roomCode: string
+  message: string
+}
 
 export type WsErrorPayload = {
-  code: string;
-  message: string;
-};
+  code: string
+  message: string
+}

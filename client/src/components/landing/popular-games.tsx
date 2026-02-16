@@ -27,7 +27,7 @@ export function PopularGames() {
           transition={{ duration: 0.5 }}
         >
           <span className="section-label">Supported Games</span>
-          <h2 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">Play what you love</h2>
+          <h2 className="font-heading text-3xl font-bold sm:text-4xl">Play what you love</h2>
           <p className="mt-4 text-muted max-w-lg mx-auto">
             Find teammates across the most popular multiplayer titles.
           </p>
@@ -44,17 +44,16 @@ export function PopularGames() {
             {games.map((game, i) => (
               <motion.div
                 key={game.id}
-                className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border bg-surface cursor-default"
+                className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border bg-surface cursor-default"
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, margin: '-30px' }}
                 transition={{ duration: 0.4, delay: i * 0.05 }}
-                whileHover={{ scale: 1.03 }}
               >
                 <img
                   src={game.coverUrl}
                   alt={game.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
                   loading="lazy"
                 />
                 {/* Gradient overlay */}

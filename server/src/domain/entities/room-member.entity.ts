@@ -1,11 +1,11 @@
 export interface RoomMember {
-  readonly id: string;
-  readonly roomId: string;
-  readonly userId: string;
-  readonly joinedAt: Date;
+  readonly id: string
+  readonly roomId: string
+  readonly userId: string
+  readonly joinedAt: Date
 }
 
 export interface CreateRoomMemberInput {
-  readonly roomId: string;
-  readonly userId: string;
+  readonly roomId: string
+  readonly userId: string
 }

@@ -1,3 +1,5 @@
+import { Search } from 'lucide-react'
+
 interface RoomFiltersProps {
   search: string
   onSearchChange: (value: string) => void
@@ -14,8 +16,8 @@ const filters = [
 ]
 
 const sorts = [
-  { value: 'newest', label: 'Newest' },
-  { value: 'oldest', label: 'Oldest' },
+  { value: 'newest', label: 'NEWEST' },
+  { value: 'oldest', label: 'OLDEST' },
 ]
 
 export function RoomFilters({
@@ -30,16 +32,7 @@ export function RoomFilters({
     <div className="flex flex-col sm:flex-row gap-3 mb-6">
       {/* Search */}
       <div className="relative flex-1">
-        <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted" />
         <input
           type="text"
           value={search}
@@ -55,7 +48,7 @@ export function RoomFilters({
           <button
             key={f.value}
             onClick={() => onFilterChange(f.value)}
-            className={`px-4 py-3 rounded-lg text-xs font-medium transition-all ${
+            className={`px-4 py-3 rounded-lg text-xs font-medium transition-all flex-1 md:flex-auto ${
               filter === f.value
                 ? 'bg-accent/10 text-accent border border-accent/20'
                 : 'bg-surface text-muted border border-border hover:border-border-light hover:text-offwhite'

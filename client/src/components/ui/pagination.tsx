@@ -36,7 +36,7 @@ export function Pagination({
           'border border-border-light',
           hasPreviousPage
             ? 'text-offwhite hover:bg-surface-hover hover:border-muted/30'
-            : 'text-muted/40 cursor-not-allowed',
+            : 'text-muted/40 cursor-not-allowed'
         )}
       >
         <ChevronLeft className="size-4" />
@@ -49,7 +49,10 @@ export function Pagination({
         return (
           <Fragment key={page}>
             {showEllipsis && (
-              <span className="flex items-center justify-center size-9 text-xs text-muted" aria-hidden>
+              <span
+                className="flex items-center justify-center size-9 text-xs text-muted"
+                aria-hidden
+              >
                 ...
               </span>
             )}
@@ -61,7 +64,7 @@ export function Pagination({
                 'flex items-center justify-center size-9 rounded-lg text-sm font-medium transition-colors',
                 page === currentPage
                   ? 'bg-accent/10 text-accent border border-accent/20'
-                  : 'text-muted border border-transparent hover:text-offwhite hover:bg-surface-hover hover:border-border-light',
+                  : 'text-muted border border-transparent hover:text-offwhite hover:bg-surface-hover hover:border-border-light'
               )}
             >
               {page}
@@ -79,7 +82,7 @@ export function Pagination({
           'border border-border-light',
           hasNextPage
             ? 'text-offwhite hover:bg-surface-hover hover:border-muted/30'
-            : 'text-muted/40 cursor-not-allowed',
+            : 'text-muted/40 cursor-not-allowed'
         )}
       >
         <ChevronRight className="size-4" />

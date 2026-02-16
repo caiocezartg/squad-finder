@@ -1,39 +1,40 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSession } from "@/lib/auth-client";
-import { api } from "@/lib/api";
-import { useWebSocket } from "@/hooks/use-websocket";
-import { useRoomsCache } from "@/hooks/use-rooms-cache";
-import { useTimeAgo } from "@/hooks/use-time-ago";
-import { PlayerSlot } from "@/components/rooms/player-slot";
-import { DiscordLinkCard } from "@/components/rooms/discord-link-card";
-import { AlertBox } from "@/components/ui/alert-box";
-import { parseWsPayload } from "@/lib/ws-validators";
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSession } from '@/lib/auth-client'
+import { api } from '@/lib/api'
+import { useWebSocket } from '@/hooks/use-websocket'
+import { useRoomsCache } from '@/hooks/use-rooms-cache'
+import { useTimeAgo } from '@/hooks/use-time-ago'
+import { PlayerSlot } from '@/components/rooms/player-slot'
+import { DiscordLinkCard } from '@/components/rooms/discord-link-card'
+import { AlertBox } from '@/components/ui/alert-box'
+import { parseWsPayload } from '@/lib/ws-validators'
 import {
   roomJoinedPayloadSchema,
   playerJoinedPayloadSchema,
   playerLeftPayloadSchema,
   errorPayloadSchema,
   roomDeletedPayloadSchema,
-} from "@squadfinder/schemas/ws";
-import type { RoomResponse, GamesResponse, Player } from "@/types";
+} from '@squadfinder/schemas/ws'
+import { Copy, LogOut } from 'lucide-react'
+import type { RoomResponse, GamesResponse, Player } from '@/types'
 
-export const Route = createFileRoute("/rooms/$code")({
+export const Route = createFileRoute('/rooms/$code')({
   component: RoomLobbyPage,
-});
+})
 
 function RoomLobbyPage() {
-  const { code } = Route.useParams();
-  const { data: session, isPending: sessionPending } = useSession();
-  const navigate = useNavigate();
-  const { removeRoom } = useRoomsCache();
-  const queryClient = useQueryClient();
+  const { code } = Route.useParams()
+  const { data: session, isPending: sessionPending } = useSession()
+  const navigate = useNavigate()
+  const { removeRoom } = useRoomsCache()
+  const queryClient = useQueryClient()
 
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isRoomReady, setIsRoomReady] = useState(false);
-  const [codeCopied, setCodeCopied] = useState(false);
+  const [players, setPlayers] = useState<Player[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [isRoomReady, setIsRoomReady] = useState(false)
+  const [codeCopied, setCodeCopied] = useState(false)
 
   // Fetch room data
   const {
@@ -41,111 +42,111 @@ function RoomLobbyPage() {
     isLoading: roomLoading,
     error: roomError,
   } = useQuery({
-    queryKey: ["room", code],
+    queryKey: ['room', code],
     queryFn: () => api.get<RoomResponse>(`/api/rooms/${code}`),
-  });
+  })
 
-  const room = roomData?.room ?? null;
+  const room = roomData?.room ?? null
 
-  const timeAgo = useTimeAgo(room?.createdAt);
+  const timeAgo = useTimeAgo(room?.createdAt)
 
   // Fetch games for cover image
   const { data: gamesData } = useQuery({
-    queryKey: ["games"],
-    queryFn: () => api.get<GamesResponse>("/api/games"),
+    queryKey: ['games'],
+    queryFn: () => api.get<GamesResponse>('/api/games'),
     staleTime: 60_000,
-  });
+  })
 
-  const game = gamesData?.games?.find((g) => g.id === room?.gameId);
+  const game = gamesData?.games?.find((g) => g.id === room?.gameId)
 
   // WebSocket connection
-  const wsUrl = `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws`;
+  const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
   const { isConnected, send, on } = useWebSocket({
     url: wsUrl,
     autoConnect: true,
-  });
+  })
 
   // WebSocket event handlers
   useEffect(() => {
-    const unsubscribeJoined = on("room_joined", (raw) => {
-      const data = parseWsPayload(roomJoinedPayloadSchema, raw);
-      if (!data) return;
-      setPlayers(data.players);
-    });
+    const unsubscribeJoined = on('room_joined', (raw) => {
+      const data = parseWsPayload(roomJoinedPayloadSchema, raw)
+      if (!data) return
+      setPlayers(data.players)
+    })
 
-    const unsubscribePlayerJoined = on("player_joined", (raw) => {
-      const data = parseWsPayload(playerJoinedPayloadSchema, raw);
-      if (!data) return;
+    const unsubscribePlayerJoined = on('player_joined', (raw) => {
+      const data = parseWsPayload(playerJoinedPayloadSchema, raw)
+      if (!data) return
       setPlayers((prev) => {
-        if (prev.some((p) => p.id === data.player.id)) return prev;
-        return [...prev, data.player];
-      });
-    });
+        if (prev.some((p) => p.id === data.player.id)) return prev
+        return [...prev, data.player]
+      })
+    })
 
-    const unsubscribePlayerLeft = on("player_left", (raw) => {
-      const data = parseWsPayload(playerLeftPayloadSchema, raw);
-      if (!data) return;
-      setPlayers((prev) => prev.filter((p) => p.id !== data.playerId));
-    });
+    const unsubscribePlayerLeft = on('player_left', (raw) => {
+      const data = parseWsPayload(playerLeftPayloadSchema, raw)
+      if (!data) return
+      setPlayers((prev) => prev.filter((p) => p.id !== data.playerId))
+    })
 
-    const unsubscribeRoomReady = on("room_ready", () => {
-      setIsRoomReady(true);
-    });
+    const unsubscribeRoomReady = on('room_ready', () => {
+      setIsRoomReady(true)
+    })
 
-    const unsubscribeError = on("error", (raw) => {
-      const data = parseWsPayload(errorPayloadSchema, raw);
-      if (!data) return;
-      setError(data.message);
-    });
+    const unsubscribeError = on('error', (raw) => {
+      const data = parseWsPayload(errorPayloadSchema, raw)
+      if (!data) return
+      setError(data.message)
+    })
 
-    const unsubscribeRoomDeleted = on("room_deleted", (raw) => {
-      const data = parseWsPayload(roomDeletedPayloadSchema, raw);
-      if (!data) return;
-      removeRoom(data.roomId);
-      navigate({ to: "/rooms" });
-    });
+    const unsubscribeRoomDeleted = on('room_deleted', (raw) => {
+      const data = parseWsPayload(roomDeletedPayloadSchema, raw)
+      if (!data) return
+      removeRoom(data.roomId)
+      navigate({ to: '/rooms' })
+    })
 
     return () => {
-      unsubscribeJoined();
-      unsubscribePlayerJoined();
-      unsubscribePlayerLeft();
-      unsubscribeRoomReady();
-      unsubscribeError();
-      unsubscribeRoomDeleted();
-    };
-  }, [on, removeRoom, navigate]);
+      unsubscribeJoined()
+      unsubscribePlayerJoined()
+      unsubscribePlayerLeft()
+      unsubscribeRoomReady()
+      unsubscribeError()
+      unsubscribeRoomDeleted()
+    }
+  }, [on, removeRoom, navigate])
 
   // Join room via WebSocket when connected
   useEffect(() => {
     if (isConnected && room) {
-      send("join_room", { roomCode: code });
+      send('join_room', { roomCode: code })
     }
-  }, [isConnected, room, code, send]);
+  }, [isConnected, room, code, send])
 
   const handleLeaveRoom = async () => {
     try {
-      const isHost = room?.hostId === session?.user?.id;
-      send("leave_room", { roomCode: code });
-      await api.post(`/api/rooms/${code}/leave`, {});
+      const isHost = room?.hostId === session?.user?.id
+      send('leave_room', { roomCode: code })
+      await api.post(`/api/rooms/${code}/leave`, {})
       if (isHost && room) {
-        removeRoom(room.id);
+        removeRoom(room.id)
       }
-      await queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      navigate({ to: "/rooms" });
+      await queryClient.invalidateQueries({ queryKey: ['rooms'] })
+      navigate({ to: '/rooms' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to leave room");
+      setError(err instanceof Error ? err.message : 'Failed to leave room')
     }
-  };
+  }
 
   const handleCopyCode = async () => {
-    await navigator.clipboard.writeText(code);
-    setCodeCopied(true);
-    setTimeout(() => setCodeCopied(false), 2000);
-  };
+    await navigator.clipboard.writeText(code)
+    setCodeCopied(true)
+    setTimeout(() => setCodeCopied(false), 2000)
+  }
 
   // Build empty slots
-  const maxPlayers = room?.maxPlayers ?? 5;
-  const emptySlots = Math.max(0, maxPlayers - players.length);
+  const maxPlayers = room?.maxPlayers ?? 5
+  const emptySlots = Math.max(0, maxPlayers - players.length)
 
   if (sessionPending || roomLoading) {
     return (
@@ -157,7 +158,7 @@ function RoomLobbyPage() {
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   if (!session?.user) {
@@ -165,20 +166,18 @@ function RoomLobbyPage() {
       <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
         <p className="text-muted">Please sign in to view this room.</p>
       </div>
-    );
+    )
   }
 
   if (roomError || (error && !room)) {
     return (
       <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
-        <p className="text-danger mb-4">
-          {roomError instanceof Error ? roomError.message : error}
-        </p>
+        <p className="text-danger mb-4">{roomError instanceof Error ? roomError.message : error}</p>
         <Link to="/rooms" className="btn-ghost">
-          Back to Rooms
+          Back to rooms
         </Link>
       </div>
-    );
+    )
   }
 
   return (
@@ -204,39 +203,22 @@ function RoomLobbyPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                {game && (
-                  <span className="badge-accent text-[10px]">{game.name}</span>
-                )}
+                {game && <span className="badge-accent text-[10px]">{game.name}</span>}
                 <span className="badge-muted text-[10px]">{timeAgo}</span>
                 {/* Connection indicator */}
                 <span
-                  className={`size-2 rounded-full ${isConnected ? "bg-accent" : "bg-danger"}`}
+                  className={`size-2 rounded-full ${isConnected ? 'bg-accent' : 'bg-danger'}`}
                 />
               </div>
-              <h1 className="font-heading text-2xl font-bold sm:text-3xl">
-                {room?.name}
-              </h1>
+              <h1 className="font-heading text-2xl font-bold sm:text-3xl">{room?.name}</h1>
               <div className="flex items-center gap-3 mt-2">
                 <button
                   onClick={handleCopyCode}
                   className="flex items-center gap-1.5 text-sm text-muted hover:text-offwhite transition-colors"
                 >
-                  <span className="font-mono font-bold text-offwhite">
-                    {code}
-                  </span>
-                  <svg
-                    className="size-3.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
-                  {codeCopied && (
-                    <span className="text-xs text-accent">Copied!</span>
-                  )}
+                  <span className="font-mono font-bold text-offwhite">{code}</span>
+                  <Copy className="size-3.5" />
+                  {codeCopied && <span className="text-xs text-accent">Copied!</span>}
                 </button>
                 <span className="text-sm text-muted">
                   {players.length}/{maxPlayers} players
@@ -258,11 +240,7 @@ function RoomLobbyPage() {
 
       {error && (
         <div className="mb-6">
-          <AlertBox
-            type="error"
-            message={error}
-            onClose={() => setError(null)}
-          />
+          <AlertBox type="error" message={error} onClose={() => setError(null)} />
         </div>
       )}
 
@@ -298,10 +276,7 @@ function RoomLobbyPage() {
         <div className="space-y-4">
           {/* Discord Link */}
           {isRoomReady && room?.discordLink && (
-            <DiscordLinkCard
-              discordLink={room.discordLink}
-              isRoomReady={isRoomReady}
-            />
+            <DiscordLinkCard discordLink={room.discordLink} isRoomReady={isRoomReady} />
           )}
 
           {/* Actions */}
@@ -309,29 +284,16 @@ function RoomLobbyPage() {
             <h2 className="font-heading text-sm font-bold text-muted uppercase tracking-wider">
               Actions
             </h2>
-            <button
-              onClick={handleLeaveRoom}
-              className="btn-danger w-full gap-2"
-            >
-              <svg
-                className="size-4"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16,17 21,12 16,7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              Leave Room
+            <button onClick={handleLeaveRoom} className="btn-danger w-full gap-2">
+              <LogOut className="size-4" />
+              Leave room
             </button>
             <Link to="/rooms" className="btn-ghost w-full">
-              Back to Rooms
+              Back to rooms
             </Link>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

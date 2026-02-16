@@ -1,6 +1,6 @@
-import { pgTable, text, timestamp, uuid, unique } from 'drizzle-orm/pg-core';
-import { user } from './auth';
-import { rooms } from './rooms';
+import { pgTable, text, timestamp, uuid, unique } from 'drizzle-orm/pg-core'
+import { user } from './auth'
+import { rooms } from './rooms'
 
 export const roomMembers = pgTable(
   'room_members',
@@ -16,8 +16,8 @@ export const roomMembers = pgTable(
   },
   (table) => ({
     roomUserUnique: unique('room_user_unique').on(table.roomId, table.userId),
-  }),
-);
+  })
+)
 
-export type RoomMemberRow = typeof roomMembers.$inferSelect;
-export type NewRoomMemberRow = typeof roomMembers.$inferInsert;
+export type RoomMemberRow = typeof roomMembers.$inferSelect
+export type NewRoomMemberRow = typeof roomMembers.$inferInsert

@@ -1,17 +1,17 @@
-import type { FastifyInstance, FastifyError, FastifyRequest } from 'fastify';
-import fp from 'fastify-plugin';
-import { ZodError } from 'zod';
-import { AppError } from '@application/errors';
+import type { FastifyInstance, FastifyError, FastifyRequest } from 'fastify'
+import fp from 'fastify-plugin'
+import { ZodError } from 'zod'
+import { AppError } from '@application/errors'
 
 interface ErrorResponse {
-  error: string;
-  message: string;
-  details?: unknown;
+  error: string
+  message: string
+  details?: unknown
 }
 
 interface ParsedError {
-  statusCode: number;
-  response: ErrorResponse;
+  statusCode: number
+  response: ErrorResponse
 }
 
 function parseError(error: FastifyError | Error): ParsedError {
@@ -26,7 +26,7 @@ function parseError(error: FastifyError | Error): ParsedError {
           message: issue.message,
         })),
       },
-    };
+    }
   }
 
   if (error instanceof AppError) {
@@ -36,7 +36,7 @@ function parseError(error: FastifyError | Error): ParsedError {
         error: error.code,
         message: error.message,
       },
-    };
+    }
   }
 
   if ('validation' in error && error.validation) {
@@ -46,7 +46,7 @@ function parseError(error: FastifyError | Error): ParsedError {
         error: 'VALIDATION_ERROR',
         message: error.message,
       },
-    };
+    }
   }
 
   if ('statusCode' in error && typeof error.statusCode === 'number') {
@@ -56,7 +56,7 @@ function parseError(error: FastifyError | Error): ParsedError {
         error: 'INTERNAL_ERROR',
         message: error.message,
       },
-    };
+    }
   }
 
   return {
@@ -65,17 +65,17 @@ function parseError(error: FastifyError | Error): ParsedError {
       error: 'INTERNAL_ERROR',
       message: 'An unexpected error occurred',
     },
-  };
+  }
 }
 
 function logError(
   fastify: FastifyInstance,
   error: Error,
   request: FastifyRequest,
-  statusCode: number,
+  statusCode: number
 ): void {
   if (statusCode === 500) {
-    fastify.log.error(error, 'Unhandled error');
+    fastify.log.error(error, 'Unhandled error')
   }
 
   if (process.env.NODE_ENV !== 'production') {
@@ -84,19 +84,19 @@ function logError(
       url: request.url,
       method: request.method,
       statusCode,
-    });
+    })
   }
 }
 
 async function errorHandlerPlugin(fastify: FastifyInstance): Promise<void> {
   fastify.setErrorHandler((error: FastifyError | Error, request, reply) => {
-    const { statusCode, response } = parseError(error);
-    logError(fastify, error, request, statusCode);
-    return reply.status(statusCode).send(response);
-  });
+    const { statusCode, response } = parseError(error)
+    logError(fastify, error, request, statusCode)
+    return reply.status(statusCode).send(response)
+  })
 }
 
 export default fp(errorHandlerPlugin, {
   name: 'error-handler',
   fastify: '5.x',
-});
+})

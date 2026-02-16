@@ -1,24 +1,27 @@
-import type { FastifyInstance } from 'fastify';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { requireAuth } from '@interface/hooks/auth.hook';
-import { RoomController } from '@interface/controllers/room.controller';
-import { GameController } from '@interface/controllers/game.controller';
-import { gameSchema, roomSchema, roomMemberSchema, createRoomInputSchema } from '@squadfinder/schemas';
-import { roomCodeParamSchema } from '@application/dtos';
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+import { requireAuth } from '@interface/hooks/auth.hook'
+import { RoomController } from '@interface/controllers/room.controller'
+import { GameController } from '@interface/controllers/game.controller'
+import {
+  gameSchema,
+  roomSchema,
+  roomMemberSchema,
+  createRoomInputSchema,
+} from '@squadfinder/schemas'
+import { roomCodeParamSchema } from '@application/dtos'
 
 const errorResponse = z.object({
   error: z.string(),
   message: z.string(),
-  details: z
-    .array(z.object({ field: z.string(), message: z.string() }))
-    .optional(),
-});
+  details: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+})
 
 export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
-  const roomController = new RoomController();
-  const gameController = new GameController();
+  const app = fastify.withTypeProvider<ZodTypeProvider>()
+  const roomController = new RoomController()
+  const gameController = new GameController()
 
   // Games
   app.get('/api/games', {
@@ -31,7 +34,7 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     handler: gameController.list.bind(gameController),
-  });
+  })
 
   // Rooms
   app.get('/api/rooms', {
@@ -44,7 +47,7 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     handler: roomController.list.bind(roomController),
-  });
+  })
 
   app.get('/api/rooms/:code', {
     schema: {
@@ -58,7 +61,7 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     handler: roomController.getByCode.bind(roomController),
-  });
+  })
 
   app.post('/api/rooms', {
     schema: {
@@ -76,7 +79,7 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
     },
     preHandler: requireAuth,
     handler: roomController.create.bind(roomController),
-  });
+  })
 
   app.post('/api/rooms/:code/join', {
     schema: {
@@ -98,7 +101,7 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
     },
     preHandler: requireAuth,
     handler: roomController.join.bind(roomController),
-  });
+  })
 
   app.post('/api/rooms/:code/leave', {
     schema: {
@@ -120,5 +123,5 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
     },
     preHandler: requireAuth,
     handler: roomController.leave.bind(roomController),
-  });
+  })
 }

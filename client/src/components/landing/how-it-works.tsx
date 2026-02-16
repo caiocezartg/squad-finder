@@ -1,7 +1,6 @@
 import * as motion from 'motion/react-client'
-
-const DISCORD_PATH =
-  'M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.373-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z'
+import { Check, Link as LinkIcon } from 'lucide-react'
+import { DiscordIcon } from '@/components/ui/icons'
 
 /* ─── Illustration: Step 1 — Discord Sign In ─── */
 
@@ -17,9 +16,7 @@ function DiscordClickIllustration() {
         viewport={{ once: true }}
         transition={{ duration: 2.2, times: [0, 0.45, 0.5, 0.55, 1] }}
       >
-        <svg className="size-3.5" fill="currentColor" viewBox="0 0 24 24">
-          <path d={DISCORD_PATH} />
-        </svg>
+        <DiscordIcon className="size-3.5" />
         Sign in
       </motion.div>
 
@@ -58,17 +55,7 @@ function DiscordClickIllustration() {
         viewport={{ once: true }}
         transition={{ delay: 1.4, duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
       >
-        <svg
-          className="size-3 text-accent"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
+        <Check className="size-3 text-accent" strokeWidth={3} />
       </motion.div>
     </div>
   )
@@ -91,9 +78,7 @@ function RoomBrowseIllustration() {
         <motion.div
           key={i}
           className={`relative z-10 w-full flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-[10px] ${
-            i === 2
-              ? 'border-accent/25 bg-accent/5'
-              : 'border-border bg-surface/80'
+            i === 2 ? 'border-accent/25 bg-accent/5' : 'border-border bg-surface/80'
           }`}
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -101,9 +86,7 @@ function RoomBrowseIllustration() {
           transition={{ delay: 0.3 + i * 0.15, duration: 0.35 }}
         >
           <div className={`size-4 rounded shrink-0 ${room.color}`} />
-          <span className="text-offwhite/80 font-medium truncate">
-            {room.name}
-          </span>
+          <span className="text-offwhite/80 font-medium truncate">{room.name}</span>
           <span className="ml-auto text-muted shrink-0">{room.players}</span>
         </motion.div>
       ))}
@@ -144,10 +127,7 @@ function SquadFillIllustration() {
               backgroundColor: 'transparent',
             }}
             whileInView={{
-              borderColor: [
-                'rgba(42, 42, 47, 1)',
-                'rgba(0, 255, 162, 0.4)',
-              ],
+              borderColor: ['rgba(42, 42, 47, 1)', 'rgba(0, 255, 162, 0.4)'],
               backgroundColor: ['transparent', 'rgba(0, 255, 162, 0.1)'],
             }}
             viewport={{ once: true }}
@@ -177,18 +157,7 @@ function SquadFillIllustration() {
         viewport={{ once: true }}
         transition={{ delay: 2.1, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
       >
-        <svg
-          className="size-3"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-        </svg>
+        <LinkIcon className="size-3" strokeWidth={2.5} />
         Discord link ready
       </motion.div>
     </div>
@@ -201,22 +170,19 @@ const steps = [
   {
     number: 1,
     title: 'Sign In with Discord',
-    description:
-      'One click. No forms, no passwords. Your Discord avatar is your identity.',
+    description: 'One click. No forms, no passwords. Your Discord avatar is your identity.',
     Illustration: DiscordClickIllustration,
   },
   {
     number: 2,
     title: 'Find or Create a Room',
-    description:
-      'Browse rooms by game or spin up your own with a Discord invite link.',
+    description: 'Browse rooms by game or spin up your own with a Discord invite link.',
     Illustration: RoomBrowseIllustration,
   },
   {
     number: 3,
     title: 'Squad Up & Play',
-    description:
-      'Room fills up, Discord link unlocks. Join voice and dominate together.',
+    description: 'Room fills up, Discord link unlocks. Join voice and dominate together.',
     Illustration: SquadFillIllustration,
   },
 ]
@@ -236,7 +202,7 @@ export function HowItWorks() {
           transition={{ duration: 0.5 }}
         >
           <span className="section-label">How It Works</span>
-          <h2 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">
+          <h2 className="font-heading text-3xl font-bold sm:text-4xl">
             From login to full squad in under a minute.
           </h2>
         </motion.div>
@@ -255,10 +221,7 @@ export function HowItWorks() {
 
             <div className="grid grid-cols-3 gap-8">
               {steps.map((step, i) => (
-                <div
-                  key={step.number}
-                  className="flex flex-col items-center"
-                >
+                <div key={step.number} className="flex flex-col items-center">
                   {/* Circle on the line */}
                   <motion.div
                     className="relative z-10 size-10 rounded-full bg-accent text-background flex items-center justify-center font-heading text-sm font-extrabold shadow-[0_0_20px_rgba(0,255,162,0.25)]"
@@ -286,12 +249,8 @@ export function HowItWorks() {
                       <step.Illustration />
                     </div>
                     <div className="p-5">
-                      <h3 className="font-heading text-base font-bold mb-1.5">
-                        {step.title}
-                      </h3>
-                      <p className="text-sm text-muted leading-relaxed">
-                        {step.description}
-                      </p>
+                      <h3 className="font-heading text-base font-bold mb-1.5">{step.title}</h3>
+                      <p className="text-sm text-muted leading-relaxed">{step.description}</p>
                     </div>
                   </motion.div>
                 </div>
@@ -342,12 +301,8 @@ export function HowItWorks() {
                       <step.Illustration />
                     </div>
                     <div className="p-4">
-                      <h3 className="font-heading text-base font-bold mb-1">
-                        {step.title}
-                      </h3>
-                      <p className="text-sm text-muted leading-relaxed">
-                        {step.description}
-                      </p>
+                      <h3 className="font-heading text-base font-bold mb-1">{step.title}</h3>
+                      <p className="text-sm text-muted leading-relaxed">{step.description}</p>
                     </div>
                   </motion.div>
                 </div>

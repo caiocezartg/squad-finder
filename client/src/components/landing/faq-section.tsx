@@ -1,5 +1,6 @@
 import * as motion from 'motion/react-client'
 import { Accordion } from '@base-ui-components/react/accordion'
+import { Plus } from 'lucide-react'
 
 const FAQ_ITEMS = [
   {
@@ -30,7 +31,7 @@ const FAQ_ITEMS = [
   {
     question: 'Can I choose the number of players?',
     answer:
-      'Yes. By default, the player count matches the selected game\'s max players, but you can customize it between 2 and 20 when creating a room.',
+      "Yes. By default, the player count matches the selected game's max players, but you can customize it between 2 and 20 when creating a room.",
   },
   {
     question: 'What games are supported?',
@@ -59,9 +60,7 @@ export function FAQSection() {
           <h2 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-3 text-muted">
-            Everything you need to know before building your squad.
-          </p>
+          <p className="mt-3 text-muted">Everything you need to know before building your squad.</p>
         </motion.div>
 
         <Accordion.Root className="space-y-2">
@@ -79,13 +78,11 @@ export function FAQSection() {
                     <span className="text-sm font-semibold text-offwhite sm:text-base">
                       {item.question}
                     </span>
-                    <PlusIcon className="size-5 shrink-0 text-muted transition-all duration-200 group-data-[panel-open]:rotate-45 group-data-[panel-open]:text-accent" />
+                    <Plus className="size-5 shrink-0 text-muted transition-all duration-200 group-data-[panel-open]:rotate-45 group-data-[panel-open]:text-accent" />
                   </Accordion.Trigger>
                 </Accordion.Header>
                 <Accordion.Panel className="h-[var(--accordion-panel-height)] overflow-hidden transition-[height] duration-200 ease-out data-[ending-style]:h-0 data-[starting-style]:h-0">
-                  <p className="px-5 pb-4 text-sm leading-relaxed text-muted">
-                    {item.answer}
-                  </p>
+                  <p className="px-5 pb-4 text-sm leading-relaxed text-muted">{item.answer}</p>
                 </Accordion.Panel>
               </Accordion.Item>
             </motion.div>
@@ -93,21 +90,5 @@ export function FAQSection() {
         </Accordion.Root>
       </div>
     </section>
-  )
-}
-
-function PlusIcon(props: React.ComponentProps<'svg'>) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      {...props}
-    >
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
   )
 }

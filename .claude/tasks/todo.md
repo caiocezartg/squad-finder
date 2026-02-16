@@ -2,7 +2,34 @@
 
 ## Completed Tasks
 
+### Migrate SVG Icons to Lucide React (2026-02-16)
+
+- [x] Install `lucide-react` and create `DiscordIcon` custom component (`client/src/components/ui/icons.tsx`)
+- [x] Migrate 28 inline SVGs across 14 files to Lucide React components
+- [x] Files migrated: `__root.tsx`, `rooms/index.tsx`, `rooms/$code.tsx`, `hero-section.tsx`, `cta-banner.tsx`, `how-it-works.tsx`, `faq-section.tsx`, `create-room-modal.tsx`, `room-filters.tsx`, `empty-state.tsx`, `player-slot.tsx`, `discord-link-card.tsx`, `alert-box.tsx`, `pagination.tsx`
+- [x] Kept animated `motion.svg` elements untouched (cursor, user slots in how-it-works)
+- [x] Typecheck pass, lint pass (0 errors, 0 warnings)
+
+### Rooms Listing Pagination (2026-02-16)
+
+- [x] Create `use-pagination` hook (`client/src/hooks/use-pagination.ts`) — reusable, handles page clamping, page range with ellipsis
+- [x] Create `Pagination` UI component (`client/src/components/ui/pagination.tsx`) — accessible, dark themed, hidden when single page
+- [x] Integrate pagination into rooms listing (`client/src/routes/rooms/index.tsx`) — 6 cards/page, resets on filter change, scroll-to-top on page change
+- [x] Typecheck pass (all 4 packages)
+
+### CreateRoomModal Form Validation & UX Improvements (2026-02-13)
+
+- [x] Install `react-hook-form` and `@hookform/resolvers` in client
+- [x] Add `.input-field-error` and `.field-error` CSS utility classes to `globals.css`
+- [x] Rewrite `CreateRoomModal` with react-hook-form + zodResolver (reuses shared `createRoomInputSchema`)
+- [x] Replace native `<select>` with Base UI `Select` component (scrollable portal dropdown, dark themed)
+- [x] Add inline per-field error messages with red border styling
+- [x] Display API errors inside the modal via AlertBox (modal stays open on errors)
+- [x] Update parent `rooms/index.tsx` to use `mutateAsync` (errors handled in modal, not page)
+- [x] All 29 tests passing, typecheck pass, lint pass (0 errors, 0 warnings)
+
 ### Frontend Redesign with Dark Theme (2026-02-08)
+
 - [x] Add `discordLink` field to Room entity (domain, DB schema, types, schemas, repository, controller, use case)
 - [x] Update mock room factory and all 23 tests pass
 - [x] Install `@base-ui-components/react` and `motion` (motion.dev)
@@ -21,6 +48,7 @@
 - [x] All 23 tests passing, typecheck pass, lint pass (0 errors, 0 warnings)
 
 ### Phase 3 - WebSocket Real-time (2026-02-07)
+
 - [x] Add WebSocket authentication via session cookie (`ws.plugin.ts` checks `request.session`)
 - [x] Update room handler to validate room exists in database (`DrizzleRoomRepository.findByCode()`)
 - [x] Fetch real player data (name, avatar, isHost) from database (`DrizzleUserRepository`)
@@ -30,6 +58,7 @@
 - [x] Test WebSocket flow end-to-end
 
 ### Swagger API Documentation with Scalar (2026-02-08)
+
 - [x] Install `fastify-type-provider-zod@6`, `@fastify/swagger@9`, `@scalar/fastify-api-reference`
 - [x] Update Zod to v4 across all packages (server, client, schemas)
 - [x] Fix `ZodError.errors` → `ZodError.issues` in error handler (Zod v4 breaking change)
@@ -40,6 +69,7 @@
 - [x] All 23 tests passing, typecheck pass, lint pass
 
 ### Turborepo Package Restructuring (2026-02-07)
+
 - [x] Create `packages/typescript-config/` with `base.json`, `react.json`, `server.json`
 - [x] Create `packages/types/` — pure TS types (domain, API, WS) as `@squadfinder/types`
 - [x] Create `packages/schemas/` — Zod validation schemas as `@squadfinder/schemas`
@@ -53,8 +83,9 @@
 - [x] All 23 tests passing, all 4 packages typecheck pass
 
 ### Turborepo Integration (2026-02-07)
+
 - [x] Install `turbo` as root dev dependency (v2.8.3)
-- [x] Create `turbo.json` with task config (build, dev, typecheck, test, lint, db:*)
+- [x] Create `turbo.json` with task config (build, dev, typecheck, test, lint, db:\*)
 - [x] Add `@squadfinder/shared` as `workspace:*` dependency to client and server
 - [x] Update root `package.json` scripts to use `turbo` instead of `bun run --filter`
 - [x] Add `packageManager` field to root `package.json`
@@ -64,6 +95,7 @@
 - [x] All 23 tests passing, all typechecks pass
 
 ### Phase 4.5 - Shared Package Consolidation (2026-02-07)
+
 - [x] Fix server tsconfig `@shared` path (was pointing to `src/shared/` instead of `../packages/shared/src/*`)
 - [x] Create `packages/shared/src/types/api.ts` (API response types: RoomsResponse, RoomResponse, etc.)
 - [x] Create `packages/shared/src/types/ws.ts` (WebSocket payload types: Player, RoomJoinedPayload, etc.)
@@ -75,6 +107,7 @@
 - [x] All 23 tests passing, both client and server typecheck pass
 
 ### Phase 4 - Client Refactoring (2026-02-07)
+
 - [x] Create `client/src/types/index.ts` with shared types
 - [x] Create `hooks/use-message-log.ts` (WebSocket log with timestamps)
 - [x] Create `hooks/use-rooms-cache.ts` (TanStack Query cache operations)
@@ -93,6 +126,7 @@
 - [x] All tests passing, typecheck pass
 
 ### Phase 2 - API Routes & Clean Architecture Refactor (2026-02-06)
+
 - [x] Create Game entity and repository interface
 - [x] Create games schema and DrizzleGameRepository
 - [x] Update Room entity and schema to include gameId
@@ -122,6 +156,7 @@
 | GET | `/api/users/me` | Yes | Get current user |
 
 ### Database & Better Auth Integration (2026-02-05)
+
 - [x] Docker Compose for PostgreSQL
 - [x] Better Auth schema (user, session, account tables)
 - [x] room_members schema with unique constraint
@@ -133,6 +168,7 @@
 - [x] All 23 tests still passing
 
 ### Unit Testing + Use Cases (2026-02-05)
+
 - [x] Test infrastructure: mocks directory, path aliases
 - [x] RoomMember entity + IRoomMemberRepository
 - [x] Room use cases: CreateRoom, GetRoomByCode, JoinRoom, LeaveRoom, GetAvailableRooms
@@ -140,16 +176,19 @@
 - [x] 23 tests passing
 
 ### Server Startup Fixes (2026-02-05)
+
 - [x] Add --env-file flag to load environment variables
 - [x] Simplify logger config (remove pino-pretty)
 - [x] Verify server and client both work correctly
 
 ### Rename to SquadFinder (2026-02-05)
+
 - [x] Change database name from `entra_pra_jogar` to `squad_finder`
 - [x] Update "Entra Pra Jogar" to "SquadFinder" in client routes
 - [x] Fix server tsconfig to include drizzle.config.ts
 
 ### Project Scaffolding (2026-02-05)
+
 - [x] Set up Bun monorepo with workspaces
 - [x] Create client package (React + Vite + TanStack + Tailwind)
 - [x] Create server package (Fastify + Clean Architecture)

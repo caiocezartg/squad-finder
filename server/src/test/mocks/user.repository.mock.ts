@@ -1,6 +1,6 @@
-import { vi, type Mock } from 'vitest';
-import type { User, CreateUserInput, UpdateUserInput } from '@domain/entities/user.entity';
-import type { IUserRepository } from '@domain/repositories/user.repository';
+import { vi, type Mock } from 'vitest'
+import type { User, CreateUserInput, UpdateUserInput } from '@domain/entities/user.entity'
+import type { IUserRepository } from '@domain/repositories/user.repository'
 
 export function createMockUser(overrides?: Partial<User>): User {
   return {
@@ -11,12 +11,12 @@ export function createMockUser(overrides?: Partial<User>): User {
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides,
-  };
+  }
 }
 
 export type MockUserRepository = {
-  [K in keyof IUserRepository]: Mock<IUserRepository[K]>;
-};
+  [K in keyof IUserRepository]: Mock<IUserRepository[K]>
+}
 
 export function createMockUserRepository(): MockUserRepository {
   return {
@@ -29,10 +29,12 @@ export function createMockUserRepository(): MockUserRepository {
           email: input.email,
           name: input.name,
           avatarUrl: input.avatarUrl ?? null,
-        }),
-      ),
+        })
+      )
     ),
-    update: vi.fn<(id: string, input: UpdateUserInput) => Promise<User | null>>().mockResolvedValue(null),
+    update: vi
+      .fn<(id: string, input: UpdateUserInput) => Promise<User | null>>()
+      .mockResolvedValue(null),
     delete: vi.fn<(id: string) => Promise<boolean>>().mockResolvedValue(false),
-  };
+  }
 }

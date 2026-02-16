@@ -1,9 +1,10 @@
-import * as motion from "motion/react-client";
-import type { Player } from "@/types";
+import * as motion from 'motion/react-client'
+import { User } from 'lucide-react'
+import type { Player } from '@/types'
 
 interface PlayerSlotProps {
-  player?: Player;
-  index: number;
+  player?: Player
+  index: number
 }
 
 export function PlayerSlot({ player, index }: PlayerSlotProps) {
@@ -11,20 +12,11 @@ export function PlayerSlot({ player, index }: PlayerSlotProps) {
     return (
       <div className="flex items-center gap-3 rounded-xl border border-dashed border-border-light p-3 opacity-40">
         <div className="size-10 rounded-full bg-surface-light border border-border flex items-center justify-center">
-          <svg
-            className="size-4 text-muted"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
+          <User className="size-4 text-muted" />
         </div>
         <span className="text-sm text-muted">Waiting for player...</span>
       </div>
-    );
+    )
   }
 
   return (
@@ -46,13 +38,9 @@ export function PlayerSlot({ player, index }: PlayerSlotProps) {
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-offwhite truncate">
-          {player.name}
-        </p>
+        <p className="text-sm font-medium text-offwhite truncate">{player.name}</p>
       </div>
-      {player.isHost && (
-        <span className="badge-accent text-[10px] shrink-0">Host</span>
-      )}
+      {player.isHost && <span className="badge-accent text-[10px] shrink-0">Host</span>}
     </motion.div>
-  );
+  )
 }

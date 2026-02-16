@@ -1,8 +1,8 @@
-import { pgTable, uuid, varchar, timestamp, integer, pgEnum, text } from 'drizzle-orm/pg-core';
-import { user } from './auth';
-import { games } from './games';
+import { pgTable, uuid, varchar, timestamp, integer, pgEnum, text } from 'drizzle-orm/pg-core'
+import { user } from './auth'
+import { games } from './games'
 
-export const roomStatusEnum = pgEnum('room_status', ['waiting', 'playing', 'finished']);
+export const roomStatusEnum = pgEnum('room_status', ['waiting', 'playing', 'finished'])
 
 export const rooms = pgTable('rooms', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -20,7 +20,7 @@ export const rooms = pgTable('rooms', {
   completedAt: timestamp('completed_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
+})
 
-export type RoomRow = typeof rooms.$inferSelect;
-export type NewRoomRow = typeof rooms.$inferInsert;
+export type RoomRow = typeof rooms.$inferSelect
+export type NewRoomRow = typeof rooms.$inferInsert

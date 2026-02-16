@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 // Room status schema
-export const roomStatusSchema = z.enum(['waiting', 'playing', 'finished']);
+export const roomStatusSchema = z.enum(['waiting', 'playing', 'finished'])
 
 // User schema
 export const userSchema = z.object({
@@ -11,9 +11,9 @@ export const userSchema = z.object({
   image: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-});
+})
 
-export type UserDto = z.infer<typeof userSchema>;
+export type UserDto = z.infer<typeof userSchema>
 
 // Game schema
 export const gameSchema = z.object({
@@ -25,9 +25,9 @@ export const gameSchema = z.object({
   maxPlayers: z.number().int(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-});
+})
 
-export type GameDto = z.infer<typeof gameSchema>;
+export type GameDto = z.infer<typeof gameSchema>
 
 // Room schema
 export const roomSchema = z.object({
@@ -43,9 +43,9 @@ export const roomSchema = z.object({
   isMember: z.boolean().optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
-});
+})
 
-export type RoomDto = z.infer<typeof roomSchema>;
+export type RoomDto = z.infer<typeof roomSchema>
 
 // Room member schema
 export const roomMemberSchema = z.object({
@@ -53,9 +53,9 @@ export const roomMemberSchema = z.object({
   roomId: z.uuid(),
   userId: z.string(),
   joinedAt: z.coerce.date(),
-});
+})
 
-export type RoomMemberDto = z.infer<typeof roomMemberSchema>;
+export type RoomMemberDto = z.infer<typeof roomMemberSchema>
 
 // Create room input schema
 export const createRoomInputSchema = z.object({
@@ -69,6 +69,6 @@ export const createRoomInputSchema = z.object({
         url.startsWith('https://discord.gg/') || url.startsWith('https://discord.com/invite/'),
       { message: 'Discord link must be a valid Discord invite URL' }
     ),
-});
+})
 
-export type CreateRoomInput = z.infer<typeof createRoomInputSchema>;
+export type CreateRoomInput = z.infer<typeof createRoomInputSchema>

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -15,20 +15,20 @@ const envSchema = z.object({
   // Discord OAuth
   DISCORD_CLIENT_ID: z.string().min(1, 'DISCORD_CLIENT_ID is required'),
   DISCORD_CLIENT_SECRET: z.string().min(1, 'DISCORD_CLIENT_SECRET is required'),
-});
+})
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema>
 
 function validateEnv(): Env {
-  const result = envSchema.safeParse(process.env);
+  const result = envSchema.safeParse(process.env)
 
   if (!result.success) {
-    console.error('Invalid environment variables:');
-    console.error(z.treeifyError(result.error));
-    process.exit(1);
+    console.error('Invalid environment variables:')
+    console.error(z.treeifyError(result.error))
+    process.exit(1)
   }
 
-  return result.data;
+  return result.data
 }
 
-export const env: Env = validateEnv();
+export const env: Env = validateEnv()

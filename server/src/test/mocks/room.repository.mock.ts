@@ -1,6 +1,6 @@
-import { vi, type Mock } from 'vitest';
-import type { Room, CreateRoomInput, UpdateRoomInput } from '@domain/entities/room.entity';
-import type { IRoomRepository } from '@domain/repositories/room.repository';
+import { vi, type Mock } from 'vitest'
+import type { Room, CreateRoomInput, UpdateRoomInput } from '@domain/entities/room.entity'
+import type { IRoomRepository } from '@domain/repositories/room.repository'
 
 export function createMockRoom(overrides?: Partial<Room>): Room {
   return {
@@ -16,12 +16,12 @@ export function createMockRoom(overrides?: Partial<Room>): Room {
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     ...overrides,
-  };
+  }
 }
 
 export type MockRoomRepository = {
-  [K in keyof IRoomRepository]: Mock<IRoomRepository[K]>;
-};
+  [K in keyof IRoomRepository]: Mock<IRoomRepository[K]>
+}
 
 export function createMockRoomRepository(): MockRoomRepository {
   return {
@@ -38,11 +38,13 @@ export function createMockRoomRepository(): MockRoomRepository {
           gameId: input.gameId,
           maxPlayers: input.maxPlayers ?? 5,
           discordLink: input.discordLink ?? null,
-        }),
-      ),
+        })
+      )
     ),
     findExpiredRooms: vi.fn<(beforeDate: Date) => Promise<Room[]>>().mockResolvedValue([]),
-    update: vi.fn<(id: string, input: UpdateRoomInput) => Promise<Room | null>>().mockResolvedValue(null),
+    update: vi
+      .fn<(id: string, input: UpdateRoomInput) => Promise<Room | null>>()
+      .mockResolvedValue(null),
     delete: vi.fn<(id: string) => Promise<boolean>>().mockResolvedValue(false),
-  };
+  }
 }

@@ -1,8 +1,8 @@
-import { eq } from 'drizzle-orm';
-import type { CreateGameInput, Game } from '@domain/entities/game.entity';
-import type { IGameRepository } from '@domain/repositories/game.repository';
-import type { Database } from '@infrastructure/database/drizzle';
-import { games, type GameRow } from '@infrastructure/database/schema/games';
+import { eq } from 'drizzle-orm'
+import type { CreateGameInput, Game } from '@domain/entities/game.entity'
+import type { IGameRepository } from '@domain/repositories/game.repository'
+import type { Database } from '@infrastructure/database/drizzle'
+import { games, type GameRow } from '@infrastructure/database/schema/games'
 
 function mapRowToEntity(row: GameRow): Game {
   return {
@@ -14,27 +14,27 @@ function mapRowToEntity(row: GameRow): Game {
     maxPlayers: row.maxPlayers,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-  };
+  }
 }
 
 export class DrizzleGameRepository implements IGameRepository {
   constructor(private readonly db: Database) {}
 
   async findById(id: string): Promise<Game | null> {
-    const result = await this.db.select().from(games).where(eq(games.id, id)).limit(1);
-    const row = result[0];
-    return row ? mapRowToEntity(row) : null;
+    const result = await this.db.select().from(games).where(eq(games.id, id)).limit(1)
+    const row = result[0]
+    return row ? mapRowToEntity(row) : null
   }
 
   async findBySlug(slug: string): Promise<Game | null> {
-    const result = await this.db.select().from(games).where(eq(games.slug, slug)).limit(1);
-    const row = result[0];
-    return row ? mapRowToEntity(row) : null;
+    const result = await this.db.select().from(games).where(eq(games.slug, slug)).limit(1)
+    const row = result[0]
+    return row ? mapRowToEntity(row) : null
   }
 
   async findAll(): Promise<Game[]> {
-    const result = await this.db.select().from(games);
-    return result.map(mapRowToEntity);
+    const result = await this.db.select().from(games)
+    return result.map(mapRowToEntity)
   }
 
   async create(input: CreateGameInput): Promise<Game> {
@@ -47,13 +47,13 @@ export class DrizzleGameRepository implements IGameRepository {
         minPlayers: input.minPlayers,
         maxPlayers: input.maxPlayers,
       })
-      .returning();
+      .returning()
 
-    const row = result[0];
+    const row = result[0]
     if (!row) {
-      throw new Error('Failed to create game');
+      throw new Error('Failed to create game')
     }
-    return mapRowToEntity(row);
+    return mapRowToEntity(row)
   }
 
   async upsertBySlug(input: CreateGameInput): Promise<Game> {
@@ -76,12 +76,12 @@ export class DrizzleGameRepository implements IGameRepository {
           updatedAt: new Date(),
         },
       })
-      .returning();
+      .returning()
 
-    const row = result[0];
+    const row = result[0]
     if (!row) {
-      throw new Error('Failed to upsert game');
+      throw new Error('Failed to upsert game')
     }
-    return mapRowToEntity(row);
+    return mapRowToEntity(row)
   }
 }

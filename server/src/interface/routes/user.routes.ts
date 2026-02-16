@@ -1,18 +1,18 @@
-import type { FastifyInstance } from 'fastify';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { requireAuth } from '@interface/hooks/auth.hook';
-import { UserController } from '@interface/controllers/user.controller';
-import { userSchema } from '@squadfinder/schemas';
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+import { requireAuth } from '@interface/hooks/auth.hook'
+import { UserController } from '@interface/controllers/user.controller'
+import { userSchema } from '@squadfinder/schemas'
 
 const errorResponse = z.object({
   error: z.string(),
   message: z.string(),
-});
+})
 
 export async function userRoutes(fastify: FastifyInstance): Promise<void> {
-  const app = fastify.withTypeProvider<ZodTypeProvider>();
-  const userController = new UserController();
+  const app = fastify.withTypeProvider<ZodTypeProvider>()
+  const userController = new UserController()
 
   app.get('/api/users/me', {
     schema: {
@@ -28,5 +28,5 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
     },
     preHandler: requireAuth,
     handler: userController.me.bind(userController),
-  });
+  })
 }
