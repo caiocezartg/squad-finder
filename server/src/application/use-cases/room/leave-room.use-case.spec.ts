@@ -54,6 +54,9 @@ describe('LeaveRoomUseCase', () => {
     })
 
     it('should return false if user not in room', async () => {
+      const room = createMockRoom({ id: 'room-1' })
+
+      mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.delete.mockResolvedValue(false)
 
       const result = await useCase.execute({
@@ -63,8 +66,17 @@ describe('LeaveRoomUseCase', () => {
 
       expect(result.success).toBe(false)
       expect(mockRoomMemberRepository.delete).toHaveBeenCalledWith('room-1', 'non-member-user')
-      expect(mockRoomRepository.findById).not.toHaveBeenCalled()
       expect(mockRoomRepository.delete).not.toHaveBeenCalled()
+    })
+
+    it('should throw RoomCompletedError if room is completed', async () => {
+      const room = createMockRoom({ id: 'room-1', completedAt: new Date() })
+
+      mockRoomRepository.findById.mockResolvedValue(room)
+
+      await expect(
+        useCase.execute({ roomId: 'room-1', userId: 'any-user' })
+      ).rejects.toThrow('completed')
     })
   })
 })

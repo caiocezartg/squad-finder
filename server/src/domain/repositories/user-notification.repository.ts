@@ -7,4 +7,6 @@ export interface IUserNotificationRepository {
   findByUserId(userId: string, limit?: number): Promise<UserNotification[]>
   create(input: CreateUserNotificationInput): Promise<UserNotification>
   markAsRead(id: string, userId: string): Promise<boolean>
+  markAllAsRead(userId: string): Promise<number>
+  delete(id: string, userId: string): Promise<boolean>
 }

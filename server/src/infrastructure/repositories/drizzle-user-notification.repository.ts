@@ -87,4 +87,29 @@ export class DrizzleUserNotificationRepository implements IUserNotificationRepos
 
     return result.length > 0
   }
+
+  async markAllAsRead(userId: string): Promise<number> {
+    const result = await this.db
+      .update(userNotifications)
+      .set({
+        readAt: new Date(),
+      })
+      .where(
+        and(eq(userNotifications.userId, userId), isNull(userNotifications.readAt))
+      )
+      .returning({ id: userNotifications.id })
+
+    return result.length
+  }
+
+  async delete(id: string, userId: string): Promise<boolean> {
+    const result = await this.db
+      .delete(userNotifications)
+      .where(
+        and(eq(userNotifications.id, id), eq(userNotifications.userId, userId))
+      )
+      .returning({ id: userNotifications.id })
+
+    return result.length > 0
+  }
 }

@@ -2,6 +2,16 @@
 
 ## Completed Tasks
 
+### WS Fix, Notification Redesign & Room Visibility (2026-02-17)
+
+- [x] **Fix WS real-time updates**: Added `room_updated` event type (schema, types, handler) so lobby subscribers see member count changes in real-time when players join/leave rooms
+- [x] **Broadcast from HTTP controllers**: `RoomController.join()` now broadcasts `room_updated` (or `room_deleted` when full) to lobby; `leave()` broadcasts `room_updated` for non-host leaves
+- [x] **Client lobby handling**: `use-rooms-cache` now has `updateRoom()`, `use-lobby-events` subscribes to `room_updated` to patch member counts in cache
+- [x] **Notification backend**: Added `DELETE /api/notifications/:id`, `POST /api/notifications/read-all` endpoints with repository methods
+- [x] **Notification menu redesign**: Game icon + badge, room name as title, player count, relative timestamps, dismiss (X) button, "Mark all read" action, better empty state
+- [x] **Room deletion flow**: Full rooms now hidden from listing immediately (`completedAt IS NOT NULL` filter in `findAvailable()`), still accessible via direct URL, deletion changed from 5min to 1 hour
+- [x] All 29 tests passing, typecheck pass (4 packages), lint pass (0 errors, 0 warnings)
+
 ### Migrate SVG Icons to Lucide React (2026-02-16)
 
 - [x] Install `lucide-react` and create `DiscordIcon` custom component (`client/src/components/ui/icons.tsx`)

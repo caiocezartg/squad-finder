@@ -82,6 +82,7 @@ export type {
 export type {
   Player,
   RoomCreatedPayload,
+  RoomUpdatedPayload,
   RoomDeletedPayload,
   RoomJoinedPayload,
   PlayerJoinedPayload,

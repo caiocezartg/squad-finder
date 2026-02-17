@@ -4,6 +4,7 @@ import type { Room, RoomsResponse } from '@/types'
 
 export interface UseRoomsCacheReturn {
   addRoom: (room: Room) => void
+  updateRoom: (roomId: string, updates: Partial<Room>) => void
   removeRoom: (roomId: string) => void
 }
 
@@ -22,6 +23,18 @@ export function useRoomsCache(): UseRoomsCacheReturn {
     [queryClient]
   )
 
+  const updateRoom = useCallback(
+    (roomId: string, updates: Partial<Room>) => {
+      queryClient.setQueryData<RoomsResponse>(['rooms'], (old) => {
+        if (!old) return { rooms: [] }
+        return {
+          rooms: old.rooms.map((r) => (r.id === roomId ? { ...r, ...updates } : r)),
+        }
+      })
+    },
+    [queryClient]
+  )
+
   const removeRoom = useCallback(
     (roomId: string) => {
       queryClient.setQueryData<RoomsResponse>(['rooms'], (old) => {
@@ -32,5 +45,5 @@ export function useRoomsCache(): UseRoomsCacheReturn {
     [queryClient]
   )
 
-  return { addRoom, removeRoom }
+  return { addRoom, updateRoom, removeRoom }
 }

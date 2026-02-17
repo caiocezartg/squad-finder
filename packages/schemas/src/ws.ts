@@ -22,6 +22,7 @@ export const wsMessageTypeSchema = z.enum([
   'unsubscribe_lobby',
   'lobby_subscribed',
   'room_created',
+  'room_updated',
   'room_deleted',
 ])
 
@@ -134,6 +135,15 @@ export const roomCreatedMessageSchema = baseWsMessageSchema.extend({
   }),
 })
 
+export const roomUpdatedMessageSchema = baseWsMessageSchema.extend({
+  type: z.literal('room_updated'),
+  payload: z.object({
+    roomId: z.uuid(),
+    roomCode: z.string().length(6),
+    memberCount: z.number().int().min(0),
+  }),
+})
+
 export const roomDeletedMessageSchema = baseWsMessageSchema.extend({
   type: z.literal('room_deleted'),
   payload: z.object({
@@ -158,6 +168,7 @@ export const viewerLeftPayloadSchema = viewerLeftMessageSchema.shape.payload
 export const roomReadyPayloadSchema = roomReadyMessageSchema.shape.payload
 export const errorPayloadSchema = errorMessageSchema.shape.payload
 export const roomCreatedPayloadSchema = roomCreatedMessageSchema.shape.payload
+export const roomUpdatedPayloadSchema = roomUpdatedMessageSchema.shape.payload
 export const roomDeletedPayloadSchema = roomDeletedMessageSchema.shape.payload
 
 // Inferred types
@@ -176,4 +187,5 @@ export type SubscribeLobbyMessage = z.infer<typeof subscribeLobbyMessageSchema>
 export type UnsubscribeLobbyMessage = z.infer<typeof unsubscribeLobbyMessageSchema>
 export type LobbySubscribedMessage = z.infer<typeof lobbySubscribedMessageSchema>
 export type RoomCreatedMessage = z.infer<typeof roomCreatedMessageSchema>
+export type RoomUpdatedMessage = z.infer<typeof roomUpdatedMessageSchema>
 export type RoomDeletedMessage = z.infer<typeof roomDeletedMessageSchema>

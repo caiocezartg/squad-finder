@@ -13,6 +13,12 @@ export type RoomCreatedPayload = {
   room: Room
 }
 
+export type RoomUpdatedPayload = {
+  roomId: string
+  roomCode: string
+  memberCount: number
+}
+
 export type RoomDeletedPayload = {
   roomId: string
   roomCode: string

@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useRoomsCache } from './use-rooms-cache'
 import { parseWsPayload } from '@/lib/ws-validators'
-import { roomCreatedPayloadSchema, roomDeletedPayloadSchema } from '@squadfinder/schemas/ws'
+import {
+  roomCreatedPayloadSchema,
+  roomUpdatedPayloadSchema,
+  roomDeletedPayloadSchema,
+} from '@squadfinder/schemas/ws'
 import type { WebSocketEventHandler } from '@/lib/ws-client'
 
 export interface UseLobbyEventsOptions {
@@ -20,7 +24,7 @@ export function useLobbyEvents({
   on,
 }: UseLobbyEventsOptions): UseLobbyEventsReturn {
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const { addRoom, removeRoom } = useRoomsCache()
+  const { addRoom, updateRoom, removeRoom } = useRoomsCache()
 
   useEffect(() => {
     if (!isConnected) return
@@ -35,6 +39,12 @@ export function useLobbyEvents({
       addRoom(data.room)
     })
 
+    const unsubscribeUpdated = on('room_updated', (raw) => {
+      const data = parseWsPayload(roomUpdatedPayloadSchema, raw)
+      if (!data) return
+      updateRoom(data.roomId, { memberCount: data.memberCount })
+    })
+
     const unsubscribeDeleted = on('room_deleted', (raw) => {
       const data = parseWsPayload(roomDeletedPayloadSchema, raw)
       if (!data) return
@@ -47,10 +57,11 @@ export function useLobbyEvents({
     return () => {
       unsubscribeLobbySubscribed()
       unsubscribeCreated()
+      unsubscribeUpdated()
       unsubscribeDeleted()
       setIsSubscribed(false)
     }
-  }, [isConnected, on, send, addRoom, removeRoom])
+  }, [isConnected, on, send, addRoom, updateRoom, removeRoom])
 
   return { isSubscribed }
 }

@@ -47,7 +47,7 @@ export async function apiClient<T>(path: string, options: RequestOptions = {}): 
   const config: RequestInit = {
     ...restOptions,
     headers: {
-      'Content-Type': 'application/json',
+      ...(body !== undefined && { 'Content-Type': 'application/json' }),
       ...headers,
     },
     credentials: 'include',

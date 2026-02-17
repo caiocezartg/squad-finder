@@ -284,9 +284,14 @@ function RoomLobbyPage() {
             <h2 className="font-heading text-sm font-bold text-muted uppercase tracking-wider">
               Actions
             </h2>
-            <button onClick={handleLeaveRoom} className="btn-danger w-full gap-2">
+            <button
+              onClick={handleLeaveRoom}
+              disabled={isRoomReady}
+              className="btn-danger w-full gap-2"
+              title={isRoomReady ? 'Cannot leave a full room' : undefined}
+            >
               <LogOut className="size-4" />
-              Leave room
+              {isRoomReady ? 'Squad is locked' : 'Leave room'}
             </button>
             <Link to="/rooms" className="btn-ghost w-full">
               Back to rooms

@@ -3,4 +3,9 @@ export { ValidationError, InvalidGameError } from './validation.error'
 export { UnauthorizedError } from './unauthorized.error'
 export { NotFoundError, RoomNotFoundError, UserNotFoundError } from './not-found.error'
 export { ConflictError, EmailAlreadyExistsError, UserAlreadyInRoomError } from './conflict.error'
-export { RoomNotWaitingError, RoomFullError, NotRoomMemberError } from './business-rule.error'
+export {
+  RoomNotWaitingError,
+  RoomFullError,
+  RoomCompletedError,
+  NotRoomMemberError,
+} from './business-rule.error'

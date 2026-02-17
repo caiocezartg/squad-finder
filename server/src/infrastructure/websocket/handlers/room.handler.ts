@@ -15,6 +15,7 @@ import type {
   ErrorMessage,
   LobbySubscribedMessage,
   RoomCreatedMessage,
+  RoomUpdatedMessage,
   RoomDeletedMessage,
 } from '../types'
 import type { Room } from '@domain/entities/room.entity'
@@ -284,6 +285,20 @@ export function broadcastRoomCreated(room: Room): void {
     type: 'room_created',
     timestamp: Date.now(),
     payload: { room },
+  }
+  broadcastToLobby(message)
+}
+
+// Called when a room's member count changes (from HTTP controller)
+export function broadcastRoomUpdated(roomId: string, roomCode: string, memberCount: number): void {
+  const message: RoomUpdatedMessage = {
+    type: 'room_updated',
+    timestamp: Date.now(),
+    payload: {
+      roomId,
+      roomCode,
+      memberCount,
+    },
   }
   broadcastToLobby(message)
 }

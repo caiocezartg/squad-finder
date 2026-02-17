@@ -18,6 +18,15 @@ export class RoomFullError extends AppError {
   }
 }
 
+export class RoomCompletedError extends AppError {
+  readonly statusCode = 422
+  readonly code = 'ROOM_COMPLETED'
+
+  constructor(roomId: string) {
+    super(`Room "${roomId}" is completed — players cannot leave`)
+  }
+}
+
 export class NotRoomMemberError extends AppError {
   readonly statusCode = 422
   readonly code = 'NOT_ROOM_MEMBER'

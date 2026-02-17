@@ -5,7 +5,7 @@ import { DeleteExpiredRoomsUseCase } from '@application/use-cases/room/delete-ex
 import { broadcastRoomDeleted } from '@infrastructure/websocket/handlers/room.handler'
 
 const CLEANUP_INTERVAL_MS = 60_000 // 1 minute
-const EXPIRATION_MINUTES = 5
+const EXPIRATION_MINUTES = 60 // 1 hour
 
 async function markLegacyFullRooms(fastify: FastifyInstance): Promise<void> {
   const repository = new DrizzleRoomRepository(fastify.db)
@@ -39,7 +39,7 @@ async function roomCleanupPlugin(fastify: FastifyInstance): Promise<void> {
       fastify.log.error(error, 'Failed to mark legacy full rooms')
     }
 
-    fastify.log.info('Room cleanup scheduler started (interval: 60s, expiration: 5min)')
+    fastify.log.info('Room cleanup scheduler started (interval: 60s, expiration: 60min)')
 
     intervalId = setInterval(async () => {
       try {

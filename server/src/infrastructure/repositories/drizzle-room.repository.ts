@@ -1,4 +1,4 @@
-import { and, eq, count, isNull, lte } from 'drizzle-orm'
+import { and, eq, count, gte, isNull, lte, or } from 'drizzle-orm'
 import type { CreateRoomInput, Room, UpdateRoomInput } from '@domain/entities/room.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { Database } from '@infrastructure/database/drizzle'
@@ -64,7 +64,15 @@ export class DrizzleRoomRepository implements IRoomRepository {
       })
       .from(rooms)
       .leftJoin(roomMembers, eq(rooms.id, roomMembers.roomId))
-      .where(eq(rooms.status, 'waiting'))
+      .where(
+        and(
+          eq(rooms.status, 'waiting'),
+          or(
+            isNull(rooms.completedAt),
+            gte(rooms.completedAt, new Date(Date.now() - 5 * 60_000))
+          )
+        )
+      )
       .groupBy(rooms.id)
 
     return result.map((row) => ({

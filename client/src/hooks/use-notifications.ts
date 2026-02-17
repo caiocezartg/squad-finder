@@ -28,6 +28,21 @@ export function useNotifications(options: UseNotificationsOptions) {
     },
   })
 
+  const markAllAsReadMutation = useMutation({
+    mutationFn: () => api.post<{ success: boolean; count: number }>('/api/notifications/read-all', {}),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['notifications'] })
+    },
+  })
+
+  const deleteNotificationMutation = useMutation({
+    mutationFn: (notificationId: string) =>
+      api.delete<{ success: boolean }>(`/api/notifications/${notificationId}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['notifications'] })
+    },
+  })
+
   const notifications = useMemo(() => query.data?.notifications ?? [], [query.data?.notifications])
   const unreadCount = useMemo(
     () => notifications.filter((notification) => notification.readAt === null).length,
@@ -41,5 +56,9 @@ export function useNotifications(options: UseNotificationsOptions) {
     isFetching: query.isFetching,
     markAsRead: markAsReadMutation.mutateAsync,
     isMarkingAsRead: markAsReadMutation.isPending,
+    markAllAsRead: markAllAsReadMutation.mutateAsync,
+    isMarkingAllAsRead: markAllAsReadMutation.isPending,
+    deleteNotification: deleteNotificationMutation.mutateAsync,
+    isDeletingNotification: deleteNotificationMutation.isPending,
   }
 }

@@ -64,4 +64,35 @@ export async function userRoutes(fastify: FastifyInstance): Promise<void> {
     preHandler: requireAuth,
     handler: userController.markNotificationAsRead.bind(userController),
   })
+
+  app.post('/api/notifications/read-all', {
+    schema: {
+      tags: ['Users'],
+      summary: 'Mark all notifications as read',
+      description: 'Marks all unread notifications as read for the authenticated user.',
+      security: [{ session: [] }],
+      response: {
+        200: z.object({ success: z.boolean(), count: z.number() }),
+        401: errorResponse,
+      },
+    },
+    preHandler: requireAuth,
+    handler: userController.markAllNotificationsAsRead.bind(userController),
+  })
+
+  app.delete('/api/notifications/:id', {
+    schema: {
+      tags: ['Users'],
+      summary: 'Delete notification',
+      description: 'Deletes a notification for the authenticated user.',
+      security: [{ session: [] }],
+      params: notificationIdParamSchema,
+      response: {
+        200: z.object({ success: z.boolean() }),
+        401: errorResponse,
+      },
+    },
+    preHandler: requireAuth,
+    handler: userController.deleteNotification.bind(userController),
+  })
 }

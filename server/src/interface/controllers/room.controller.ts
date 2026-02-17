@@ -14,6 +14,7 @@ import { RoomNotFoundError, InvalidGameError, NotRoomMemberError } from '@applic
 import { createRoomRequestSchema, roomCodeParamSchema } from '@application/dtos'
 import {
   broadcastRoomCreated,
+  broadcastRoomUpdated,
   broadcastRoomDeleted,
 } from '@infrastructure/websocket/handlers/room.handler'
 
@@ -113,6 +114,10 @@ export class RoomController {
     })
 
     const memberCount = await roomMemberRepository.countByRoomId(room.id)
+
+    // Update member count for lobby viewers
+    broadcastRoomUpdated(room.id, room.code, memberCount)
+
     if (memberCount >= room.maxPlayers) {
       const markedAsNotified = await roomRepository.markReadyNotified(room.id, new Date())
 
@@ -183,9 +188,13 @@ export class RoomController {
       throw new NotRoomMemberError(userId, room.id)
     }
 
-    // If host left, the room was deleted - broadcast to lobby
     if (isHost) {
+      // Host left — room was deleted, broadcast to lobby
       broadcastRoomDeleted(room.id, room.code)
+    } else {
+      // Regular member left — update member count for lobby viewers
+      const memberCount = await roomMemberRepository.countByRoomId(room.id)
+      broadcastRoomUpdated(room.id, room.code, memberCount)
     }
 
     await reply.send({

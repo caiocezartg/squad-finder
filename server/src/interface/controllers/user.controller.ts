@@ -47,4 +47,23 @@ export class UserController {
 
     await reply.send({ success })
   }
+
+  async markAllNotificationsAsRead(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = getUserId(request)
+
+    const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
+    const count = await userNotificationRepository.markAllAsRead(userId)
+
+    await reply.send({ success: true, count })
+  }
+
+  async deleteNotification(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = getUserId(request)
+    const params = notificationIdParamSchema.parse(request.params)
+
+    const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
+    const success = await userNotificationRepository.delete(params.id, userId)
+
+    await reply.send({ success })
+  }
 }
