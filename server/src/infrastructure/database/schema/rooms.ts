@@ -18,6 +18,7 @@ export const rooms = pgTable('rooms', {
   maxPlayers: integer('max_players').notNull().default(5),
   discordLink: text('discord_link'),
   completedAt: timestamp('completed_at', { withTimezone: true }),
+  readyNotifiedAt: timestamp('ready_notified_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 })

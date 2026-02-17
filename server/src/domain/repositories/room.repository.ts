@@ -9,5 +9,6 @@ export interface IRoomRepository {
   create(input: CreateRoomInput): Promise<Room>
   findExpiredRooms(beforeDate: Date): Promise<Room[]>
   update(id: string, input: UpdateRoomInput): Promise<Room | null>
+  markReadyNotified(roomId: string, notifiedAt: Date): Promise<boolean>
   delete(id: string): Promise<boolean>
 }

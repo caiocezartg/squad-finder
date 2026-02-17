@@ -57,6 +57,31 @@ export const roomMemberSchema = z.object({
 
 export type RoomMemberDto = z.infer<typeof roomMemberSchema>
 
+// User notification schema
+export const userNotificationTypeSchema = z.enum(['room_ready'])
+
+export const userNotificationPayloadSchema = z.object({
+  roomId: z.uuid(),
+  roomCode: z.string().length(6),
+  roomName: z.string(),
+  gameName: z.string(),
+  players: z.array(z.string()),
+  discordLink: z.url().nullable(),
+})
+
+export const userNotificationSchema = z.object({
+  id: z.uuid(),
+  userId: z.string(),
+  type: userNotificationTypeSchema,
+  title: z.string(),
+  message: z.string(),
+  payload: userNotificationPayloadSchema,
+  readAt: z.coerce.date().nullable(),
+  createdAt: z.coerce.date(),
+})
+
+export type UserNotificationDto = z.infer<typeof userNotificationSchema>
+
 // Create room input schema
 export const createRoomInputSchema = z.object({
   name: z.string().min(1, 'Room name is required').max(100, 'Room name too long'),

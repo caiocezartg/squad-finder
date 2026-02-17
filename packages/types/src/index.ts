@@ -47,8 +47,36 @@ export type RoomMember = {
   joinedAt: Date
 }
 
+export type UserNotificationType = 'room_ready'
+
+export type UserNotificationPayload = {
+  roomId: string
+  roomCode: string
+  roomName: string
+  gameName: string
+  players: string[]
+  discordLink: string | null
+}
+
+export type UserNotification = {
+  id: string
+  userId: string
+  type: UserNotificationType
+  title: string
+  message: string
+  payload: UserNotificationPayload
+  readAt: Date | null
+  createdAt: Date
+}
+
 // API Response Types
-export type { RoomsResponse, RoomResponse, GamesResponse, CreateRoomResponse } from './api'
+export type {
+  RoomsResponse,
+  RoomResponse,
+  GamesResponse,
+  CreateRoomResponse,
+  NotificationsResponse,
+} from './api'
 
 // WebSocket Payload Types
 export type {

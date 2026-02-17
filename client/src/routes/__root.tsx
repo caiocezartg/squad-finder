@@ -3,6 +3,7 @@ import { useSession, signIn, signOut } from '@/lib/auth-client'
 import { useState } from 'react'
 import { Users, ChevronDown, LogOut } from 'lucide-react'
 import { DiscordIcon } from '@/components/ui/icons'
+import { NotificationsMenu } from '@/components/layout/notifications-menu'
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -11,6 +12,7 @@ export const Route = createRootRoute({
 function RootLayout() {
   const { data: session } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const matches = useMatches()
   const isLanding = matches.length > 0 && matches[matches.length - 1]?.fullPath === '/'
 
@@ -52,31 +54,53 @@ function RootLayout() {
 
           <div className="flex items-center gap-3">
             {session?.user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-hover transition-colors"
-                >
-                  {session.user.image ? (
-                    <img
-                      src={session.user.image}
-                      alt=""
-                      className="size-7 rounded-full ring-1 ring-border"
-                    />
-                  ) : (
-                    <div className="size-7 rounded-full bg-accent/20 flex items-center justify-center text-xs font-bold text-accent">
-                      {session.user.name?.charAt(0)?.toUpperCase()}
-                    </div>
-                  )}
-                  <span className="hidden sm:block text-sm font-medium text-offwhite">
-                    {session.user.name}
-                  </span>
-                  <ChevronDown className="size-4 text-muted" />
-                </button>
+              <>
+                {(menuOpen || notificationsOpen) && (
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => {
+                      setMenuOpen(false)
+                      setNotificationsOpen(false)
+                    }}
+                  />
+                )}
 
-                {menuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <NotificationsMenu
+                  enabled={!!session?.user}
+                  isOpen={notificationsOpen}
+                  onToggle={() => {
+                    setNotificationsOpen((prev) => !prev)
+                    setMenuOpen(false)
+                  }}
+                  onClose={() => setNotificationsOpen(false)}
+                />
+
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setMenuOpen((prev) => !prev)
+                      setNotificationsOpen(false)
+                    }}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface-hover transition-colors"
+                  >
+                    {session.user.image ? (
+                      <img
+                        src={session.user.image}
+                        alt=""
+                        className="size-7 rounded-full ring-1 ring-border"
+                      />
+                    ) : (
+                      <div className="size-7 rounded-full bg-accent/20 flex items-center justify-center text-xs font-bold text-accent">
+                        {session.user.name?.charAt(0)?.toUpperCase()}
+                      </div>
+                    )}
+                    <span className="hidden sm:block text-sm font-medium text-offwhite">
+                      {session.user.name}
+                    </span>
+                    <ChevronDown className="size-4 text-muted" />
+                  </button>
+
+                  {menuOpen && (
                     <div className="absolute right-0 top-full mt-2 z-50 w-48 rounded-xl border border-border bg-surface p-1 shadow-2xl shadow-black/50">
                       <div className="px-3 py-2 border-b border-border mb-1">
                         <p className="text-xs text-muted truncate">{session.user.email}</p>
@@ -92,9 +116,9 @@ function RootLayout() {
                         Sign Out
                       </button>
                     </div>
-                  </>
-                )}
-              </div>
+                  )}
+                </div>
+              </>
             ) : (
               <button onClick={handleSignIn} className="btn-discord gap-2">
                 <DiscordIcon className="size-4" />

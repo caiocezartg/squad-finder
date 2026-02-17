@@ -1,4 +1,4 @@
-import { eq, count, lte } from 'drizzle-orm'
+import { and, eq, count, isNull, lte } from 'drizzle-orm'
 import type { CreateRoomInput, Room, UpdateRoomInput } from '@domain/entities/room.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { Database } from '@infrastructure/database/drizzle'
@@ -25,6 +25,7 @@ function mapRowToEntity(row: RoomRow): Room {
     maxPlayers: row.maxPlayers,
     discordLink: row.discordLink,
     completedAt: row.completedAt,
+    readyNotifiedAt: row.readyNotifiedAt,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }
@@ -107,6 +108,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
       maxPlayers: number
       discordLink: string
       completedAt: Date
+      readyNotifiedAt: Date
       updatedAt: Date
     }> = {
       updatedAt: new Date(),
@@ -127,11 +129,27 @@ export class DrizzleRoomRepository implements IRoomRepository {
     if (input.completedAt !== undefined) {
       updateData.completedAt = input.completedAt
     }
+    if (input.readyNotifiedAt !== undefined) {
+      updateData.readyNotifiedAt = input.readyNotifiedAt
+    }
 
     const result = await this.db.update(rooms).set(updateData).where(eq(rooms.id, id)).returning()
 
     const row = result[0]
     return row ? mapRowToEntity(row) : null
+  }
+
+  async markReadyNotified(roomId: string, notifiedAt: Date): Promise<boolean> {
+    const result = await this.db
+      .update(rooms)
+      .set({
+        readyNotifiedAt: notifiedAt,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(rooms.id, roomId), isNull(rooms.readyNotifiedAt)))
+      .returning({ id: rooms.id })
+
+    return result.length > 0
   }
 
   async delete(id: string): Promise<boolean> {

@@ -2,11 +2,14 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository'
 import { DrizzleRoomMemberRepository } from '@infrastructure/repositories/drizzle-room-member.repository'
 import { DrizzleGameRepository } from '@infrastructure/repositories/drizzle-game.repository'
+import { DrizzleUserRepository } from '@infrastructure/repositories/drizzle-user.repository'
+import { DrizzleUserNotificationRepository } from '@infrastructure/repositories/drizzle-user-notification.repository'
 import { CreateRoomUseCase } from '@application/use-cases/room/create-room.use-case'
 import { GetAvailableRoomsUseCase } from '@application/use-cases/room/get-available-rooms.use-case'
 import { GetRoomByCodeUseCase } from '@application/use-cases/room/get-room-by-code.use-case'
 import { JoinRoomUseCase } from '@application/use-cases/room/join-room.use-case'
 import { LeaveRoomUseCase } from '@application/use-cases/room/leave-room.use-case'
+import { NotifyRoomReadyUseCase } from '@application/use-cases/room/notify-room-ready.use-case'
 import { RoomNotFoundError, InvalidGameError, NotRoomMemberError } from '@application/errors'
 import { createRoomRequestSchema, roomCodeParamSchema } from '@application/dtos'
 import {
@@ -108,6 +111,46 @@ export class RoomController {
       roomId: room.id,
       userId,
     })
+
+    const memberCount = await roomMemberRepository.countByRoomId(room.id)
+    if (memberCount >= room.maxPlayers) {
+      const markedAsNotified = await roomRepository.markReadyNotified(room.id, new Date())
+
+      if (markedAsNotified) {
+        try {
+          const userRepository = new DrizzleUserRepository(request.server.db)
+          const gameRepository = new DrizzleGameRepository(request.server.db)
+          const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
+
+          const notifyRoomReadyUseCase = new NotifyRoomReadyUseCase(
+            roomRepository,
+            roomMemberRepository,
+            userRepository,
+            gameRepository,
+            userNotificationRepository
+          )
+
+          const notificationResult = await notifyRoomReadyUseCase.execute({ roomId: room.id })
+          request.server.log.info(
+            {
+              roomId: room.id,
+              roomCode: room.code,
+              ...notificationResult,
+            },
+            'Room ready notifications processed'
+          )
+        } catch (error) {
+          request.server.log.error(
+            {
+              roomId: room.id,
+              roomCode: room.code,
+              error,
+            },
+            'Failed to process room ready notifications'
+          )
+        }
+      }
+    }
 
     await reply.send({
       message: 'Joined room successfully',

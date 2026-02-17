@@ -10,6 +10,7 @@ export interface Room {
   readonly maxPlayers: number
   readonly discordLink: string | null
   readonly completedAt: Date | null
+  readonly readyNotifiedAt: Date | null
   readonly memberCount?: number
   readonly createdAt: Date
   readonly updatedAt: Date
@@ -29,4 +30,5 @@ export interface UpdateRoomInput {
   readonly maxPlayers?: number
   readonly discordLink?: string
   readonly completedAt?: Date
+  readonly readyNotifiedAt?: Date
 }

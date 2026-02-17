@@ -1,4 +1,4 @@
-import type { Room, Game } from './index'
+import type { Room, Game, UserNotification } from './index'
 
 // API Response Types
 export type RoomsResponse = {
@@ -15,4 +15,8 @@ export type GamesResponse = {
 
 export type CreateRoomResponse = {
   room: Room
+}
+
+export type NotificationsResponse = {
+  notifications: UserNotification[]
 }
