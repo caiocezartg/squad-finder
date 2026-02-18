@@ -1,7 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { DrizzleUserRepository } from '@infrastructure/repositories/drizzle-user.repository'
-import { DrizzleUserNotificationRepository } from '@infrastructure/repositories/drizzle-user-notification.repository'
-import { GetUserUseCase } from '@application/use-cases/user/get-user.use-case'
+import type { IUserNotificationRepository } from '@domain/repositories/user-notification.repository'
+import type { IGetUserUseCase } from '@application/use-cases/user/get-user.use-case'
 import { UserNotFoundError, UnauthorizedError } from '@application/errors'
 import { listNotificationsQuerySchema, notificationIdParamSchema } from '@application/dtos'
 
@@ -12,13 +11,17 @@ function getUserId(request: FastifyRequest): string {
   return request.session.user.id
 }
 
+export interface UserControllerDeps {
+  readonly getUserUseCase: IGetUserUseCase
+  readonly userNotificationRepository: IUserNotificationRepository
+}
+
 export class UserController {
+  constructor(private readonly deps: UserControllerDeps) {}
+
   async me(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = getUserId(request)
-
-    const userRepository = new DrizzleUserRepository(request.server.db)
-    const useCase = new GetUserUseCase(userRepository)
-    const result = await useCase.execute({ id: userId })
+    const result = await this.deps.getUserUseCase.execute({ id: userId })
 
     if (!result.user) {
       throw new UserNotFoundError(userId)
@@ -32,8 +35,7 @@ export class UserController {
     const query = listNotificationsQuerySchema.parse(request.query)
     const limit = query.limit ?? 20
 
-    const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
-    const notifications = await userNotificationRepository.findByUserId(userId, limit)
+    const notifications = await this.deps.userNotificationRepository.findByUserId(userId, limit)
 
     await reply.send({ notifications })
   }
@@ -42,8 +44,7 @@ export class UserController {
     const userId = getUserId(request)
     const params = notificationIdParamSchema.parse(request.params)
 
-    const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
-    const success = await userNotificationRepository.markAsRead(params.id, userId)
+    const success = await this.deps.userNotificationRepository.markAsRead(params.id, userId)
 
     await reply.send({ success })
   }
@@ -51,8 +52,7 @@ export class UserController {
   async markAllNotificationsAsRead(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = getUserId(request)
 
-    const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
-    const count = await userNotificationRepository.markAllAsRead(userId)
+    const count = await this.deps.userNotificationRepository.markAllAsRead(userId)
 
     await reply.send({ success: true, count })
   }
@@ -61,8 +61,7 @@ export class UserController {
     const userId = getUserId(request)
     const params = notificationIdParamSchema.parse(request.params)
 
-    const userNotificationRepository = new DrizzleUserNotificationRepository(request.server.db)
-    const success = await userNotificationRepository.delete(params.id, userId)
+    const success = await this.deps.userNotificationRepository.delete(params.id, userId)
 
     await reply.send({ success })
   }

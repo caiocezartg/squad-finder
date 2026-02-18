@@ -18,11 +18,12 @@ describe('LeaveRoomUseCase', () => {
   })
 
   describe('execute', () => {
-    it('should leave room successfully', async () => {
+    it('should leave room successfully and return member count', async () => {
       const room = createMockRoom({ id: 'room-1', hostId: 'host-user' })
 
       mockRoomMemberRepository.delete.mockResolvedValue(true)
       mockRoomRepository.findById.mockResolvedValue(room)
+      mockRoomMemberRepository.countByRoomId.mockResolvedValue(3)
 
       const result = await useCase.execute({
         roomId: 'room-1',
@@ -30,7 +31,10 @@ describe('LeaveRoomUseCase', () => {
       })
 
       expect(result.success).toBe(true)
+      expect(result.wasHostLeave).toBe(false)
+      expect(result.memberCount).toBe(3)
       expect(mockRoomMemberRepository.delete).toHaveBeenCalledWith('room-1', 'regular-user')
+      expect(mockRoomMemberRepository.countByRoomId).toHaveBeenCalledWith('room-1')
       expect(mockRoomRepository.delete).not.toHaveBeenCalled()
     })
 
@@ -48,6 +52,8 @@ describe('LeaveRoomUseCase', () => {
       })
 
       expect(result.success).toBe(true)
+      expect(result.wasHostLeave).toBe(true)
+      expect(result.memberCount).toBe(0)
       expect(mockRoomMemberRepository.delete).toHaveBeenCalledWith('room-1', 'host-user')
       expect(mockRoomMemberRepository.deleteByRoomId).toHaveBeenCalledWith('room-1')
       expect(mockRoomRepository.delete).toHaveBeenCalledWith('room-1')
@@ -65,6 +71,7 @@ describe('LeaveRoomUseCase', () => {
       })
 
       expect(result.success).toBe(false)
+      expect(result.wasHostLeave).toBe(false)
       expect(mockRoomMemberRepository.delete).toHaveBeenCalledWith('room-1', 'non-member-user')
       expect(mockRoomRepository.delete).not.toHaveBeenCalled()
     })

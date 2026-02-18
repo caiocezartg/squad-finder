@@ -12,7 +12,11 @@ export interface NotifyRoomReadyOutput {
   readonly inAppCreated: number
 }
 
-export class NotifyRoomReadyUseCase {
+export interface INotifyRoomReadyUseCase {
+  execute(input: NotifyRoomReadyInput): Promise<NotifyRoomReadyOutput>
+}
+
+export class NotifyRoomReadyUseCase implements INotifyRoomReadyUseCase {
   constructor(
     private readonly roomRepository: IRoomRepository,
     private readonly roomMemberRepository: IRoomMemberRepository,

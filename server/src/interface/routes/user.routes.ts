@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { requireAuth } from '@interface/hooks/auth.hook'
-import { UserController } from '@interface/controllers/user.controller'
+import { createUserController } from '@interface/factories/user.factory'
 import { userSchema, userNotificationSchema } from '@squadfinder/schemas'
 import { listNotificationsQuerySchema, notificationIdParamSchema } from '@application/dtos'
 
@@ -13,7 +13,7 @@ const errorResponse = z.object({
 
 export async function userRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>()
-  const userController = new UserController()
+  const userController = createUserController(fastify.db)
 
   app.get('/api/users/me', {
     schema: {

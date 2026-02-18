@@ -9,6 +9,8 @@ export interface LeaveRoomInput {
 
 export interface LeaveRoomOutput {
   readonly success: boolean
+  readonly wasHostLeave: boolean
+  readonly memberCount: number
 }
 
 export interface ILeaveRoomUseCase {
@@ -31,14 +33,18 @@ export class LeaveRoomUseCase implements ILeaveRoomUseCase {
     const deleted = await this.roomMemberRepository.delete(input.roomId, input.userId)
 
     if (!deleted) {
-      return { success: false }
+      return { success: false, wasHostLeave: false, memberCount: 0 }
     }
 
-    if (room && room.hostId === input.userId) {
+    const wasHostLeave = room !== null && room.hostId === input.userId
+
+    if (wasHostLeave) {
       await this.roomMemberRepository.deleteByRoomId(input.roomId)
       await this.roomRepository.delete(input.roomId)
+      return { success: true, wasHostLeave: true, memberCount: 0 }
     }
 
-    return { success: true }
+    const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
+    return { success: true, wasHostLeave: false, memberCount }
   }
 }

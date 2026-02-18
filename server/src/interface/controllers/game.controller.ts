@@ -1,10 +1,15 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
-import { DrizzleGameRepository } from '@infrastructure/repositories/drizzle-game.repository'
+import type { IGameRepository } from '@domain/repositories/game.repository'
+
+export interface GameControllerDeps {
+  readonly gameRepository: IGameRepository
+}
 
 export class GameController {
-  async list(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-    const gameRepository = new DrizzleGameRepository(request.server.db)
-    const games = await gameRepository.findAll()
+  constructor(private readonly deps: GameControllerDeps) {}
+
+  async list(_request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const games = await this.deps.gameRepository.findAll()
 
     await reply.send({ games })
   }

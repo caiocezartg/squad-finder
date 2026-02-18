@@ -2,8 +2,8 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { requireAuth } from '@interface/hooks/auth.hook'
-import { RoomController } from '@interface/controllers/room.controller'
-import { GameController } from '@interface/controllers/game.controller'
+import { createRoomController } from '@interface/factories/room.factory'
+import { createGameController } from '@interface/factories/game.factory'
 import {
   gameSchema,
   roomSchema,
@@ -20,8 +20,8 @@ const errorResponse = z.object({
 
 export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>()
-  const roomController = new RoomController()
-  const gameController = new GameController()
+  const roomController = createRoomController(fastify.db)
+  const gameController = createGameController(fastify.db)
 
   // Games
   app.get('/api/games', {

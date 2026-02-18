@@ -29,7 +29,7 @@ describe('JoinRoomUseCase', () => {
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
-      mockRoomMemberRepository.countByRoomId.mockResolvedValue(2)
+      mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(2).mockResolvedValueOnce(3)
       mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
 
       const result = await useCase.execute({
@@ -38,9 +38,10 @@ describe('JoinRoomUseCase', () => {
       })
 
       expect(result.roomMember).toEqual(expectedMember)
+      expect(result.memberCount).toBe(3)
+      expect(result.isRoomNowFull).toBe(false)
       expect(mockRoomRepository.findById).toHaveBeenCalledWith('room-1')
       expect(mockRoomMemberRepository.findByRoomAndUser).toHaveBeenCalledWith('room-1', 'user-1')
-      expect(mockRoomMemberRepository.countByRoomId).toHaveBeenCalledWith('room-1')
       expect(mockRoomMemberRepository.create).toHaveBeenCalledWith({
         roomId: 'room-1',
         userId: 'user-1',
@@ -87,6 +88,7 @@ describe('JoinRoomUseCase', () => {
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(existingMember)
+      mockRoomMemberRepository.countByRoomId.mockResolvedValue(3)
 
       const result = await useCase.execute({
         roomId: 'room-1',
@@ -94,10 +96,12 @@ describe('JoinRoomUseCase', () => {
       })
 
       expect(result.roomMember).toEqual(existingMember)
+      expect(result.memberCount).toBe(3)
+      expect(result.isRoomNowFull).toBe(false)
       expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
     })
 
-    it('should set completedAt when last player joins', async () => {
+    it('should set completedAt and markReadyNotified when last player joins', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 3 })
       const expectedMember = createMockRoomMember({
         roomId: 'room-1',
@@ -113,6 +117,7 @@ describe('JoinRoomUseCase', () => {
       mockRoomRepository.update.mockResolvedValue(
         createMockRoom({ ...room, completedAt: new Date() })
       )
+      mockRoomRepository.markReadyNotified.mockResolvedValue(true)
 
       const result = await useCase.execute({
         roomId: 'room-1',
@@ -120,9 +125,12 @@ describe('JoinRoomUseCase', () => {
       })
 
       expect(result.roomMember).toEqual(expectedMember)
+      expect(result.memberCount).toBe(3)
+      expect(result.isRoomNowFull).toBe(true)
       expect(mockRoomRepository.update).toHaveBeenCalledWith('room-1', {
         completedAt: expect.any(Date),
       })
+      expect(mockRoomRepository.markReadyNotified).toHaveBeenCalledWith('room-1', expect.any(Date))
     })
 
     it('should not set completedAt when room is not full after join', async () => {
@@ -137,12 +145,14 @@ describe('JoinRoomUseCase', () => {
       mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(1).mockResolvedValueOnce(2)
       mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
 
-      await useCase.execute({
+      const result = await useCase.execute({
         roomId: 'room-1',
         userId: 'user-2',
       })
 
+      expect(result.isRoomNowFull).toBe(false)
       expect(mockRoomRepository.update).not.toHaveBeenCalled()
+      expect(mockRoomRepository.markReadyNotified).not.toHaveBeenCalled()
     })
 
     it('should throw RoomNotWaitingError if room status is not waiting', async () => {

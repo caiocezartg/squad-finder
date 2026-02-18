@@ -10,6 +10,8 @@ export interface JoinRoomInput {
 
 export interface JoinRoomOutput {
   readonly roomMember: RoomMember
+  readonly memberCount: number
+  readonly isRoomNowFull: boolean
 }
 
 export interface IJoinRoomUseCase {
@@ -38,7 +40,8 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       input.userId
     )
     if (existingMember) {
-      return { roomMember: existingMember }
+      const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
+      return { roomMember: existingMember, memberCount, isRoomNowFull: false }
     }
 
     const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
@@ -53,12 +56,15 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
 
     // Set completedAt when room reaches max players (triggers auto-deletion after 5 min)
     const newMemberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
-    if (newMemberCount >= room.maxPlayers) {
+    const isRoomNowFull = newMemberCount >= room.maxPlayers
+
+    if (isRoomNowFull) {
       await this.roomRepository.update(input.roomId, {
         completedAt: new Date(),
       })
+      await this.roomRepository.markReadyNotified(input.roomId, new Date())
     }
 
-    return { roomMember }
+    return { roomMember, memberCount: newMemberCount, isRoomNowFull }
   }
 }
