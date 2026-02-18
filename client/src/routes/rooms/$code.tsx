@@ -17,7 +17,7 @@ import {
   errorPayloadSchema,
   roomDeletedPayloadSchema,
 } from '@squadfinder/schemas/ws'
-import { Copy, LogOut } from 'lucide-react'
+import { ArrowLeft, Copy, LogOut } from 'lucide-react'
 import type { RoomResponse, GamesResponse, Player } from '@/types'
 
 export const Route = createFileRoute('/rooms/$code')({
@@ -152,7 +152,7 @@ function RoomLobbyPage() {
     return (
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="card h-48 animate-pulse mb-6" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="card h-16 animate-pulse" />
           ))}
@@ -181,9 +181,29 @@ function RoomLobbyPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+      {/* Top navigation bar */}
+      <div className="flex items-center justify-between mb-6">
+        <Link
+          to="/rooms"
+          className="flex items-center gap-2 rounded-lg border border-border-light bg-surface px-4 py-2 text-sm text-muted hover:text-offwhite hover:border-muted/30 hover:bg-surface-hover transition-all"
+        >
+          <ArrowLeft className="size-4" />
+          Back to rooms
+        </Link>
+        <button
+          onClick={handleLeaveRoom}
+          disabled={isRoomReady}
+          className="flex items-center gap-2 rounded-lg border border-danger/20 bg-danger/5 px-4 py-2 text-sm text-danger/80 hover:text-danger hover:bg-danger/10 hover:border-danger/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          title={isRoomReady ? 'Cannot leave a full room' : undefined}
+        >
+          <LogOut className="size-4" />
+          {isRoomReady ? 'Squad locked' : 'Leave room'}
+        </button>
+      </div>
+
       {/* Room Header with game cover background */}
-      <div className="relative rounded-2xl overflow-hidden mb-8">
+      <div className="relative rounded-2xl overflow-hidden mb-6">
         {/* Background image */}
         <div className="absolute inset-0">
           {game?.coverUrl ? (
@@ -244,59 +264,25 @@ function RoomLobbyPage() {
         </div>
       )}
 
-      {/* Room Ready Banner */}
-      {isRoomReady && (
-        <div className="mb-6 rounded-xl border border-accent/30 bg-accent/5 p-4 text-center">
-          <p className="font-heading text-lg font-bold text-accent">
-            Room is full! Your squad is ready!
-          </p>
+      {/* Discord invite — full-width, prominent */}
+      {isRoomReady && room?.discordLink && (
+        <div className="mb-6">
+          <DiscordLinkCard discordLink={room.discordLink} isRoomReady={isRoomReady} />
         </div>
       )}
 
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Players - takes 2 columns */}
-        <div className="lg:col-span-2">
-          <div className="card p-5">
-            <h2 className="font-heading text-sm font-bold text-muted mb-4 uppercase tracking-wider">
-              Players ({players.length}/{maxPlayers})
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {players.map((player, i) => (
-                <PlayerSlot key={player.id} player={player} index={i} />
-              ))}
-              {Array.from({ length: emptySlots }).map((_, i) => (
-                <PlayerSlot key={`empty-${i}`} index={players.length + i} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Discord Link */}
-          {isRoomReady && room?.discordLink && (
-            <DiscordLinkCard discordLink={room.discordLink} isRoomReady={isRoomReady} />
-          )}
-
-          {/* Actions */}
-          <div className="card p-5 space-y-3">
-            <h2 className="font-heading text-sm font-bold text-muted uppercase tracking-wider">
-              Actions
-            </h2>
-            <button
-              onClick={handleLeaveRoom}
-              disabled={isRoomReady}
-              className="btn-danger w-full gap-2"
-              title={isRoomReady ? 'Cannot leave a full room' : undefined}
-            >
-              <LogOut className="size-4" />
-              {isRoomReady ? 'Squad is locked' : 'Leave room'}
-            </button>
-            <Link to="/rooms" className="btn-ghost w-full">
-              Back to rooms
-            </Link>
-          </div>
+      {/* Players — full width */}
+      <div className="card p-5">
+        <h2 className="font-heading text-sm font-bold text-muted mb-4 uppercase tracking-wider">
+          Players ({players.length}/{maxPlayers})
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {players.map((player, i) => (
+            <PlayerSlot key={player.id} player={player} index={i} />
+          ))}
+          {Array.from({ length: emptySlots }).map((_, i) => (
+            <PlayerSlot key={`empty-${i}`} index={players.length + i} />
+          ))}
         </div>
       </div>
     </div>

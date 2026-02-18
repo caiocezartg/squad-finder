@@ -1,5 +1,16 @@
 # SquadFinder - Task Progress
 
+## Current Task
+
+### Room Card Banner Design Refactor (2026-02-17)
+
+**Design:** Horizontal neon banner, 2-column grid, image left + content right, neon left border, visual mock tags (language PT + contextual tag derived from room name), player slots as dot indicators.
+
+- [x] Redesign `client/src/components/rooms/room-card.tsx` → horizontal banner layout
+- [x] Update grid in `client/src/routes/rooms/index.tsx` → `grid-cols-1 lg:grid-cols-2`
+- [x] Update loading skeleton in `rooms/index.tsx` → landscape dimensions
+- [x] Typecheck + lint pass (0 errors, 0 warnings)
+
 ## Completed Tasks
 
 ### WS Fix, Notification Redesign & Room Visibility (2026-02-17)

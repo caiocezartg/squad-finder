@@ -177,9 +177,9 @@ function RoomsPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="card h-52 animate-pulse" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="card h-40 animate-pulse" />
           ))}
         </div>
       </div>
@@ -191,7 +191,7 @@ function RoomsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-heading text-2xl font-bold sm:text-3xl">Explore Rooms</h1>
+          <h1 className="font-heading text-2xl font-bold sm:text-3xl">Explore rooms</h1>
           <p className="mt-1 text-sm text-muted">
             {roomCount} room{roomCount !== 1 ? 's' : ''} available
           </p>
@@ -249,7 +249,7 @@ function RoomsPage() {
         />
       ) : (
         <>
-          <div id="rooms-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div id="rooms-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {paginatedRooms.map((room) => (
               <RoomCard
                 key={room.id}

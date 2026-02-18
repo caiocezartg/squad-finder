@@ -32,9 +32,7 @@ function NotificationItem({
         disabled={disabled}
         onClick={onNavigate}
         className={`w-full rounded-lg px-3 py-2.5 text-left transition-all duration-200 ${
-          isUnread
-            ? 'bg-accent/[0.06] hover:bg-accent/[0.1]'
-            : 'hover:bg-surface-hover'
+          isUnread ? 'bg-accent/[0.06] hover:bg-accent/[0.1]' : 'hover:bg-surface-hover'
         }`}
       >
         <div className="flex gap-2.5">
@@ -42,16 +40,12 @@ function NotificationItem({
           <div className="flex flex-col items-center pt-0.5">
             <div
               className={`size-7 rounded-lg flex items-center justify-center shrink-0 ${
-                isUnread
-                  ? 'bg-accent/15 text-accent'
-                  : 'bg-surface-light text-muted'
+                isUnread ? 'bg-accent/15 text-accent' : 'bg-surface-light text-muted'
               }`}
             >
               <Gamepad2 className="size-3.5" />
             </div>
-            {isUnread && (
-              <div className="mt-1.5 size-1.5 rounded-full bg-accent shrink-0" />
-            )}
+            {isUnread && <div className="mt-1.5 size-1.5 rounded-full bg-accent shrink-0" />}
           </div>
 
           {/* Content */}
@@ -64,15 +58,17 @@ function NotificationItem({
               >
                 {notification.payload.roomName}
               </p>
-              <span className="text-[10px] text-muted/60 shrink-0 pt-px">{timeAgo}</span>
             </div>
 
             <div className="mt-1 flex items-center gap-1.5">
-              <span className="badge-accent text-[9px] px-1.5 py-0">{notification.payload.gameName}</span>
+              <span className="badge-accent text-[9px] px-1.5 py-0">
+                {notification.payload.gameName}
+              </span>
               <span className="flex items-center gap-0.5 text-[10px] text-muted">
                 <Users className="size-2.5" />
                 {playerCount}
               </span>
+              <span className="text-[10px] text-muted/60 shrink-0 pt-px">{timeAgo}</span>
             </div>
 
             <p className="mt-1 text-[11px] text-muted/80 leading-snug line-clamp-1">
@@ -199,7 +195,8 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
           {notifications.length > 0 && (
             <div className="border-t border-border px-4 py-2">
               <p className="text-center text-[10px] text-muted/50">
-                Showing last {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+                Showing last {notifications.length} notification
+                {notifications.length !== 1 ? 's' : ''}
               </p>
             </div>
           )}
