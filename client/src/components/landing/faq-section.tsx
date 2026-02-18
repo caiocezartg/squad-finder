@@ -66,7 +66,7 @@ export function FAQSection() {
         <Accordion.Root className="space-y-2">
           {FAQ_ITEMS.map((item, i) => (
             <motion.div
-              key={i}
+              key={item.question}
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}

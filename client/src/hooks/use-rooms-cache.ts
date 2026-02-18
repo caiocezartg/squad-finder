@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { Room, RoomsResponse } from '@/types'
 
-export interface UseRoomsCacheReturn {
+interface UseRoomsCacheReturn {
   addRoom: (room: Room) => void
   updateRoom: (roomId: string, updates: Partial<Room>) => void
   removeRoom: (roomId: string) => void

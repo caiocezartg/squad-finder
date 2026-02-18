@@ -103,7 +103,11 @@ export function BackgroundRipple() {
   return (
     <div
       ref={containerRef}
+      role="presentation"
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') handleClick(e as unknown as React.MouseEvent)
+      }}
       className="absolute inset-0 overflow-hidden"
       style={{
         maskImage: 'linear-gradient(to bottom, black 40%, transparent 85%)',

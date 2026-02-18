@@ -8,13 +8,13 @@ import {
 } from '@squadfinder/schemas/ws'
 import type { WebSocketEventHandler } from '@/lib/ws-client'
 
-export interface UseLobbyEventsOptions {
+interface UseLobbyEventsOptions {
   isConnected: boolean
   send: (type: string, data: unknown) => void
   on: (event: string, handler: WebSocketEventHandler) => () => void
 }
 
-export interface UseLobbyEventsReturn {
+interface UseLobbyEventsReturn {
   isSubscribed: boolean
 }
 

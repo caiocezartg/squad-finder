@@ -1,6 +1,6 @@
 export type WebSocketEventHandler = (data: unknown) => void
 
-export interface WebSocketClientOptions {
+interface WebSocketClientOptions {
   url: string
   reconnectInterval?: number
   maxReconnectAttempts?: number

@@ -1,13 +1,5 @@
-// Re-export all shared types from the monorepo package
-export type {
-  Room,
-  Game,
-  RoomStatus,
-  User,
-  RoomMember,
-  UserNotification,
-  UserNotificationPayload,
-} from '@squadfinder/types'
+// Re-export shared types from the monorepo package
+export type { Room, Game, UserNotification } from '@squadfinder/types'
 export type {
   RoomsResponse,
   RoomResponse,
@@ -15,14 +7,4 @@ export type {
   CreateRoomResponse,
   NotificationsResponse,
 } from '@squadfinder/types'
-export type {
-  Player,
-  RoomCreatedPayload,
-  RoomUpdatedPayload,
-  RoomDeletedPayload,
-  RoomJoinedPayload,
-  PlayerJoinedPayload,
-  PlayerLeftPayload,
-  RoomReadyPayload,
-  WsErrorPayload,
-} from '@squadfinder/types'
+export type { Player } from '@squadfinder/types'

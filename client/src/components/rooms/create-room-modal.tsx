@@ -110,7 +110,7 @@ export function CreateRoomModal({
 
               {/* Game Select */}
               <div>
-                <label className="block text-sm font-medium text-offwhite mb-1.5">Game</label>
+                <label htmlFor="modal-gameId" className="block text-sm font-medium text-offwhite mb-1.5">Game</label>
                 <Controller
                   name="gameId"
                   control={control}
@@ -122,6 +122,7 @@ export function CreateRoomModal({
                       }}
                     >
                       <Select.Trigger
+                        id="modal-gameId"
                         className={`flex h-[42px] w-full cursor-default items-center justify-between rounded-lg border px-4 text-sm transition-colors duration-200 select-none focus:outline-none focus:ring-1 ${
                           errors.gameId
                             ? 'border-danger/50 bg-surface text-offwhite focus:border-danger/70 focus:ring-danger/20'

@@ -41,8 +41,8 @@ function DiscordClickIllustration() {
       {/* Click ripple */}
       <motion.div
         className="absolute z-0 size-3 rounded-full bg-discord/30"
-        initial={{ scale: 0, opacity: 0 }}
-        whileInView={{ scale: [0, 8], opacity: [0.6, 0] }}
+        initial={{ scale: 0.95, opacity: 0 }}
+        whileInView={{ scale: [0.95, 8], opacity: [0.6, 0] }}
         viewport={{ once: true }}
         transition={{ delay: 1, duration: 0.6, ease: 'easeOut' }}
       />
@@ -50,7 +50,7 @@ function DiscordClickIllustration() {
       {/* Success checkmark */}
       <motion.div
         className="absolute top-3 right-4 z-10 size-6 rounded-full bg-accent/15 flex items-center justify-center"
-        initial={{ scale: 0, opacity: 0 }}
+        initial={{ scale: 0.95, opacity: 0 }}
         whileInView={{ scale: 1, opacity: 1 }}
         viewport={{ once: true }}
         transition={{ delay: 1.4, duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
@@ -76,7 +76,7 @@ function RoomBrowseIllustration() {
 
       {rooms.map((room, i) => (
         <motion.div
-          key={i}
+          key={room.name}
           className={`relative z-10 w-full flex items-center gap-2.5 rounded-lg border px-3 py-1.5 text-[10px] ${
             i === 2 ? 'border-accent/25 bg-accent/5' : 'border-border bg-surface/80'
           }`}
@@ -225,7 +225,7 @@ export function HowItWorks() {
                   {/* Circle on the line */}
                   <motion.div
                     className="relative z-10 size-10 rounded-full bg-accent text-background flex items-center justify-center font-heading text-sm font-extrabold shadow-[0_0_20px_rgba(0,255,162,0.25)]"
-                    initial={{ opacity: 0, scale: 0 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true, margin: '-80px' }}
                     transition={{
@@ -277,7 +277,7 @@ export function HowItWorks() {
                   {/* Circle on the vertical line */}
                   <motion.div
                     className="absolute -left-10 top-0 z-10 size-8 rounded-full bg-accent text-background flex items-center justify-center font-heading text-xs font-extrabold shadow-[0_0_16px_rgba(0,255,162,0.2)]"
-                    initial={{ opacity: 0, scale: 0 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true, margin: '-50px' }}
                     transition={{

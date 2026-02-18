@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { WebSocketClient, type WebSocketEventHandler } from '@/lib/ws-client'
 
-export interface UseWebSocketOptions {
+interface UseWebSocketOptions {
   url: string
   autoConnect?: boolean
   reconnectInterval?: number
   maxReconnectAttempts?: number
 }
 
-export interface UseWebSocketReturn {
+interface UseWebSocketReturn {
   isConnected: boolean
   connect: () => void
   disconnect: () => void

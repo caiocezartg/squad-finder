@@ -1,12 +1,6 @@
 import { env } from '@/env'
 
-export interface ApiError {
-  message: string
-  code?: string
-  status: number
-}
-
-export class ApiClientError extends Error {
+class ApiClientError extends Error {
   public readonly status: number
   public readonly code?: string
 
@@ -41,7 +35,7 @@ function buildUrl(path: string): string {
   return `${baseUrl}${path.startsWith('/') ? path : `/${path}`}`
 }
 
-export async function apiClient<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function apiClient<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { body, headers, ...restOptions } = options
 
   const config: RequestInit = {

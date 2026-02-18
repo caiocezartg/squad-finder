@@ -56,8 +56,10 @@ function RootLayout() {
             {session?.user ? (
               <>
                 {(menuOpen || notificationsOpen) && (
-                  <div
-                    className="fixed inset-0 z-40"
+                  <button
+                    type="button"
+                    aria-label="Close menu"
+                    className="fixed inset-0 z-40 cursor-default appearance-none border-none bg-transparent"
                     onClick={() => {
                       setMenuOpen(false)
                       setNotificationsOpen(false)
