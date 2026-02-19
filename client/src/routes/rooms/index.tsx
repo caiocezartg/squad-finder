@@ -199,7 +199,7 @@ function RoomsPage() {
         {session?.user && (
           <button onClick={() => setModalOpen(true)} className="btn-accent gap-2">
             <Plus className="size-4" />
-            Create Room
+            Create new room
           </button>
         )}
       </div>
