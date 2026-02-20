@@ -35,3 +35,21 @@ export class NotRoomMemberError extends AppError {
     super(`User "${userId}" is not a member of room "${roomId}"`)
   }
 }
+
+export class RoomCreateLimitReachedError extends AppError {
+  readonly statusCode = 422
+  readonly code = 'ROOM_CREATE_LIMIT_REACHED'
+
+  constructor(limit: number) {
+    super(`You can only host ${limit} active rooms at a time`)
+  }
+}
+
+export class RoomJoinLimitReachedError extends AppError {
+  readonly statusCode = 422
+  readonly code = 'ROOM_JOIN_LIMIT_REACHED'
+
+  constructor(limit: number) {
+    super(`You can only be in ${limit} active rooms at a time`)
+  }
+}

@@ -8,4 +8,6 @@ export {
   RoomFullError,
   RoomCompletedError,
   NotRoomMemberError,
+  RoomCreateLimitReachedError,
+  RoomJoinLimitReachedError,
 } from './business-rule.error'
