@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RoomsIndexRouteImport } from './routes/rooms/index'
+import { Route as RoomsMyRouteImport } from './routes/rooms/my'
 import { Route as RoomsCodeRouteImport } from './routes/rooms/$code'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const RoomsIndexRoute = RoomsIndexRouteImport.update({
   path: '/rooms/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoomsMyRoute = RoomsMyRouteImport.update({
+  id: '/rooms/my',
+  path: '/rooms/my',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RoomsCodeRoute = RoomsCodeRouteImport.update({
   id: '/rooms/$code',
   path: '/rooms/$code',
@@ -32,30 +38,34 @@ const RoomsCodeRoute = RoomsCodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/rooms/$code': typeof RoomsCodeRoute
+  '/rooms/my': typeof RoomsMyRoute
   '/rooms/': typeof RoomsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/rooms/$code': typeof RoomsCodeRoute
+  '/rooms/my': typeof RoomsMyRoute
   '/rooms': typeof RoomsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/rooms/$code': typeof RoomsCodeRoute
+  '/rooms/my': typeof RoomsMyRoute
   '/rooms/': typeof RoomsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rooms/$code' | '/rooms/'
+  fullPaths: '/' | '/rooms/$code' | '/rooms/my' | '/rooms/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rooms/$code' | '/rooms'
-  id: '__root__' | '/' | '/rooms/$code' | '/rooms/'
+  to: '/' | '/rooms/$code' | '/rooms/my' | '/rooms'
+  id: '__root__' | '/' | '/rooms/$code' | '/rooms/my' | '/rooms/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RoomsCodeRoute: typeof RoomsCodeRoute
+  RoomsMyRoute: typeof RoomsMyRoute
   RoomsIndexRoute: typeof RoomsIndexRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoomsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rooms/my': {
+      id: '/rooms/my'
+      path: '/rooms/my'
+      fullPath: '/rooms/my'
+      preLoaderRoute: typeof RoomsMyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rooms/$code': {
       id: '/rooms/$code'
       path: '/rooms/$code'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RoomsCodeRoute: RoomsCodeRoute,
+  RoomsMyRoute: RoomsMyRoute,
   RoomsIndexRoute: RoomsIndexRoute,
 }
 export const routeTree = rootRouteImport

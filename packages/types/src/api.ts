@@ -20,3 +20,8 @@ export type CreateRoomResponse = {
 export type NotificationsResponse = {
   notifications: UserNotification[]
 }
+
+export type MyRoomsResponse = {
+  hosted: Room[]
+  joined: Room[]
+}

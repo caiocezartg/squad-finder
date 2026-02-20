@@ -78,6 +78,7 @@ export type {
   GamesResponse,
   CreateRoomResponse,
   NotificationsResponse,
+  MyRoomsResponse,
 } from './api'
 
 // WebSocket Payload Types

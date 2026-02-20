@@ -6,5 +6,6 @@ export type {
   GamesResponse,
   CreateRoomResponse,
   NotificationsResponse,
+  MyRoomsResponse,
 } from '@squadfinder/types'
 export type { Player } from '@squadfinder/types'
