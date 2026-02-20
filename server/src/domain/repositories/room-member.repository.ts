@@ -8,4 +8,6 @@ export interface IRoomMemberRepository {
   delete(roomId: string, userId: string): Promise<boolean>
   deleteByRoomId(roomId: string): Promise<boolean>
   countByRoomId(roomId: string): Promise<number>
+  /** Counts memberships where the room is still active (status waiting|playing, completedAt null). */
+  countActiveByUserId(userId: string): Promise<number>
 }

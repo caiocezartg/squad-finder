@@ -36,5 +36,6 @@ export function createMockRoomMemberRepository(): MockRoomMemberRepository {
     delete: vi.fn<(roomId: string, userId: string) => Promise<boolean>>().mockResolvedValue(false),
     deleteByRoomId: vi.fn<(roomId: string) => Promise<boolean>>().mockResolvedValue(false),
     countByRoomId: vi.fn<(roomId: string) => Promise<number>>().mockResolvedValue(0),
+    countActiveByUserId: vi.fn<(userId: string) => Promise<number>>().mockResolvedValue(0),
   }
 }
