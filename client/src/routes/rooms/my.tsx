@@ -137,6 +137,9 @@ function MyRoomsPage() {
     [applyFilters, myRoomsData?.joined]
   )
 
+  const hasActiveFilters =
+    search.trim().length > 0 || filter !== 'all' || language !== 'all' || tagFilter.trim().length > 0
+
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -191,7 +194,9 @@ function MyRoomsPage() {
       <section className="mb-10">
         <h2 className="font-heading text-lg font-semibold mb-4 text-offwhite">Rooms I Created</h2>
         {filteredHosted.length === 0 ? (
-          <p className="text-white/40 text-sm py-6">No rooms here yet.</p>
+          <p className="text-white/40 text-sm py-6">
+            {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredHosted.map((room) => (
@@ -214,7 +219,9 @@ function MyRoomsPage() {
       <section>
         <h2 className="font-heading text-lg font-semibold mb-4 text-offwhite">Rooms I Joined</h2>
         {filteredJoined.length === 0 ? (
-          <p className="text-white/40 text-sm py-6">No rooms here yet.</p>
+          <p className="text-white/40 text-sm py-6">
+            {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+          </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredJoined.map((room) => (
