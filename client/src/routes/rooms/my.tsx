@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Tabs } from '@base-ui-components/react'
 import { useSession } from '@/lib/auth-client'
 import { api } from '@/lib/api'
 import { RoomCard } from '@/components/rooms/room-card'
@@ -126,6 +127,9 @@ function MyRoomsPage() {
   const hasActiveFilters =
     search.trim().length > 0 || filter !== 'all' || language !== 'all' || tagFilter.trim().length > 0
 
+  const hostedCount = myRoomsData?.hosted.length ?? 0
+  const joinedCount = myRoomsData?.joined.length ?? 0
+
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -170,55 +174,71 @@ function MyRoomsPage() {
         onTagFilterChange={setTagFilter}
       />
 
-      {/* Rooms I Created */}
-      <section className="mb-10">
-        <h2 className="font-heading text-lg font-semibold mb-4 text-offwhite">Rooms I Created</h2>
-        {filteredHosted.length === 0 ? (
-          <p className="text-white/40 text-sm py-6">
-            {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredHosted.map((room) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                game={gamesMap.get(room.gameId)}
-                onJoin={(code) => {
-                  navigate({ to: '/rooms/$code', params: { code } })
-                }}
-                isLoading={false}
-                currentMembers={room.memberCount}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+      <Tabs.Root defaultValue="created" className="mt-6">
+        {/* Tab list */}
+        <Tabs.List className="flex gap-1 border-b border-white/10 mb-6">
+          <Tabs.Tab
+            value="created"
+            className="px-4 py-2.5 text-sm font-medium text-white/50 transition-colors cursor-pointer data-[selected]:text-accent data-[selected]:border-b-2 data-[selected]:border-accent hover:text-white/80 -mb-px outline-none"
+          >
+            Created ({hostedCount})
+          </Tabs.Tab>
+          <Tabs.Tab
+            value="joined"
+            className="px-4 py-2.5 text-sm font-medium text-white/50 transition-colors cursor-pointer data-[selected]:text-accent data-[selected]:border-b-2 data-[selected]:border-accent hover:text-white/80 -mb-px outline-none"
+          >
+            Joined ({joinedCount})
+          </Tabs.Tab>
+        </Tabs.List>
 
-      {/* Rooms I Joined */}
-      <section>
-        <h2 className="font-heading text-lg font-semibold mb-4 text-offwhite">Rooms I Joined</h2>
-        {filteredJoined.length === 0 ? (
-          <p className="text-white/40 text-sm py-6">
-            {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredJoined.map((room) => (
-              <RoomCard
-                key={room.id}
-                room={room}
-                game={gamesMap.get(room.gameId)}
-                onJoin={(code) => {
-                  navigate({ to: '/rooms/$code', params: { code } })
-                }}
-                isLoading={false}
-                currentMembers={room.memberCount}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+        {/* Created panel */}
+        <Tabs.Panel value="created">
+          {filteredHosted.length === 0 ? (
+            <p className="text-white/40 text-sm py-6">
+              {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredHosted.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  game={gamesMap.get(room.gameId)}
+                  onJoin={(code) => {
+                    navigate({ to: '/rooms/$code', params: { code } })
+                  }}
+                  isLoading={false}
+                  currentMembers={room.memberCount}
+                />
+              ))}
+            </div>
+          )}
+        </Tabs.Panel>
+
+        {/* Joined panel */}
+        <Tabs.Panel value="joined">
+          {filteredJoined.length === 0 ? (
+            <p className="text-white/40 text-sm py-6">
+              {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredJoined.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  game={gamesMap.get(room.gameId)}
+                  onJoin={(code) => {
+                    navigate({ to: '/rooms/$code', params: { code } })
+                  }}
+                  isLoading={false}
+                  currentMembers={room.memberCount}
+                />
+              ))}
+            </div>
+          )}
+        </Tabs.Panel>
+      </Tabs.Root>
 
       {/* Create room modal */}
       <CreateRoomModal
