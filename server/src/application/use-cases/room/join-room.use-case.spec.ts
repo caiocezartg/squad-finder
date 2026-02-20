@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { JoinRoomUseCase } from './join-room.use-case'
-import { RoomNotFoundError, RoomNotWaitingError, RoomFullError } from '@application/errors'
+import {
+  RoomNotFoundError,
+  RoomNotWaitingError,
+  RoomFullError,
+  RoomJoinLimitReachedError,
+} from '@application/errors'
 import {
   createMockRoom,
   createMockRoomRepository,
@@ -169,6 +174,36 @@ describe('JoinRoomUseCase', () => {
 
       expect(mockRoomMemberRepository.findByRoomAndUser).not.toHaveBeenCalled()
       expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+    })
+
+    it('should throw RoomJoinLimitReachedError when user is already in 5 active rooms', async () => {
+      const room = createMockRoom({ id: 'room-id', status: 'waiting', maxPlayers: 5 })
+
+      mockRoomRepository.findById.mockResolvedValue(room)
+      mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null) // not already in this room
+      mockRoomMemberRepository.countActiveByUserId.mockResolvedValue(5)
+
+      await expect(
+        useCase.execute({ roomId: 'room-id', userId: 'user-id' })
+      ).rejects.toThrow(RoomJoinLimitReachedError)
+
+      expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+    })
+
+    it('should allow joining when user is in 4 active rooms (below limit)', async () => {
+      const room = createMockRoom({ id: 'room-id', status: 'waiting', maxPlayers: 5 })
+      const expectedMember = createMockRoomMember({ roomId: 'room-id', userId: 'user-id' })
+
+      mockRoomRepository.findById.mockResolvedValue(room)
+      mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
+      mockRoomMemberRepository.countActiveByUserId.mockResolvedValue(4)
+      mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(2).mockResolvedValueOnce(3)
+      mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
+
+      const result = await useCase.execute({ roomId: 'room-id', userId: 'user-id' })
+
+      expect(mockRoomMemberRepository.create).toHaveBeenCalledOnce()
+      expect(result.roomMember).toBeDefined()
     })
   })
 })

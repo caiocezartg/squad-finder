@@ -1,7 +1,14 @@
 import type { RoomMember } from '@domain/entities/room-member.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository'
-import { RoomNotFoundError, RoomNotWaitingError, RoomFullError } from '@application/errors'
+import {
+  RoomNotFoundError,
+  RoomNotWaitingError,
+  RoomFullError,
+  RoomJoinLimitReachedError,
+} from '@application/errors'
+
+const ROOM_JOIN_LIMIT = 5
 
 export interface JoinRoomInput {
   readonly roomId: string
@@ -42,6 +49,12 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
     if (existingMember) {
       const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
       return { roomMember: existingMember, memberCount, isRoomNowFull: false }
+    }
+
+    // Enforce membership limit: max 5 active rooms
+    const activeMembershipCount = await this.roomMemberRepository.countActiveByUserId(input.userId)
+    if (activeMembershipCount >= ROOM_JOIN_LIMIT) {
+      throw new RoomJoinLimitReachedError(ROOM_JOIN_LIMIT)
     }
 
     const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
