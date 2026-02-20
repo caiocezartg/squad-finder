@@ -20,7 +20,10 @@ export const rooms = pgTable('rooms', {
   discordLink: text('discord_link'),
   completedAt: timestamp('completed_at', { withTimezone: true }),
   readyNotifiedAt: timestamp('ready_notified_at', { withTimezone: true }),
-  tags: text('tags').array().notNull().default(sql`ARRAY[]::text[]`),
+  tags: text('tags')
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
   language: varchar('language', { length: 5 }).notNull().default('pt-br'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

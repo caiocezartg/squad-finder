@@ -156,9 +156,7 @@ function RoomsPage() {
     // Filter by tag
     if (tagFilter.trim()) {
       const term = tagFilter.trim().toLowerCase().replace(/^#/, '')
-      result = result.filter((room) =>
-        room.tags.some((t) => t.toLowerCase().includes(term))
-      )
+      result = result.filter((room) => room.tags.some((t) => t.toLowerCase().includes(term)))
     }
 
     // Sort
@@ -259,7 +257,9 @@ function RoomsPage() {
       {/* Room cards grid */}
       {filteredRooms.length === 0 ? (
         <EmptyState
-          title={search || language !== 'all' || tagFilter.trim() ? 'No rooms found' : 'No rooms yet'}
+          title={
+            search || language !== 'all' || tagFilter.trim() ? 'No rooms found' : 'No rooms yet'
+          }
           description={
             search || language !== 'all' || tagFilter.trim()
               ? 'No rooms match your filters. Try adjusting your search or filters.'

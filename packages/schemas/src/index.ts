@@ -86,7 +86,7 @@ export type UserNotificationDto = z.infer<typeof userNotificationSchema>
 
 // Create room input schema
 export const createRoomInputSchema = z.object({
-  name: z.string().min(1, 'Room name is required').max(100, 'Room name too long'),
+  name: z.string().min(1, 'Room name is required').max(30, 'Room name too long'),
   gameId: z.uuid({ error: 'Invalid game ID' }),
   maxPlayers: z.number().int().min(2).max(20).optional(),
   discordLink: z
@@ -98,7 +98,8 @@ export const createRoomInputSchema = z.object({
     ),
   tags: z
     .array(
-      z.string()
+      z
+        .string()
         .max(15, 'Tag too long')
         .transform((t) => t.replace(/^#+/, '').toLowerCase())
     )

@@ -29,7 +29,8 @@ export function useNotifications(options: UseNotificationsOptions) {
   })
 
   const markAllAsReadMutation = useMutation({
-    mutationFn: () => api.post<{ success: boolean; count: number }>('/api/notifications/read-all', {}),
+    mutationFn: () =>
+      api.post<{ success: boolean; count: number }>('/api/notifications/read-all', {}),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },

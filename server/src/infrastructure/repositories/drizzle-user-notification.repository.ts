@@ -94,9 +94,7 @@ export class DrizzleUserNotificationRepository implements IUserNotificationRepos
       .set({
         readAt: new Date(),
       })
-      .where(
-        and(eq(userNotifications.userId, userId), isNull(userNotifications.readAt))
-      )
+      .where(and(eq(userNotifications.userId, userId), isNull(userNotifications.readAt)))
       .returning({ id: userNotifications.id })
 
     return result.length
@@ -105,9 +103,7 @@ export class DrizzleUserNotificationRepository implements IUserNotificationRepos
   async delete(id: string, userId: string): Promise<boolean> {
     const result = await this.db
       .delete(userNotifications)
-      .where(
-        and(eq(userNotifications.id, id), eq(userNotifications.userId, userId))
-      )
+      .where(and(eq(userNotifications.id, id), eq(userNotifications.userId, userId)))
       .returning({ id: userNotifications.id })
 
     return result.length > 0

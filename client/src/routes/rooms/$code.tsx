@@ -222,14 +222,30 @@ function RoomLobbyPage() {
         <div className="relative px-6 py-8 sm:px-8 sm:py-10">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 {game && <span className="badge-accent text-[10px]">{game.name}</span>}
+                {room?.language && (
+                  <span className="badge-muted text-[10px]">
+                    {room.language === 'pt-br' ? 'PT-BR' : 'EN'}
+                  </span>
+                )}
                 <span className="badge-muted text-[10px]">{timeAgo}</span>
-                {/* Connection indicator */}
                 <span
                   className={`size-2 rounded-full ${isConnected ? 'bg-accent' : 'bg-danger'}`}
                 />
               </div>
+              {room?.tags && room.tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                  {room.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-md border border-accent/20 bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
               <h1 className="font-heading text-2xl font-bold sm:text-3xl">{room?.name}</h1>
               <div className="flex items-center gap-3 mt-2">
                 <button

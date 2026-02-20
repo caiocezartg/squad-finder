@@ -2,6 +2,624 @@
 
 ## Current Task
 
+### My Rooms — Tab Switcher UI (2026-02-20)
+
+**Goal:** Replace the two stacked sections on `/rooms/my` with a Base UI tab switcher showing "Created (N)" and "Joined (N)" tabs.
+
+**Architecture:** Single-file change in `client/src/routes/rooms/my.tsx`. Use `@base-ui-components/react` Tabs primitive. Tab counts show unfiltered totals. Filters apply to whichever tab is active.
+
+---
+
+#### Task 1: Replace two-section layout with Base UI Tabs
+
+**File:** `client/src/routes/rooms/my.tsx`
+
+**Step 1.1: Import Tabs from Base UI**
+
+Add to imports:
+```typescript
+import { Tabs } from '@base-ui-components/react'
+```
+
+**Step 1.2: Add unfiltered count variables** (right before the `return` statement):
+```typescript
+const hostedCount = myRoomsData?.hosted.length ?? 0
+const joinedCount = myRoomsData?.joined.length ?? 0
+```
+
+**Step 1.3: Replace the two `<section>` elements** with a `Tabs.Root` block. The full replacement (swap out lines from `{/* Rooms I Created */}` through the end of `{/* Rooms I Joined */}` closing tag):
+
+```tsx
+<Tabs.Root defaultValue="created" className="mt-6">
+  {/* Tab list */}
+  <Tabs.List className="flex gap-1 border-b border-white/10 mb-6">
+    <Tabs.Tab
+      value="created"
+      className="px-4 py-2.5 text-sm font-medium text-white/50 transition-colors cursor-pointer
+                 data-[selected]:text-accent data-[selected]:border-b-2 data-[selected]:border-accent
+                 hover:text-white/80 -mb-px outline-none"
+    >
+      Created ({hostedCount})
+    </Tabs.Tab>
+    <Tabs.Tab
+      value="joined"
+      className="px-4 py-2.5 text-sm font-medium text-white/50 transition-colors cursor-pointer
+                 data-[selected]:text-accent data-[selected]:border-b-2 data-[selected]:border-accent
+                 hover:text-white/80 -mb-px outline-none"
+    >
+      Joined ({joinedCount})
+    </Tabs.Tab>
+  </Tabs.List>
+
+  {/* Created panel */}
+  <Tabs.Panel value="created">
+    {filteredHosted.length === 0 ? (
+      <p className="text-white/40 text-sm py-6">
+        {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+      </p>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredHosted.map((room) => (
+          <RoomCard
+            key={room.id}
+            room={room}
+            game={gamesMap.get(room.gameId)}
+            onJoin={(code) => {
+              navigate({ to: '/rooms/$code', params: { code } })
+            }}
+            isLoading={false}
+            currentMembers={room.memberCount}
+          />
+        ))}
+      </div>
+    )}
+  </Tabs.Panel>
+
+  {/* Joined panel */}
+  <Tabs.Panel value="joined">
+    {filteredJoined.length === 0 ? (
+      <p className="text-white/40 text-sm py-6">
+        {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+      </p>
+    ) : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredJoined.map((room) => (
+          <RoomCard
+            key={room.id}
+            room={room}
+            game={gamesMap.get(room.gameId)}
+            onJoin={(code) => {
+              navigate({ to: '/rooms/$code', params: { code } })
+            }}
+            isLoading={false}
+            currentMembers={room.memberCount}
+          />
+        ))}
+      </div>
+    )}
+  </Tabs.Panel>
+</Tabs.Root>
+```
+
+**Step 1.4:** Remove the `mb-10` class from the outer wrapper of the first section (since sections no longer exist, only the `Tabs.Root` wrapper). The `Tabs.Root` has `mt-6` instead.
+
+**Step 1.5:** Run `bun run typecheck` from client → 0 errors
+
+**Step 1.6:** Run `bun run lint` from root → 0 errors
+
+**Step 1.7:** Commit:
+```bash
+git add client/src/routes/rooms/my.tsx
+git commit -m "feat(ui): replace My Rooms sections with tab switcher"
+```
+
+- [ ] Task 1 complete
+
+---
+
+## Completed Tasks
+
+### My Rooms + Join/Create Limits (2026-02-20) ✅
+
+**Goal:** Add `/rooms/my` page showing user's active rooms in two sections ("Rooms I Created" / "Rooms I Joined"), enforce 3-room host limit and 5-room total membership limit (active rooms only: waiting/playing).
+
+**Architecture:**
+- Backend: New error classes → extend repository interfaces → implement in Drizzle repos → update use cases → new `GetMyRoomsUseCase` → new `GET /api/rooms/my` endpoint
+- Frontend: API client function → new `/rooms/my` route (auth-guarded) → navbar link (auth-only) → limit error handling in create modal and join flow
+
+---
+
+#### Task 1: Add limit error classes
+**Files:**
+- Modify: `server/src/application/errors/business-rule.error.ts`
+- Modify: `server/src/application/errors/index.ts`
+
+**Step 1.1:** Add to `business-rule.error.ts`:
+```typescript
+export class RoomCreateLimitReachedError extends AppError {
+  readonly statusCode = 422
+  readonly code = 'ROOM_CREATE_LIMIT_REACHED'
+  constructor() {
+    super('You can only host 3 active rooms at a time')
+  }
+}
+
+export class RoomJoinLimitReachedError extends AppError {
+  readonly statusCode = 422
+  readonly code = 'ROOM_JOIN_LIMIT_REACHED'
+  constructor() {
+    super('You can only be in 5 active rooms at a time')
+  }
+}
+```
+
+**Step 1.2:** Update export in `index.ts`:
+```typescript
+export {
+  RoomNotWaitingError,
+  RoomFullError,
+  RoomCompletedError,
+  NotRoomMemberError,
+  RoomCreateLimitReachedError,
+  RoomJoinLimitReachedError,
+} from './business-rule.error'
+```
+
+**Step 1.3:** Commit:
+```bash
+git add server/src/application/errors/
+git commit -m "feat(room): add RoomCreateLimitReached and RoomJoinLimitReached errors"
+```
+
+- [ ] Task 1 complete
+
+---
+
+#### Task 2: Extend IRoomRepository with `countActiveByHostId` + `findMyRooms`
+**Files:**
+- Modify: `server/src/domain/repositories/room.repository.ts`
+- Modify: `server/src/infrastructure/repositories/drizzle-room.repository.ts`
+
+**Step 2.1:** Add signatures to `room.repository.ts`:
+```typescript
+countActiveByHostId(hostId: string): Promise<number>
+findMyRooms(userId: string): Promise<{ hosted: Room[]; joined: Room[] }>
+```
+
+**Step 2.2:** Implement `countActiveByHostId` in DrizzleRoomRepository:
+```typescript
+async countActiveByHostId(hostId: string): Promise<number> {
+  const result = await this.db
+    .select({ count: count() })
+    .from(rooms)
+    .where(
+      and(
+        eq(rooms.hostId, hostId),
+        or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
+        isNull(rooms.completedAt)
+      )
+    )
+  return result[0]?.count ?? 0
+}
+```
+(Add `or`, `isNull` to drizzle-orm imports)
+
+**Step 2.3:** Implement `findMyRooms` in DrizzleRoomRepository:
+```typescript
+async findMyRooms(userId: string): Promise<{ hosted: Room[]; joined: Room[] }> {
+  const allMembersAlias = alias(roomMembers, 'all_members')
+  const userMembershipAlias = alias(roomMembers, 'user_membership')
+
+  const activeCondition = and(
+    or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
+    isNull(rooms.completedAt)
+  )
+
+  const selectFields = {
+    id: rooms.id, code: rooms.code, name: rooms.name,
+    hostId: rooms.hostId, gameId: rooms.gameId, status: rooms.status,
+    maxPlayers: rooms.maxPlayers, discordLink: rooms.discordLink,
+    completedAt: rooms.completedAt, readyNotifiedAt: rooms.readyNotifiedAt,
+    tags: rooms.tags, language: rooms.language,
+    createdAt: rooms.createdAt, updatedAt: rooms.updatedAt,
+    memberCount: count(allMembersAlias.id),
+  }
+
+  const hostedRows = await this.db
+    .select(selectFields)
+    .from(rooms)
+    .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
+    .where(and(eq(rooms.hostId, userId), activeCondition))
+    .groupBy(rooms.id)
+    .orderBy(desc(rooms.createdAt))
+
+  const joinedRows = await this.db
+    .select(selectFields)
+    .from(rooms)
+    .innerJoin(
+      userMembershipAlias,
+      and(eq(userMembershipAlias.roomId, rooms.id), eq(userMembershipAlias.userId, userId))
+    )
+    .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
+    .where(and(ne(rooms.hostId, userId), activeCondition))
+    .groupBy(rooms.id)
+    .orderBy(desc(rooms.createdAt))
+
+  const mapRow = (r: (typeof hostedRows)[0]) => ({
+    ...mapRowToEntity({
+      id: r.id, code: r.code, name: r.name, hostId: r.hostId, gameId: r.gameId,
+      status: r.status, maxPlayers: r.maxPlayers, discordLink: r.discordLink,
+      completedAt: r.completedAt, readyNotifiedAt: r.readyNotifiedAt,
+      tags: r.tags, language: r.language, createdAt: r.createdAt, updatedAt: r.updatedAt,
+    }),
+    memberCount: r.memberCount,
+    isMember: true as const,
+  })
+
+  return { hosted: hostedRows.map(mapRow), joined: joinedRows.map(mapRow) }
+}
+```
+(Add `alias` from `drizzle-orm/pg-core`, `ne`, `desc` from `drizzle-orm`, import `roomMembers` schema)
+
+**Step 2.4:** Commit:
+```bash
+git add server/src/domain/repositories/room.repository.ts server/src/infrastructure/repositories/drizzle-room.repository.ts
+git commit -m "feat(room): add countActiveByHostId and findMyRooms to room repository"
+```
+
+- [ ] Task 2 complete
+
+---
+
+#### Task 3: Extend IRoomMemberRepository with `countActiveByUserId`
+**Files:**
+- Modify: `server/src/domain/repositories/room-member.repository.ts`
+- Modify: `server/src/infrastructure/repositories/drizzle-room-member.repository.ts`
+
+**Step 3.1:** Add signature to `room-member.repository.ts`:
+```typescript
+countActiveByUserId(userId: string): Promise<number>
+```
+
+**Step 3.2:** Implement in DrizzleRoomMemberRepository:
+```typescript
+async countActiveByUserId(userId: string): Promise<number> {
+  const result = await this.db
+    .select({ count: count() })
+    .from(roomMembers)
+    .innerJoin(rooms, eq(rooms.id, roomMembers.roomId))
+    .where(
+      and(
+        eq(roomMembers.userId, userId),
+        or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
+        isNull(rooms.completedAt)
+      )
+    )
+  return result[0]?.count ?? 0
+}
+```
+(Import `rooms` schema from `@infrastructure/database/schema/rooms`, add `or`, `isNull` from drizzle-orm)
+
+**Step 3.3:** Commit:
+```bash
+git add server/src/domain/repositories/room-member.repository.ts server/src/infrastructure/repositories/drizzle-room-member.repository.ts
+git commit -m "feat(room): add countActiveByUserId to room member repository"
+```
+
+- [ ] Task 3 complete
+
+---
+
+#### Task 4: Update CreateRoomUseCase — enforce 3-room host limit
+**Files:**
+- Modify: `server/src/application/use-cases/room/create-room.use-case.ts`
+- Modify: `server/src/application/use-cases/room/create-room.use-case.spec.ts`
+
+**Step 4.1:** In spec, add `countActiveByHostId: vi.fn().mockResolvedValue(0)` to the mock room repo in `beforeEach`, then add failing test:
+```typescript
+it('should throw RoomCreateLimitReachedError when user already hosts 3 active rooms', async () => {
+  mockRoomRepo.countActiveByHostId.mockResolvedValue(3)
+  await expect(useCase.execute({ ...validInput })).rejects.toThrow(RoomCreateLimitReachedError)
+})
+```
+
+**Step 4.2:** Run `bun run test` from server → expect new test to FAIL
+
+**Step 4.3:** In `create-room.use-case.ts`, after game validation and before room creation:
+```typescript
+const activeRoomCount = await this.roomRepository.countActiveByHostId(input.hostId)
+if (activeRoomCount >= 3) {
+  throw new RoomCreateLimitReachedError()
+}
+```
+Import `RoomCreateLimitReachedError` from `@application/errors`.
+
+**Step 4.4:** Run `bun run test` from server → all pass
+
+**Step 4.5:** Commit:
+```bash
+git add server/src/application/use-cases/room/
+git commit -m "feat(room): enforce 3-room host limit in CreateRoomUseCase"
+```
+
+- [ ] Task 4 complete
+
+---
+
+#### Task 5: Update JoinRoomUseCase — enforce 5-room total membership limit
+**Files:**
+- Modify: `server/src/application/use-cases/room/join-room.use-case.ts`
+- Modify: `server/src/application/use-cases/room/join-room.use-case.spec.ts` (check if it exists, else find test file)
+
+**Step 5.1:** In spec, add `countActiveByUserId: vi.fn().mockResolvedValue(0)` to the mock room member repo, then add failing test:
+```typescript
+it('should throw RoomJoinLimitReachedError when user is already in 5 active rooms', async () => {
+  mockRoomMemberRepo.countActiveByUserId.mockResolvedValue(5)
+  mockRoomMemberRepo.findByRoomAndUser.mockResolvedValue(null)
+  await expect(useCase.execute({ roomId: 'room1', userId: 'user1' })).rejects.toThrow(RoomJoinLimitReachedError)
+})
+```
+
+**Step 5.2:** Run tests → expect new test to FAIL
+
+**Step 5.3:** In `join-room.use-case.ts`, after the idempotency check (existingMember early return) and before the room capacity check:
+```typescript
+const activeMembershipCount = await this.roomMemberRepository.countActiveByUserId(input.userId)
+if (activeMembershipCount >= 5) {
+  throw new RoomJoinLimitReachedError()
+}
+```
+Import `RoomJoinLimitReachedError` from `@application/errors`.
+
+**Step 5.4:** Run tests → all pass
+
+**Step 5.5:** Commit:
+```bash
+git add server/src/application/use-cases/room/
+git commit -m "feat(room): enforce 5-room membership limit in JoinRoomUseCase"
+```
+
+- [ ] Task 5 complete
+
+---
+
+#### Task 6: Create GetMyRoomsUseCase + spec
+**Files:**
+- Create: `server/src/application/use-cases/room/get-my-rooms.use-case.ts`
+- Create: `server/src/application/use-cases/room/get-my-rooms.use-case.spec.ts`
+
+**Step 6.1:** Write `get-my-rooms.use-case.spec.ts` (failing):
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { GetMyRoomsUseCase } from './get-my-rooms.use-case'
+import type { IRoomRepository } from '@domain/repositories/room.repository'
+
+describe('GetMyRoomsUseCase', () => {
+  let mockRoomRepo: { findMyRooms: ReturnType<typeof vi.fn> }
+  let useCase: GetMyRoomsUseCase
+
+  beforeEach(() => {
+    mockRoomRepo = { findMyRooms: vi.fn() }
+    useCase = new GetMyRoomsUseCase(mockRoomRepo as unknown as IRoomRepository)
+  })
+
+  it('should return hosted and joined rooms for a user', async () => {
+    const mockResult = { hosted: [{ id: '1' }], joined: [{ id: '2' }] }
+    mockRoomRepo.findMyRooms.mockResolvedValue(mockResult)
+    const result = await useCase.execute({ userId: 'user1' })
+    expect(result).toEqual(mockResult)
+    expect(mockRoomRepo.findMyRooms).toHaveBeenCalledWith('user1')
+  })
+
+  it('should return empty arrays when user has no rooms', async () => {
+    mockRoomRepo.findMyRooms.mockResolvedValue({ hosted: [], joined: [] })
+    const result = await useCase.execute({ userId: 'user1' })
+    expect(result.hosted).toHaveLength(0)
+    expect(result.joined).toHaveLength(0)
+  })
+})
+```
+
+**Step 6.2:** Run tests → expect FAIL
+
+**Step 6.3:** Create `get-my-rooms.use-case.ts`:
+```typescript
+import type { Room } from '@domain/entities/room.entity'
+import type { IRoomRepository } from '@domain/repositories/room.repository'
+
+export interface GetMyRoomsOutput {
+  readonly hosted: Room[]
+  readonly joined: Room[]
+}
+
+export class GetMyRoomsUseCase {
+  constructor(private readonly roomRepository: IRoomRepository) {}
+
+  async execute(input: { userId: string }): Promise<GetMyRoomsOutput> {
+    return this.roomRepository.findMyRooms(input.userId)
+  }
+}
+```
+
+**Step 6.4:** Run tests → all pass
+
+**Step 6.5:** Commit:
+```bash
+git add server/src/application/use-cases/room/
+git commit -m "feat(room): add GetMyRoomsUseCase"
+```
+
+- [ ] Task 6 complete
+
+---
+
+#### Task 7: Add GET /api/rooms/my to factory, controller, and routes
+**Files:**
+- Modify: `server/src/interface/factories/room.factory.ts` — read first to understand DI pattern, then inject GetMyRoomsUseCase
+- Modify: `server/src/interface/controllers/room.controller.ts` — add `getMyRooms` handler
+- Modify: `server/src/interface/routes/room.routes.ts` — register route (before `:code` to avoid routing conflicts)
+
+**Step 7.1:** Read `room.factory.ts` to understand how use cases are injected into the controller, then add:
+```typescript
+const getMyRoomsUseCase = new GetMyRoomsUseCase(roomRepository)
+// Pass to RoomController constructor
+```
+
+**Step 7.2:** Add `getMyRooms` to `RoomController`:
+```typescript
+async getMyRooms(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+  const userId = request.session.user.id
+  const result = await this.getMyRoomsUseCase.execute({ userId })
+  reply.send({ hosted: result.hosted, joined: result.joined })
+}
+```
+
+**Step 7.3:** Add route in `room.routes.ts` (before `GET /api/rooms/:code`):
+```typescript
+app.get('/api/rooms/my', {
+  schema: {
+    tags: ['Rooms'],
+    summary: 'Get my rooms',
+    description: 'Returns rooms created by or joined by the authenticated user.',
+    security: [{ session: [] }],
+    response: {
+      200: z.object({ hosted: z.array(roomSchema), joined: z.array(roomSchema) }),
+      401: errorResponse,
+    },
+  },
+  preHandler: requireAuth,
+  handler: roomController.getMyRooms.bind(roomController),
+})
+```
+
+**Step 7.4:** Run `bun run typecheck` from server → 0 errors
+
+**Step 7.5:** Commit:
+```bash
+git add server/src/interface/
+git commit -m "feat(room): add GET /api/rooms/my endpoint"
+```
+
+- [ ] Task 7 complete
+
+---
+
+#### Task 8: Add API client function for my rooms (frontend)
+**Files:**
+- Read client API files (e.g., `client/src/lib/api.ts` or `client/src/hooks/`) to understand fetch pattern
+- Modify the appropriate file to add `getMyRooms()`
+
+**Step 8.1:** Find how other API calls are made (e.g., how rooms/index.tsx fetches `/api/rooms`), mirror that pattern:
+```typescript
+export async function getMyRooms(): Promise<{ hosted: Room[]; joined: Room[] }> {
+  const res = await fetch('/api/rooms/my', { credentials: 'include' })
+  if (!res.ok) {
+    const err = await res.json()
+    throw err
+  }
+  return res.json()
+}
+```
+
+**Step 8.2:** Commit
+
+- [ ] Task 8 complete
+
+---
+
+#### Task 9: Create /rooms/my frontend route
+**Files:**
+- Create: `client/src/routes/rooms/my.tsx`
+
+**Step 9.1:** Read `client/src/routes/rooms/index.tsx` to copy the filter state, filter logic, game data fetching, and RoomCard rendering pattern.
+
+**Step 9.2:** Create `my.tsx` as an auth-guarded page:
+- Use `createFileRoute('/rooms/my')` (TanStack Router auto-discovers)
+- Redirect to `/` if `session.user` is falsy using `useEffect` + `useNavigate`
+- Same filter state: `search`, `filter`, `sort`, `language`, `tagFilter`
+- Fetch games with `useQuery(['games'], getGames)` for RoomCard
+- Fetch my rooms with `useQuery(['my-rooms'], getMyRooms, { enabled: !!session?.user })`
+- Apply same client-side filter/sort function to both `hosted` and `joined` arrays
+- Render two sections: "Rooms I Created" and "Rooms I Joined"
+- Inline empty state per section: `<p className="text-white/40 text-sm py-4">No rooms here yet.</p>`
+- Show "Create Room" button in header (same as rooms/index.tsx)
+- Show `CreateRoomModal` when button is clicked
+- Invalidate `['my-rooms']` query on successful room creation
+- Join/leave actions: navigate to `/rooms/$code` on card click (re-use RoomCard's existing behavior)
+
+**Step 9.3:** Run `bun run typecheck` from client → 0 errors
+
+**Step 9.4:** Commit:
+```bash
+git add client/src/routes/rooms/my.tsx
+git commit -m "feat(ui): add /rooms/my page with two-section layout"
+```
+
+- [ ] Task 9 complete
+
+---
+
+#### Task 10: Add "My Rooms" link to navbar
+**Files:**
+- Modify: `client/src/routes/__root.tsx`
+
+**Step 10.1:** Read `__root.tsx` to understand the navbar structure and existing link styling.
+
+**Step 10.2:** Add a "My Rooms" link visible only to authenticated users, next to existing nav links:
+```tsx
+{session?.user && (
+  <Link
+    to="/rooms/my"
+    className="text-sm font-medium text-white/70 hover:text-white transition-colors"
+    activeProps={{ className: 'text-accent' }}
+  >
+    My Rooms
+  </Link>
+)}
+```
+(Match the exact className pattern of existing navbar links)
+
+**Step 10.3:** Run `bun run typecheck` → 0 errors
+
+**Step 10.4:** Commit:
+```bash
+git add client/src/routes/__root.tsx
+git commit -m "feat(ui): add My Rooms nav link for authenticated users"
+```
+
+- [ ] Task 10 complete
+
+---
+
+#### Task 11: Handle limit errors in create modal and join flow
+**Files:**
+- Read `client/src/components/rooms/create-room-modal.tsx` — verify it already shows API errors in AlertBox (no change needed if generic error handling works)
+- Read `client/src/routes/rooms/index.tsx` — understand how join errors are handled, update if needed
+
+**Step 11.1:** In `create-room-modal.tsx`, verify that the generic error handler catches 422 errors and shows `error.message` in AlertBox. If it does, no change needed (the server already sends human-readable messages).
+
+**Step 11.2:** In `rooms/index.tsx`, find the join error handler and ensure `ROOM_JOIN_LIMIT_REACHED` shows the server's message:
+```typescript
+// In join mutation error handler, check if error message is already forwarded
+// The server sends: { error: 'ROOM_JOIN_LIMIT_REACHED', message: 'You can only be in 5 active rooms at a time' }
+// Ensure setJoinError or toast uses error.message
+```
+
+**Step 11.3:** Commit if any changes made
+
+- [ ] Task 11 complete
+
+---
+
+#### Task 12: Verification ✅
+- [x] Run `bun run test` from root → 39/39 tests pass
+- [x] Run `bun run typecheck` from root → 0 errors across all packages
+- [x] Run `bun run lint` from root → 0 errors, 0 warnings
+
+---
+
+## Completed Tasks
+
 ### Tags + Language Feature (2026-02-20) ✅
 
 **Design:** Add custom tags (up to 5, max 15 chars each) and language selection (PT-BR / EN) to rooms. Tags and language are persisted in the database (Drizzle `text[].array()` + `varchar`), displayed on room cards, and filterable in the lobby.

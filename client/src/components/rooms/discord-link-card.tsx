@@ -40,9 +40,7 @@ export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardPro
             <DiscordIcon className="size-6 text-discord" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-heading text-base font-bold text-offwhite">
-              Your squad is ready!
-            </h3>
+            <h3 className="font-heading text-base font-bold text-offwhite">Your squad is ready!</h3>
             <p className="text-sm text-muted mt-0.5">
               Join the Discord server to start playing together.
             </p>
