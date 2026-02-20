@@ -10,6 +10,7 @@ import { GetRoomByCodeUseCase } from '@application/use-cases/room/get-room-by-co
 import { JoinRoomUseCase } from '@application/use-cases/room/join-room.use-case'
 import { LeaveRoomUseCase } from '@application/use-cases/room/leave-room.use-case'
 import { NotifyRoomReadyUseCase } from '@application/use-cases/room/notify-room-ready.use-case'
+import { GetMyRoomsUseCase } from '@application/use-cases/room/get-my-rooms.use-case'
 import { RoomController } from '@interface/controllers/room.controller'
 
 export function createRoomController(db: Database) {
@@ -38,6 +39,7 @@ export function createRoomController(db: Database) {
     gameRepository,
     userNotificationRepository
   )
+  const getMyRoomsUseCase = new GetMyRoomsUseCase(roomRepository)
 
   return new RoomController({
     createRoomUseCase,
@@ -46,5 +48,6 @@ export function createRoomController(db: Database) {
     joinRoomUseCase,
     leaveRoomUseCase,
     notifyRoomReadyUseCase,
+    getMyRoomsUseCase,
   })
 }

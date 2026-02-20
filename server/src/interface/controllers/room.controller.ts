@@ -5,6 +5,7 @@ import type { IGetRoomByCodeUseCase } from '@application/use-cases/room/get-room
 import type { IJoinRoomUseCase } from '@application/use-cases/room/join-room.use-case'
 import type { ILeaveRoomUseCase } from '@application/use-cases/room/leave-room.use-case'
 import type { INotifyRoomReadyUseCase } from '@application/use-cases/room/notify-room-ready.use-case'
+import type { IGetMyRoomsUseCase } from '@application/use-cases/room/get-my-rooms.use-case'
 import { RoomNotFoundError, NotRoomMemberError } from '@application/errors'
 import { createRoomRequestSchema, roomCodeParamSchema } from '@application/dtos'
 import {
@@ -20,6 +21,7 @@ export interface RoomControllerDeps {
   readonly joinRoomUseCase: IJoinRoomUseCase
   readonly leaveRoomUseCase: ILeaveRoomUseCase
   readonly notifyRoomReadyUseCase: INotifyRoomReadyUseCase
+  readonly getMyRoomsUseCase: IGetMyRoomsUseCase
 }
 
 export class RoomController {
@@ -27,9 +29,7 @@ export class RoomController {
 
   async list(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     const userId = request.session?.user?.id
-    const result = await this.deps.getAvailableRoomsUseCase.execute(
-      userId ? { userId } : undefined
-    )
+    const result = await this.deps.getAvailableRoomsUseCase.execute(userId ? { userId } : undefined)
 
     await reply.send({ rooms: result.rooms })
   }
@@ -139,5 +139,12 @@ export class RoomController {
       message: 'Left room successfully',
       success: true,
     })
+  }
+
+  async getMyRooms(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    const userId = request.userId
+    const result = await this.deps.getMyRoomsUseCase.execute({ userId })
+
+    await reply.send({ hosted: result.hosted, joined: result.joined })
   }
 }

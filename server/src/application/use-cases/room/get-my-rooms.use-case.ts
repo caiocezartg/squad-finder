@@ -6,7 +6,11 @@ export interface GetMyRoomsOutput {
   readonly joined: Room[]
 }
 
-export class GetMyRoomsUseCase {
+export interface IGetMyRoomsUseCase {
+  execute(input: { userId: string }): Promise<GetMyRoomsOutput>
+}
+
+export class GetMyRoomsUseCase implements IGetMyRoomsUseCase {
   constructor(private readonly roomRepository: IRoomRepository) {}
 
   async execute(input: { userId: string }): Promise<GetMyRoomsOutput> {

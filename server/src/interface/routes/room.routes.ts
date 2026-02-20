@@ -49,6 +49,25 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
     handler: roomController.list.bind(roomController),
   })
 
+  app.get('/api/rooms/my', {
+    schema: {
+      tags: ['Rooms'],
+      summary: 'Get my rooms',
+      description:
+        'Returns rooms created by or joined by the authenticated user, grouped into hosted and joined.',
+      security: [{ session: [] }],
+      response: {
+        200: z.object({
+          hosted: z.array(roomSchema),
+          joined: z.array(roomSchema),
+        }),
+        401: errorResponse,
+      },
+    },
+    preHandler: requireAuth,
+    handler: roomController.getMyRooms.bind(roomController),
+  })
+
   app.get('/api/rooms/:code', {
     schema: {
       tags: ['Rooms'],
