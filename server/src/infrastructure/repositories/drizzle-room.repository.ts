@@ -125,25 +125,26 @@ export class DrizzleRoomRepository implements IRoomRepository {
       memberCount: count(allMembersAlias.id),
     }
 
-    const hostedRows = await this.db
-      .select(selectFields)
-      .from(rooms)
-      .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
-      .where(and(eq(rooms.hostId, userId), activeCondition))
-      .groupBy(rooms.id)
-      .orderBy(desc(rooms.createdAt))
-
-    const joinedRows = await this.db
-      .select(selectFields)
-      .from(rooms)
-      .innerJoin(
-        userMembershipAlias,
-        and(eq(userMembershipAlias.roomId, rooms.id), eq(userMembershipAlias.userId, userId))
-      )
-      .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
-      .where(and(ne(rooms.hostId, userId), activeCondition))
-      .groupBy(rooms.id)
-      .orderBy(desc(rooms.createdAt))
+    const [hostedRows, joinedRows] = await Promise.all([
+      this.db
+        .select(selectFields)
+        .from(rooms)
+        .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
+        .where(and(eq(rooms.hostId, userId), activeCondition))
+        .groupBy(rooms.id)
+        .orderBy(desc(rooms.createdAt)),
+      this.db
+        .select(selectFields)
+        .from(rooms)
+        .innerJoin(
+          userMembershipAlias,
+          and(eq(userMembershipAlias.roomId, rooms.id), eq(userMembershipAlias.userId, userId))
+        )
+        .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
+        .where(and(ne(rooms.hostId, userId), activeCondition))
+        .groupBy(rooms.id)
+        .orderBy(desc(rooms.createdAt)),
+    ])
 
     const mapRow = (r: (typeof hostedRows)[0]) => {
       const { memberCount, ...roomRow } = r

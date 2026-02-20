@@ -6,7 +6,6 @@ import { api } from '@/lib/api'
 import { RoomCard } from '@/components/rooms/room-card'
 import { RoomFilters } from '@/components/rooms/room-filters'
 import { CreateRoomModal } from '@/components/rooms/create-room-modal'
-import { AlertBox } from '@/components/ui/alert-box'
 import { Plus } from 'lucide-react'
 import type { MyRoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@/types'
 
@@ -19,7 +18,6 @@ function MyRoomsPage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
@@ -64,18 +62,6 @@ function MyRoomsPage() {
       setModalOpen(false)
       queryClient.invalidateQueries({ queryKey: ['my-rooms'] })
       navigate({ to: '/rooms/$code', params: { code: result.room.code } })
-    },
-  })
-
-  // Join room mutation
-  const joinRoomMutation = useMutation({
-    mutationFn: (roomCode: string) => api.post(`/api/rooms/${roomCode}/join`, {}),
-    onSuccess: async (_, roomCode) => {
-      await queryClient.invalidateQueries({ queryKey: ['my-rooms'] })
-      navigate({ to: '/rooms/$code', params: { code: roomCode } })
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : 'Failed to join room')
     },
   })
 
@@ -170,12 +156,6 @@ function MyRoomsPage() {
         </button>
       </div>
 
-      {error && (
-        <div className="mb-6">
-          <AlertBox type="error" message={error} onClose={() => setError(null)} />
-        </div>
-      )}
-
       {/* Filters */}
       <RoomFilters
         search={search}
@@ -230,13 +210,9 @@ function MyRoomsPage() {
                 room={room}
                 game={gamesMap.get(room.gameId)}
                 onJoin={(code) => {
-                  if (room.isMember) {
-                    navigate({ to: '/rooms/$code', params: { code } })
-                  } else {
-                    joinRoomMutation.mutate(code)
-                  }
+                  navigate({ to: '/rooms/$code', params: { code } })
                 }}
-                isLoading={!room.isMember && joinRoomMutation.isPending}
+                isLoading={false}
                 currentMembers={room.memberCount}
               />
             ))}
