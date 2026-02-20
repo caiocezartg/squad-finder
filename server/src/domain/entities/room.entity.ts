@@ -14,6 +14,7 @@ export interface Room {
   readonly completedAt: Date | null
   readonly readyNotifiedAt: Date | null
   readonly memberCount?: number
+  readonly isMember?: boolean
   readonly createdAt: Date
   readonly updatedAt: Date
 }

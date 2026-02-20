@@ -1,4 +1,5 @@
-import { and, eq, count, gte, isNull, lte, or } from 'drizzle-orm'
+import { and, eq, count, desc, gte, isNull, lte, ne, or } from 'drizzle-orm'
+import { alias } from 'drizzle-orm/pg-core'
 import type { CreateRoomInput, Room, UpdateRoomInput } from '@domain/entities/room.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { Database } from '@infrastructure/database/drizzle'
@@ -69,10 +70,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
       .where(
         and(
           eq(rooms.status, 'waiting'),
-          or(
-            isNull(rooms.completedAt),
-            gte(rooms.completedAt, new Date(Date.now() - 5 * 60_000))
-          )
+          or(isNull(rooms.completedAt), gte(rooms.completedAt, new Date(Date.now() - 5 * 60_000)))
         )
       )
       .groupBy(rooms.id)
@@ -81,6 +79,82 @@ export class DrizzleRoomRepository implements IRoomRepository {
       ...mapRowToEntity(row.room),
       memberCount: row.memberCount,
     }))
+  }
+
+  async countActiveByHostId(hostId: string): Promise<number> {
+    const result = await this.db
+      .select({ count: count() })
+      .from(rooms)
+      .where(
+        and(
+          eq(rooms.hostId, hostId),
+          or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
+          // Note: unlike findAvailable(), no grace window — a room with completedAt set is done.
+          isNull(rooms.completedAt)
+        )
+      )
+    return result[0]?.count ?? 0
+  }
+
+  async findMyRooms(userId: string): Promise<{ hosted: Room[]; joined: Room[] }> {
+    const allMembersAlias = alias(roomMembers, 'all_members')
+    const userMembershipAlias = alias(roomMembers, 'user_membership')
+
+    // Note: unlike findAvailable(), we use strict isNull(completedAt) here with no grace window.
+    // My Rooms shows only genuinely active rooms (not ones in the 5-min deletion window).
+    const activeCondition = and(
+      or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
+      isNull(rooms.completedAt)
+    )
+
+    const selectFields = {
+      id: rooms.id,
+      code: rooms.code,
+      name: rooms.name,
+      hostId: rooms.hostId,
+      gameId: rooms.gameId,
+      status: rooms.status,
+      maxPlayers: rooms.maxPlayers,
+      discordLink: rooms.discordLink,
+      completedAt: rooms.completedAt,
+      readyNotifiedAt: rooms.readyNotifiedAt,
+      tags: rooms.tags,
+      language: rooms.language,
+      createdAt: rooms.createdAt,
+      updatedAt: rooms.updatedAt,
+      memberCount: count(allMembersAlias.id),
+    }
+
+    const hostedRows = await this.db
+      .select(selectFields)
+      .from(rooms)
+      .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
+      .where(and(eq(rooms.hostId, userId), activeCondition))
+      .groupBy(rooms.id)
+      .orderBy(desc(rooms.createdAt))
+
+    const joinedRows = await this.db
+      .select(selectFields)
+      .from(rooms)
+      .innerJoin(
+        userMembershipAlias,
+        and(eq(userMembershipAlias.roomId, rooms.id), eq(userMembershipAlias.userId, userId))
+      )
+      .leftJoin(allMembersAlias, eq(allMembersAlias.roomId, rooms.id))
+      .where(and(ne(rooms.hostId, userId), activeCondition))
+      .groupBy(rooms.id)
+      .orderBy(desc(rooms.createdAt))
+
+    const mapRow = (r: (typeof hostedRows)[0]) => {
+      const { memberCount, ...roomRow } = r
+      return {
+        ...mapRowToEntity(roomRow as RoomRow),
+        memberCount,
+        isMember: true as const,
+      }
+    }
+
+    return { hosted: hostedRows.map(mapRow), joined: joinedRows.map(mapRow) }
   }
 
   async findExpiredRooms(beforeDate: Date): Promise<Room[]> {

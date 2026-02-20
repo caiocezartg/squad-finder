@@ -6,6 +6,8 @@ export interface IRoomRepository {
   findByHostId(hostId: string): Promise<Room[]>
   findAll(): Promise<Room[]>
   findAvailable(): Promise<Room[]>
+  countActiveByHostId(hostId: string): Promise<number>
+  findMyRooms(userId: string): Promise<{ hosted: Room[]; joined: Room[] }>
   create(input: CreateRoomInput): Promise<Room>
   findExpiredRooms(beforeDate: Date): Promise<Room[]>
   update(id: string, input: UpdateRoomInput): Promise<Room | null>
