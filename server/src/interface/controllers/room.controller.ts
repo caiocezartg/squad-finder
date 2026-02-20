@@ -55,6 +55,8 @@ export class RoomController {
       gameId: body.gameId,
       maxPlayers: body.maxPlayers,
       discordLink: body.discordLink,
+      tags: body.tags,
+      language: body.language,
     })
 
     broadcastRoomCreated(result.room)

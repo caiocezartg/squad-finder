@@ -2,7 +2,48 @@
 
 ## Current Task
 
-### Room Card Banner Design Refactor (2026-02-17)
+### Tags + Language Feature (2026-02-20)
+
+**Design:** Add custom tags (up to 5, max 15 chars each) and language selection (PT-BR / EN) to rooms. Tags and language are persisted in the database (Drizzle `text[].array()` + `varchar`), displayed on room cards, and filterable in the lobby.
+
+#### Database & Server
+- [ ] Update Drizzle schema `rooms` — add `tags text[].array()` and `language varchar(5)` with defaults
+- [ ] Generate and run migration (`db:generate` + `db:migrate`)
+- [ ] Update domain entity `Room` — add `tags: string[]` and `language: 'en' | 'pt-br'`
+- [ ] Update `CreateRoomInput` and `UpdateRoomInput` in domain entity
+- [ ] Update shared schema `packages/schemas` — add tags + language to `createRoomInputSchema` and `roomSchema`
+- [ ] Update `packages/types` — add tags + language to `Room` type
+- [ ] Update `DrizzleRoomRepository` — insert and select tags + language
+- [ ] Update `CreateRoomUseCase` — pass tags + language through to repository
+- [ ] Update affected unit tests
+
+#### Frontend
+- [ ] Update `CreateRoomModal` — add tag chip input (Enter/comma adds chip, max 5) and PT-BR/EN language toggle
+- [ ] Update `rooms/index.tsx` — include `tags` and `language` in `createRoomMutation` payload
+- [ ] Update `RoomCard` — replace hardcoded `🇧🇷 PT` badge and `deriveTag()` with real `room.language` and `room.tags` data
+- [ ] Update `RoomFilters` — add language filter (All / PT-BR / EN) and tag text filter
+- [ ] Update filter logic in `rooms/index.tsx` — filter by language and by tag
+
+#### Verification
+- [ ] Typecheck pass (all 4 packages)
+- [ ] Lint pass (0 errors, 0 warnings)
+- [ ] Tests passing
+
+---
+
+### Room Card Redesign v2 — Background Image + Info-First Layout (2026-02-19)
+
+**Design:** Image moves to right side as background with gradient fade, content stays left with clear hierarchy: room name > game name > tags + code > player dots. Image desaturated by default, gains color on hover. Member indicator via subtle accent border.
+
+- [x] Refactor `room-card.tsx` — image as absolute background right, gradient overlay, desaturated default
+- [x] Update content layout — room name prominent, game name in accent, tags + code row, dots at bottom
+- [x] Add hover effect — image saturate + brightness transition, CTA overlay with backdrop-blur
+- [x] Add `isMember` indicator — subtle `border-accent/30` on member cards
+- [x] Increase card height to `h-48`
+- [x] Update loading skeleton in `rooms/index.tsx` to match new h-48
+- [x] Typecheck + lint pass (0 errors, 0 warnings)
+
+### Room Card Banner Design Refactor (2026-02-17) ✅
 
 **Design:** Horizontal neon banner, 2-column grid, image left + content right, neon left border, visual mock tags (language PT + contextual tag derived from room name), player slots as dot indicators.
 

@@ -30,6 +30,8 @@ function RoomsPage() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('newest')
+  const [language, setLanguage] = useState('all')
+  const [tagFilter, setTagFilter] = useState('')
   const autoJoinCodeRef = useRef<string | null>(null)
   const queryClient = useQueryClient()
 
@@ -63,6 +65,8 @@ function RoomsPage() {
       gameId: string
       maxPlayers?: number
       discordLink: string
+      tags: string[]
+      language: 'en' | 'pt-br'
     }) => api.post<CreateRoomResponse>('/api/rooms', body),
     onSuccess: (result) => {
       setModalOpen(false)
@@ -144,6 +148,19 @@ function RoomsPage() {
       })
     }
 
+    // Filter by language
+    if (language !== 'all') {
+      result = result.filter((room) => room.language === language)
+    }
+
+    // Filter by tag
+    if (tagFilter.trim()) {
+      const term = tagFilter.trim().toLowerCase().replace(/^#/, '')
+      result = result.filter((room) =>
+        room.tags.some((t) => t.toLowerCase().includes(term))
+      )
+    }
+
     // Sort
     if (sort === 'newest') {
       result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -152,7 +169,7 @@ function RoomsPage() {
     }
 
     return result
-  }, [roomsData?.rooms, search, filter, sort, gamesMap])
+  }, [roomsData?.rooms, search, filter, sort, gamesMap, language, tagFilter])
 
   const {
     currentPage,
@@ -177,9 +194,9 @@ function RoomsPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="card h-40 animate-pulse" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="card h-64 animate-pulse" />
           ))}
         </div>
       </div>
@@ -227,15 +244,25 @@ function RoomsPage() {
           setSort(v)
           goToPage(1)
         }}
+        language={language}
+        onLanguageChange={(v) => {
+          setLanguage(v)
+          goToPage(1)
+        }}
+        tagFilter={tagFilter}
+        onTagFilterChange={(v) => {
+          setTagFilter(v)
+          goToPage(1)
+        }}
       />
 
       {/* Room cards grid */}
       {filteredRooms.length === 0 ? (
         <EmptyState
-          title={search ? 'No rooms found' : 'No rooms yet'}
+          title={search || language !== 'all' || tagFilter.trim() ? 'No rooms found' : 'No rooms yet'}
           description={
-            search
-              ? `No rooms match "${search}". Try a different search.`
+            search || language !== 'all' || tagFilter.trim()
+              ? 'No rooms match your filters. Try adjusting your search or filters.'
               : 'Be the first to create a room and start a squad!'
           }
           action={
@@ -249,7 +276,7 @@ function RoomsPage() {
         />
       ) : (
         <>
-          <div id="rooms-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div id="rooms-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedRooms.map((room) => (
               <RoomCard
                 key={room.id}

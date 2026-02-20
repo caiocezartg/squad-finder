@@ -39,6 +39,8 @@ export const roomSchema = z.object({
   status: roomStatusSchema,
   maxPlayers: z.number().int(),
   discordLink: z.url().nullable(),
+  tags: z.array(z.string()).default([]),
+  language: z.enum(['en', 'pt-br']).default('pt-br'),
   memberCount: z.number().int().optional(),
   isMember: z.boolean().optional(),
   createdAt: z.coerce.date(),
@@ -94,6 +96,15 @@ export const createRoomInputSchema = z.object({
         url.startsWith('https://discord.gg/') || url.startsWith('https://discord.com/invite/'),
       { message: 'Discord link must be a valid Discord invite URL' }
     ),
+  tags: z
+    .array(
+      z.string()
+        .max(15, 'Tag too long')
+        .transform((t) => t.replace(/^#+/, '').toLowerCase())
+    )
+    .max(5, 'Max 5 tags')
+    .default([]),
+  language: z.enum(['en', 'pt-br']).default('pt-br'),
 })
 
 export type CreateRoomInput = z.infer<typeof createRoomInputSchema>

@@ -1,4 +1,5 @@
 import { useForm, Controller } from 'react-hook-form'
+import { useState, useRef } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Dialog } from '@base-ui-components/react/dialog'
@@ -14,6 +15,9 @@ const formSchema = createRoomInputSchema.extend({
   gameId: z.uuid({ error: 'Please select a game' }),
 })
 
+type FormInput = z.input<typeof formSchema>
+type FormValues = z.output<typeof formSchema>
+
 interface CreateRoomModalProps {
   games: Game[]
   onSubmit: (data: CreateRoomInput) => Promise<unknown>
@@ -21,6 +25,97 @@ interface CreateRoomModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
+
+// ─── Tags Chip Input ──────────────────────────────────────────────────────────
+
+interface TagsChipInputProps {
+  value: string[]
+  onChange: (tags: string[]) => void
+  onBlur: () => void
+  hasError: boolean
+}
+
+function TagsChipInput({ value: tags, onChange, onBlur, hasError }: TagsChipInputProps) {
+  const [inputValue, setInputValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const atLimit = tags.length >= 5
+
+  const addTag = (raw: string) => {
+    const tag = raw.replace(/^#+/, '').trim().toLowerCase()
+    if (!tag || atLimit || tags.includes(tag)) return
+    onChange([...tags, tag])
+  }
+
+  const removeTag = (index: number) => {
+    onChange(tags.filter((_, i) => i !== index))
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      addTag(inputValue)
+      setInputValue('')
+    } else if (e.key === 'Backspace' && inputValue === '' && tags.length > 0) {
+      removeTag(tags.length - 1)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    if (val.endsWith(',')) {
+      addTag(val.slice(0, -1))
+      setInputValue('')
+    } else {
+      setInputValue(val)
+    }
+  }
+
+  return (
+    <div
+      className={`input-field flex flex-wrap gap-1.5 items-center min-h-[42px] cursor-text ${hasError ? 'border-danger/50 focus-within:border-danger/70 focus-within:ring-danger/20' : ''}`}
+      onClick={() => inputRef.current?.focus()}
+    >
+      {tags.map((tag, index) => (
+        <span
+          key={index}
+          className="bg-surface-light border border-border-light rounded-md px-2 py-0.5 text-xs text-offwhite flex items-center gap-1"
+        >
+          #{tag}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              removeTag(index)
+            }}
+            className="text-muted hover:text-offwhite ml-1 text-sm leading-none"
+            aria-label={`Remove tag ${tag}`}
+          >
+            ×
+          </button>
+        </span>
+      ))}
+      {tags.length === 0 && inputValue === '' && (
+        <span className="text-muted/60 text-sm pointer-events-none">type a tag...</span>
+      )}
+      {!atLimit && (
+        <input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onBlur={onBlur}
+          maxLength={15}
+          className="flex-1 min-w-[80px] bg-transparent text-sm text-offwhite outline-none placeholder:text-muted/60"
+          placeholder={tags.length > 0 ? 'add more...' : ''}
+          aria-label="Add tag"
+        />
+      )}
+    </div>
+  )
+}
+
+// ─── Create Room Modal ────────────────────────────────────────────────────────
 
 export function CreateRoomModal({
   games,
@@ -38,13 +133,15 @@ export function CreateRoomModal({
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<CreateRoomInput>({
+  } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       gameId: '',
       maxPlayers: undefined,
       discordLink: '',
+      tags: [],
+      language: 'pt-br',
     },
   })
 
@@ -54,7 +151,7 @@ export function CreateRoomModal({
   const onFormSubmit = handleSubmit(async (data) => {
     try {
       clearErrors('root')
-      await onSubmit(data)
+      await onSubmit(data as unknown as CreateRoomInput)
     } catch (err) {
       setError('root', {
         message: err instanceof Error ? err.message : 'Failed to create room',
@@ -200,6 +297,62 @@ export function CreateRoomModal({
                   })}
                 />
                 {errors.maxPlayers && <p className="field-error">{errors.maxPlayers.message}</p>}
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="block text-sm font-medium text-offwhite mb-1.5">
+                  Tags <span className="text-muted font-normal">(optional)</span>
+                </label>
+                <Controller
+                  name="tags"
+                  control={control}
+                  render={({ field }) => (
+                    <TagsChipInput
+                      value={field.value ?? []}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      hasError={!!errors.tags}
+                    />
+                  )}
+                />
+                <p className="mt-1 text-xs text-muted">
+                  Press Enter or comma to add · max 5 tags
+                </p>
+                {errors.tags && <p className="field-error">{errors.tags.message}</p>}
+              </div>
+
+              {/* Language */}
+              <div>
+                <label className="block text-sm font-medium text-offwhite mb-1.5">Language</label>
+                <Controller
+                  name="language"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="flex gap-2">
+                      {(
+                        [
+                          { value: 'pt-br', label: '🇧🇷 PT-BR' },
+                          { value: 'en', label: '🇺🇸 EN' },
+                        ] as const
+                      ).map(({ value, label }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => field.onChange(value)}
+                          className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                            field.value === value
+                              ? 'bg-accent/10 text-accent border border-accent/20'
+                              : 'bg-surface text-muted border border-border hover:border-border-light hover:text-offwhite'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                />
+                {errors.language && <p className="field-error">{errors.language.message}</p>}
               </div>
 
               {/* Discord Link */}

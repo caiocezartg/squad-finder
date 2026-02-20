@@ -9,6 +9,8 @@ export interface Room {
   readonly status: RoomStatus
   readonly maxPlayers: number
   readonly discordLink: string | null
+  readonly tags: string[]
+  readonly language: 'en' | 'pt-br'
   readonly completedAt: Date | null
   readonly readyNotifiedAt: Date | null
   readonly memberCount?: number
@@ -22,6 +24,8 @@ export interface CreateRoomInput {
   readonly gameId: string
   readonly maxPlayers?: number
   readonly discordLink: string
+  readonly tags?: string[]
+  readonly language?: 'en' | 'pt-br'
 }
 
 export interface UpdateRoomInput {
@@ -29,6 +33,8 @@ export interface UpdateRoomInput {
   readonly status?: RoomStatus
   readonly maxPlayers?: number
   readonly discordLink?: string
+  readonly tags?: string[]
+  readonly language?: 'en' | 'pt-br'
   readonly completedAt?: Date
   readonly readyNotifiedAt?: Date
 }

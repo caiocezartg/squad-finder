@@ -33,6 +33,8 @@ export type Room = {
   status: RoomStatus
   maxPlayers: number
   discordLink: string | null
+  tags: string[]
+  language: 'en' | 'pt-br'
   memberCount?: number
   isMember?: boolean
   createdAt: Date

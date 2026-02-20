@@ -11,6 +11,8 @@ export interface CreateRoomInput {
   readonly gameId: string
   readonly maxPlayers?: number
   readonly discordLink: string
+  readonly tags?: string[]
+  readonly language?: 'en' | 'pt-br'
 }
 
 export interface CreateRoomOutput {
@@ -43,6 +45,8 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
       gameId: input.gameId,
       maxPlayers,
       discordLink: input.discordLink,
+      tags: input.tags,
+      language: input.language,
     })
 
     const hostMember = await this.roomMemberRepository.create({

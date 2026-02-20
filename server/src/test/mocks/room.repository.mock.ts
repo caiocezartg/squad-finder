@@ -12,6 +12,8 @@ export function createMockRoom(overrides?: Partial<Room>): Room {
     status: 'waiting',
     maxPlayers: 5,
     discordLink: null,
+    tags: [],
+    language: 'pt-br' as const,
     completedAt: null,
     readyNotifiedAt: null,
     createdAt: new Date('2024-01-01'),
@@ -39,6 +41,8 @@ export function createMockRoomRepository(): MockRoomRepository {
           gameId: input.gameId,
           maxPlayers: input.maxPlayers ?? 5,
           discordLink: input.discordLink ?? null,
+          tags: input.tags ?? [],
+          language: (input.language ?? 'pt-br') as 'en' | 'pt-br',
         })
       )
     ),

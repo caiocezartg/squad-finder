@@ -24,6 +24,8 @@ function mapRowToEntity(row: RoomRow): Room {
     status: row.status,
     maxPlayers: row.maxPlayers,
     discordLink: row.discordLink,
+    tags: row.tags,
+    language: row.language as 'en' | 'pt-br',
     completedAt: row.completedAt,
     readyNotifiedAt: row.readyNotifiedAt,
     createdAt: row.createdAt,
@@ -99,6 +101,8 @@ export class DrizzleRoomRepository implements IRoomRepository {
         gameId: input.gameId,
         maxPlayers: input.maxPlayers ?? 5,
         discordLink: input.discordLink ?? null,
+        tags: input.tags ?? [],
+        language: input.language ?? 'pt-br',
       })
       .returning()
 
@@ -115,6 +119,8 @@ export class DrizzleRoomRepository implements IRoomRepository {
       status: 'waiting' | 'playing' | 'finished'
       maxPlayers: number
       discordLink: string
+      tags: string[]
+      language: string
       completedAt: Date
       readyNotifiedAt: Date
       updatedAt: Date
@@ -133,6 +139,12 @@ export class DrizzleRoomRepository implements IRoomRepository {
     }
     if (input.discordLink !== undefined) {
       updateData.discordLink = input.discordLink
+    }
+    if (input.tags !== undefined) {
+      updateData.tags = input.tags
+    }
+    if (input.language !== undefined) {
+      updateData.language = input.language
     }
     if (input.completedAt !== undefined) {
       updateData.completedAt = input.completedAt

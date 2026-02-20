@@ -15,6 +15,13 @@
       "when": 1771291755602,
       "tag": "0001_foamy_psylocke",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771561443749,
+      "tag": "0002_wet_korg",
+      "breakpoints": true
     }
   ]
 }
