@@ -15,7 +15,7 @@ const GAMES_DATA = [
   {
     name: 'Minecraft',
     slug: 'minecraft',
-    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co49x5.webp',
+    coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co49x5.webp',
     minPlayers: 2,
     maxPlayers: 10,
   },

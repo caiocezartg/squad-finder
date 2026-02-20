@@ -2,32 +2,32 @@
 
 ## Current Task
 
-### Tags + Language Feature (2026-02-20)
+### Tags + Language Feature (2026-02-20) ✅
 
 **Design:** Add custom tags (up to 5, max 15 chars each) and language selection (PT-BR / EN) to rooms. Tags and language are persisted in the database (Drizzle `text[].array()` + `varchar`), displayed on room cards, and filterable in the lobby.
 
 #### Database & Server
-- [ ] Update Drizzle schema `rooms` — add `tags text[].array()` and `language varchar(5)` with defaults
-- [ ] Generate and run migration (`db:generate` + `db:migrate`)
-- [ ] Update domain entity `Room` — add `tags: string[]` and `language: 'en' | 'pt-br'`
-- [ ] Update `CreateRoomInput` and `UpdateRoomInput` in domain entity
-- [ ] Update shared schema `packages/schemas` — add tags + language to `createRoomInputSchema` and `roomSchema`
-- [ ] Update `packages/types` — add tags + language to `Room` type
-- [ ] Update `DrizzleRoomRepository` — insert and select tags + language
-- [ ] Update `CreateRoomUseCase` — pass tags + language through to repository
-- [ ] Update affected unit tests
+- [x] Update Drizzle schema `rooms` — add `tags text[].array()` and `language varchar(5)` with defaults
+- [x] Generate and run migration (`db:generate` + `db:migrate`)
+- [x] Update domain entity `Room` — add `tags: string[]` and `language: 'en' | 'pt-br'`
+- [x] Update `CreateRoomInput` and `UpdateRoomInput` in domain entity
+- [x] Update shared schema `packages/schemas` — add tags + language to `createRoomInputSchema` and `roomSchema`
+- [x] Update `packages/types` — add tags + language to `Room` type
+- [x] Update `DrizzleRoomRepository` — insert and select tags + language
+- [x] Update `CreateRoomUseCase` — pass tags + language through to repository
+- [x] Update affected unit tests
 
 #### Frontend
-- [ ] Update `CreateRoomModal` — add tag chip input (Enter/comma adds chip, max 5) and PT-BR/EN language toggle
-- [ ] Update `rooms/index.tsx` — include `tags` and `language` in `createRoomMutation` payload
-- [ ] Update `RoomCard` — replace hardcoded `🇧🇷 PT` badge and `deriveTag()` with real `room.language` and `room.tags` data
-- [ ] Update `RoomFilters` — add language filter (All / PT-BR / EN) and tag text filter
-- [ ] Update filter logic in `rooms/index.tsx` — filter by language and by tag
+- [x] Update `CreateRoomModal` — add tag chip input (Enter/comma adds chip, max 5) and PT-BR/EN language toggle
+- [x] Update `rooms/index.tsx` — include `tags` and `language` in `createRoomMutation` payload
+- [x] Update `RoomCard` — replace hardcoded `🇧🇷 PT` badge and `deriveTag()` with real `room.language` and `room.tags` data
+- [x] Update `RoomFilters` — add language filter (All / PT-BR / EN) and tag text filter
+- [x] Update filter logic in `rooms/index.tsx` — filter by language and by tag
 
 #### Verification
-- [ ] Typecheck pass (all 4 packages)
-- [ ] Lint pass (0 errors, 0 warnings)
-- [ ] Tests passing
+- [x] Typecheck pass (all 4 packages)
+- [x] Lint pass (0 errors, 0 warnings)
+- [x] Tests passing (33/33)
 
 ---
 
