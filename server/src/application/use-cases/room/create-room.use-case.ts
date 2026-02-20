@@ -3,7 +3,9 @@ import type { RoomMember } from '@domain/entities/room-member.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository'
 import type { IGameRepository } from '@domain/repositories/game.repository'
-import { InvalidGameError } from '@application/errors'
+import { InvalidGameError, RoomCreateLimitReachedError } from '@application/errors'
+
+const ROOM_CREATE_LIMIT = 3
 
 export interface CreateRoomInput {
   readonly name: string
@@ -35,6 +37,12 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
     const game = await this.gameRepository.findById(input.gameId)
     if (!game) {
       throw new InvalidGameError(input.gameId)
+    }
+
+    // Enforce host limit: max 3 active rooms
+    const activeRoomCount = await this.roomRepository.countActiveByHostId(input.hostId)
+    if (activeRoomCount >= ROOM_CREATE_LIMIT) {
+      throw new RoomCreateLimitReachedError(ROOM_CREATE_LIMIT)
     }
 
     const maxPlayers = input.maxPlayers ?? game.maxPlayers

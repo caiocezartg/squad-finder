@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { CreateRoomUseCase } from './create-room.use-case'
-import { InvalidGameError } from '@application/errors'
+import { InvalidGameError, RoomCreateLimitReachedError } from '@application/errors'
 import {
   createMockRoom,
   createMockRoomRepository,
@@ -20,7 +20,11 @@ describe('CreateRoomUseCase', () => {
     mockRoomRepository = createMockRoomRepository()
     mockGameRepository = createMockGameRepository()
     mockRoomMemberRepository = createMockRoomMemberRepository()
-    useCase = new CreateRoomUseCase(mockRoomRepository, mockGameRepository, mockRoomMemberRepository)
+    useCase = new CreateRoomUseCase(
+      mockRoomRepository,
+      mockGameRepository,
+      mockRoomMemberRepository
+    )
   })
 
   describe('execute', () => {
@@ -166,6 +170,59 @@ describe('CreateRoomUseCase', () => {
       })
       expect(result.hostMember.roomId).toBe('room-1')
       expect(result.hostMember.userId).toBe('host-123')
+    })
+
+    it('should throw RoomCreateLimitReachedError when user already hosts 3 active rooms', async () => {
+      // Arrange
+      const game = createMockGame({ id: 'game-123' })
+      mockGameRepository.findById.mockResolvedValue(game)
+      mockRoomRepository.countActiveByHostId.mockResolvedValue(3)
+
+      // Act & Assert
+      await expect(
+        useCase.execute({
+          name: 'Test Room',
+          hostId: 'host-123',
+          gameId: 'game-123',
+          discordLink: 'https://discord.gg/test',
+        })
+      ).rejects.toThrow(RoomCreateLimitReachedError)
+
+      expect(mockRoomRepository.create).not.toHaveBeenCalled()
+    })
+
+    it('should allow room creation when user hosts 2 active rooms (below limit)', async () => {
+      // Arrange
+      const game = createMockGame({ id: 'game-123', maxPlayers: 5 })
+      mockGameRepository.findById.mockResolvedValue(game)
+      mockRoomRepository.countActiveByHostId.mockResolvedValue(2)
+
+      const expectedRoom = createMockRoom({
+        name: 'My Room',
+        hostId: 'host-123',
+        gameId: 'game-123',
+        maxPlayers: 5,
+      })
+      mockRoomRepository.create.mockResolvedValue(expectedRoom)
+
+      const expectedMember = createMockRoomMember({
+        roomId: expectedRoom.id,
+        userId: 'host-123',
+      })
+      mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
+
+      // Act
+      const result = await useCase.execute({
+        name: 'My Room',
+        hostId: 'host-123',
+        gameId: 'game-123',
+        maxPlayers: 5,
+        discordLink: 'https://discord.gg/test',
+      })
+
+      // Assert
+      expect(mockRoomRepository.create).toHaveBeenCalledOnce()
+      expect(result.room).toBeDefined()
     })
   })
 })

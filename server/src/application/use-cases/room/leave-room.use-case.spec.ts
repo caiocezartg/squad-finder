@@ -81,9 +81,9 @@ describe('LeaveRoomUseCase', () => {
 
       mockRoomRepository.findById.mockResolvedValue(room)
 
-      await expect(
-        useCase.execute({ roomId: 'room-1', userId: 'any-user' })
-      ).rejects.toThrow('completed')
+      await expect(useCase.execute({ roomId: 'room-1', userId: 'any-user' })).rejects.toThrow(
+        'completed'
+      )
     })
   })
 })
