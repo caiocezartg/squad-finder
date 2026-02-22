@@ -23,22 +23,6 @@ function payloadToRecord(payload: UserNotificationPayload): Record<string, unkno
   }
 }
 
-function normalizePayload(raw: unknown): unknown {
-  if (typeof raw !== 'object' || raw === null || !('players' in raw)) return raw
-
-  const payload = raw as Record<string, unknown>
-  if (
-    Array.isArray(payload.players) &&
-    payload.players.length > 0 &&
-    typeof payload.players[0] === 'string'
-  ) {
-    // Migrate legacy format: string[] → {name, image}[]
-    return { ...payload, players: payload.players.map((name: string) => ({ name, image: null })) }
-  }
-
-  return raw
-}
-
 function mapRowToEntity(row: UserNotificationRow): UserNotification {
   return {
     id: row.id,
@@ -46,7 +30,7 @@ function mapRowToEntity(row: UserNotificationRow): UserNotification {
     type: userNotificationTypeSchema.parse(row.type),
     title: row.title,
     message: row.message,
-    payload: userNotificationPayloadSchema.parse(normalizePayload(row.payload)),
+    payload: userNotificationPayloadSchema.parse(row.payload),
     readAt: row.readAt,
     createdAt: row.createdAt,
   }
