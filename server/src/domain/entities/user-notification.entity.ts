@@ -5,7 +5,7 @@ export interface UserNotificationPayload {
   readonly roomCode: string
   readonly roomName: string
   readonly gameName: string
-  readonly players: string[]
+  readonly players: ReadonlyArray<{ readonly name: string; readonly image: string | null }>
   readonly discordLink: string | null
 }
 

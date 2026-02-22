@@ -6,13 +6,9 @@ import type { IJoinRoomUseCase } from '@application/use-cases/room/join-room.use
 import type { ILeaveRoomUseCase } from '@application/use-cases/room/leave-room.use-case'
 import type { INotifyRoomReadyUseCase } from '@application/use-cases/room/notify-room-ready.use-case'
 import type { IGetMyRoomsUseCase } from '@application/use-cases/room/get-my-rooms.use-case'
+import type { IRoomBroadcaster } from '@domain/services/room-broadcaster.interface'
 import { RoomNotFoundError, NotRoomMemberError } from '@application/errors'
 import { createRoomRequestSchema, roomCodeParamSchema } from '@application/dtos'
-import {
-  broadcastRoomCreated,
-  broadcastRoomUpdated,
-  broadcastRoomDeleted,
-} from '@infrastructure/websocket/handlers/room.handler'
 
 export interface RoomControllerDeps {
   readonly createRoomUseCase: ICreateRoomUseCase
@@ -22,6 +18,7 @@ export interface RoomControllerDeps {
   readonly leaveRoomUseCase: ILeaveRoomUseCase
   readonly notifyRoomReadyUseCase: INotifyRoomReadyUseCase
   readonly getMyRoomsUseCase: IGetMyRoomsUseCase
+  readonly broadcaster: IRoomBroadcaster
 }
 
 export class RoomController {
@@ -59,7 +56,7 @@ export class RoomController {
       language: body.language,
     })
 
-    broadcastRoomCreated(result.room)
+    this.deps.broadcaster.broadcastRoomCreated(result.room)
 
     await reply.status(201).send({ room: result.room })
   }
@@ -78,7 +75,7 @@ export class RoomController {
       userId,
     })
 
-    broadcastRoomUpdated(room.id, room.code, result.memberCount)
+    this.deps.broadcaster.broadcastRoomUpdated(room.id, room.code, result.memberCount)
 
     if (result.isRoomNowFull) {
       try {
@@ -130,9 +127,9 @@ export class RoomController {
     }
 
     if (result.wasHostLeave) {
-      broadcastRoomDeleted(room.id, room.code)
+      this.deps.broadcaster.broadcastRoomDeleted(room.id, room.code)
     } else {
-      broadcastRoomUpdated(room.id, room.code, result.memberCount)
+      this.deps.broadcaster.broadcastRoomUpdated(room.id, room.code, result.memberCount)
     }
 
     await reply.send({

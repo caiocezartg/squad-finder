@@ -1,4 +1,5 @@
 import type { Database } from '@infrastructure/database/drizzle'
+import type { IRoomBroadcaster } from '@domain/services/room-broadcaster.interface'
 import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository'
 import { DrizzleRoomMemberRepository } from '@infrastructure/repositories/drizzle-room-member.repository'
 import { DrizzleGameRepository } from '@infrastructure/repositories/drizzle-game.repository'
@@ -13,7 +14,7 @@ import { NotifyRoomReadyUseCase } from '@application/use-cases/room/notify-room-
 import { GetMyRoomsUseCase } from '@application/use-cases/room/get-my-rooms.use-case'
 import { RoomController } from '@interface/controllers/room.controller'
 
-export function createRoomController(db: Database) {
+export function createRoomController(db: Database, broadcaster: IRoomBroadcaster) {
   const roomRepository = new DrizzleRoomRepository(db)
   const roomMemberRepository = new DrizzleRoomMemberRepository(db)
   const gameRepository = new DrizzleGameRepository(db)
@@ -49,5 +50,6 @@ export function createRoomController(db: Database) {
     leaveRoomUseCase,
     notifyRoomReadyUseCase,
     getMyRoomsUseCase,
+    broadcaster,
   })
 }

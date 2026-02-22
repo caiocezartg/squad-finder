@@ -7,8 +7,7 @@ import {
   RoomFullError,
   RoomJoinLimitReachedError,
 } from '@application/errors'
-
-const ROOM_JOIN_LIMIT = 5
+import { ROOM } from '@config/constants'
 
 export interface JoinRoomInput {
   readonly roomId: string
@@ -53,8 +52,8 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
 
     // Enforce membership limit: max 5 active rooms
     const activeMembershipCount = await this.roomMemberRepository.countActiveByUserId(input.userId)
-    if (activeMembershipCount >= ROOM_JOIN_LIMIT) {
-      throw new RoomJoinLimitReachedError(ROOM_JOIN_LIMIT)
+    if (activeMembershipCount >= ROOM.JOIN_LIMIT) {
+      throw new RoomJoinLimitReachedError(ROOM.JOIN_LIMIT)
     }
 
     const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)

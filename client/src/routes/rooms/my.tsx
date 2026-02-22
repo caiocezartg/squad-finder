@@ -2,11 +2,14 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Tabs } from '@base-ui-components/react'
+import { toast } from 'sonner'
 import { useSession } from '@/lib/auth-client'
 import { api } from '@/lib/api'
+import { getUserFriendlyError } from '@/lib/error-messages'
 import { RoomCard } from '@/components/rooms/room-card'
 import { RoomFilters } from '@/components/rooms/room-filters'
 import { CreateRoomModal } from '@/components/rooms/create-room-modal'
+import { AlertBox } from '@/components/ui/alert-box'
 import { Plus } from 'lucide-react'
 import type { MyRoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@/types'
 
@@ -34,7 +37,11 @@ function MyRoomsPage() {
   }, [sessionLoading, session?.user, navigate])
 
   // Fetch my rooms
-  const { data: myRoomsData, isLoading: myRoomsLoading } = useQuery({
+  const {
+    data: myRoomsData,
+    isLoading: myRoomsLoading,
+    isError: myRoomsError,
+  } = useQuery({
     queryKey: ['my-rooms'],
     queryFn: () => api.get<MyRoomsResponse>('/api/rooms/my'),
     enabled: !!session?.user,
@@ -63,6 +70,9 @@ function MyRoomsPage() {
       setModalOpen(false)
       queryClient.invalidateQueries({ queryKey: ['my-rooms'] })
       navigate({ to: '/rooms/$code', params: { code: result.room.code } })
+    },
+    onError: (err) => {
+      toast.error(getUserFriendlyError(err))
     },
   })
 
@@ -159,6 +169,12 @@ function MyRoomsPage() {
           Create new room
         </button>
       </div>
+
+      {myRoomsError && (
+        <div className="mb-6">
+          <AlertBox type="error" message="Failed to load your rooms. Please refresh the page." />
+        </div>
+      )}
 
       {/* Filters */}
       <RoomFilters

@@ -2,6 +2,7 @@ import { createRootRoute, Link, Outlet, useMatches } from '@tanstack/react-route
 import { useSession, signIn, signOut } from '@/lib/auth-client'
 import { useState } from 'react'
 import { Users, ChevronDown, LogOut } from 'lucide-react'
+import { Toaster } from 'sonner'
 import { DiscordIcon } from '@/components/ui/icons'
 import { NotificationsMenu } from '@/components/layout/notifications-menu'
 
@@ -45,14 +46,22 @@ function RootLayout() {
             <nav className="hidden md:flex items-center gap-1">
               <Link
                 to="/rooms"
-                className="px-3 py-2 text-sm font-medium text-muted hover:text-offwhite transition-colors rounded-lg hover:bg-surface-hover"
+                activeOptions={{ exact: true }}
+                className="rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-colors text-muted hover:bg-surface-hover hover:text-offwhite"
+                activeProps={{
+                  className: '!text-accent',
+                }}
               >
                 ALL ROOMS
               </Link>
               {session?.user && (
                 <Link
                   to="/rooms/my"
-                  className="px-3 py-2 text-sm font-medium text-muted hover:text-offwhite transition-colors rounded-lg hover:bg-surface-hover"
+                  activeOptions={{ exact: true }}
+                  className="rounded-lg border border-transparent px-3 py-2 text-sm font-medium transition-colors text-muted hover:bg-surface-hover hover:text-offwhite"
+                  activeProps={{
+                    className: '!text-accent',
+                  }}
                 >
                   MY ROOMS
                 </Link>
@@ -150,6 +159,8 @@ function RootLayout() {
           </div>
         </footer>
       )}
+
+      <Toaster theme="dark" position="bottom-right" richColors />
     </div>
   )
 }

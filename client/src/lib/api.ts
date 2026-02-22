@@ -1,6 +1,6 @@
 import { env } from '@/env'
 
-class ApiClientError extends Error {
+export class ApiClientError extends Error {
   public readonly status: number
   public readonly code?: string
 

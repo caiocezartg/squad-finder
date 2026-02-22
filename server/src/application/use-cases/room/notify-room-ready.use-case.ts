@@ -37,8 +37,12 @@ export class NotifyRoomReadyUseCase implements INotifyRoomReadyUseCase {
     const members = await this.roomMemberRepository.findByRoomId(room.id)
     const userIds = [...new Set(members.map((member) => member.userId))]
 
-    const users = await Promise.all(userIds.map((userId) => this.userRepository.findById(userId)))
-    const players = users.map((user) => user?.name ?? 'Unknown')
+    const users = await this.userRepository.findByIds(userIds)
+    const usersById = new Map(users.map((u) => [u.id, u]))
+    const players = userIds.map((userId) => {
+      const u = usersById.get(userId)
+      return { name: u?.name ?? 'Unknown', image: u?.avatarUrl ?? null }
+    })
 
     const title = 'Room ready: your squad is full'
     const message = `${room.name} is ready. Your Discord invite is now available.`

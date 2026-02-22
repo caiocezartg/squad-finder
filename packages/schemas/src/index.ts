@@ -67,7 +67,7 @@ export const userNotificationPayloadSchema = z.object({
   roomCode: z.string().length(6),
   roomName: z.string(),
   gameName: z.string(),
-  players: z.array(z.string()),
+  players: z.array(z.object({ name: z.string(), image: z.string().nullable() })),
   discordLink: z.url().nullable(),
 })
 
@@ -86,7 +86,7 @@ export type UserNotificationDto = z.infer<typeof userNotificationSchema>
 
 // Create room input schema
 export const createRoomInputSchema = z.object({
-  name: z.string().min(1, 'Room name is required').max(30, 'Room name too long'),
+  name: z.string().trim().min(1, 'Room name is required').max(30, 'Room name too long'),
   gameId: z.uuid({ error: 'Invalid game ID' }),
   maxPlayers: z.number().int().min(2).max(20).optional(),
   discordLink: z
@@ -100,6 +100,7 @@ export const createRoomInputSchema = z.object({
     .array(
       z
         .string()
+        .trim()
         .max(15, 'Tag too long')
         .transform((t) => t.replace(/^#+/, '').toLowerCase())
     )

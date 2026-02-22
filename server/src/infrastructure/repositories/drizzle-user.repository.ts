@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import type { CreateUserInput, UpdateUserInput, User } from '@domain/entities/user.entity'
 import type { IUserRepository } from '@domain/repositories/user.repository'
 import type { Database } from '@infrastructure/database/drizzle'
@@ -22,6 +22,12 @@ export class DrizzleUserRepository implements IUserRepository {
     const result = await this.db.select().from(user).where(eq(user.id, id)).limit(1)
     const row = result[0]
     return row ? mapRowToEntity(row) : null
+  }
+
+  async findByIds(ids: string[]): Promise<User[]> {
+    if (ids.length === 0) return []
+    const result = await this.db.select().from(user).where(inArray(user.id, ids))
+    return result.map(mapRowToEntity)
   }
 
   async findByEmail(email: string): Promise<User | null> {

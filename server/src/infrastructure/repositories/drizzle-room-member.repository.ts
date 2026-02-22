@@ -1,9 +1,10 @@
-import { eq, and, or, count, isNull } from 'drizzle-orm'
+import { eq, and, count } from 'drizzle-orm'
 import type { CreateRoomMemberInput, RoomMember } from '@domain/entities/room-member.entity'
 import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository'
 import type { Database } from '@infrastructure/database/drizzle'
 import { roomMembers, type RoomMemberRow } from '@infrastructure/database/schema/room-members'
 import { rooms } from '@infrastructure/database/schema/rooms'
+import { activeRoomCondition } from './drizzle-room.repository'
 
 function mapRowToEntity(row: RoomMemberRow): RoomMember {
   return {
@@ -78,19 +79,13 @@ export class DrizzleRoomMemberRepository implements IRoomMemberRepository {
   }
 
   async countActiveByUserId(userId: string): Promise<number> {
+    // A room can be status='waiting' with completedAt set (full, pending deletion).
+    // Exclude those — they are not genuinely active from the member's perspective.
     const result = await this.db
       .select({ count: count() })
       .from(roomMembers)
       .innerJoin(rooms, eq(rooms.id, roomMembers.roomId))
-      .where(
-        and(
-          eq(roomMembers.userId, userId),
-          or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
-          // A room can be status='waiting' with completedAt set (full, pending deletion).
-          // Exclude those — they are not genuinely active from the member's perspective.
-          isNull(rooms.completedAt)
-        )
-      )
+      .where(and(eq(roomMembers.userId, userId), activeRoomCondition()))
     return result[0]?.count ?? 0
   }
 }

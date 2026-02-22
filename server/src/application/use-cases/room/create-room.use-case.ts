@@ -4,8 +4,7 @@ import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository'
 import type { IGameRepository } from '@domain/repositories/game.repository'
 import { InvalidGameError, RoomCreateLimitReachedError } from '@application/errors'
-
-const ROOM_CREATE_LIMIT = 3
+import { ROOM } from '@config/constants'
 
 export interface CreateRoomInput {
   readonly name: string
@@ -41,8 +40,8 @@ export class CreateRoomUseCase implements ICreateRoomUseCase {
 
     // Enforce host limit: max 3 active rooms
     const activeRoomCount = await this.roomRepository.countActiveByHostId(input.hostId)
-    if (activeRoomCount >= ROOM_CREATE_LIMIT) {
-      throw new RoomCreateLimitReachedError(ROOM_CREATE_LIMIT)
+    if (activeRoomCount >= ROOM.CREATE_LIMIT) {
+      throw new RoomCreateLimitReachedError(ROOM.CREATE_LIMIT)
     }
 
     const maxPlayers = input.maxPlayers ?? game.maxPlayers

@@ -20,7 +20,7 @@ const errorResponse = z.object({
 
 export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>()
-  const roomController = createRoomController(fastify.db)
+  const roomController = createRoomController(fastify.db, fastify.broadcaster)
   const gameController = createGameController(fastify.db)
 
   // Games

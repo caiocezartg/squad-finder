@@ -2,10 +2,7 @@ import type { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
 import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository'
 import { DeleteExpiredRoomsUseCase } from '@application/use-cases/room/delete-expired-rooms.use-case'
-import { broadcastRoomDeleted } from '@infrastructure/websocket/handlers/room.handler'
-
-const CLEANUP_INTERVAL_MS = 60_000 // 1 minute
-const EXPIRATION_MINUTES = 60 // 1 hour
+import { ROOM } from '@config/constants'
 
 async function markLegacyFullRooms(fastify: FastifyInstance): Promise<void> {
   const repository = new DrizzleRoomRepository(fastify.db)
@@ -39,16 +36,16 @@ async function roomCleanupPlugin(fastify: FastifyInstance): Promise<void> {
       fastify.log.error(error, 'Failed to mark legacy full rooms')
     }
 
-    fastify.log.info('Room cleanup scheduler started (interval: 60s, expiration: 60min)')
+    fastify.log.info(`Room cleanup scheduler started (interval: ${ROOM.CLEANUP_INTERVAL_MS / 1000}s, expiration: ${ROOM.EXPIRATION_MINUTES}min)`)
 
     intervalId = setInterval(async () => {
       try {
         const repository = new DrizzleRoomRepository(fastify.db)
         const useCase = new DeleteExpiredRoomsUseCase(repository)
-        const result = await useCase.execute({ expirationMinutes: EXPIRATION_MINUTES })
+        const result = await useCase.execute({ expirationMinutes: ROOM.EXPIRATION_MINUTES })
 
         for (const room of result.deletedRooms) {
-          broadcastRoomDeleted(room.id, room.code)
+          fastify.broadcaster.broadcastRoomDeleted(room.id, room.code)
         }
 
         if (result.deletedRooms.length > 0) {
@@ -57,7 +54,7 @@ async function roomCleanupPlugin(fastify: FastifyInstance): Promise<void> {
       } catch (error) {
         fastify.log.error(error, 'Room cleanup failed')
       }
-    }, CLEANUP_INTERVAL_MS)
+    }, ROOM.CLEANUP_INTERVAL_MS)
   })
 
   fastify.addHook('onClose', () => {
@@ -67,5 +64,5 @@ async function roomCleanupPlugin(fastify: FastifyInstance): Promise<void> {
 
 export default fp(roomCleanupPlugin, {
   name: 'room-cleanup',
-  dependencies: ['database'],
+  dependencies: ['database', 'websocket-handler'],
 })

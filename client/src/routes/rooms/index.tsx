@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { signIn, useSession } from '@/lib/auth-client'
 import { api } from '@/lib/api'
+import { getUserFriendlyError } from '@/lib/error-messages'
 import { useWebSocket } from '@/hooks/use-websocket'
 import { useLobbyEvents } from '@/hooks/use-lobby-events'
 import { RoomCard } from '@/components/rooms/room-card'
@@ -23,7 +25,6 @@ export const Route = createFileRoute('/rooms/')({
 function RoomsPage() {
   const { data: session } = useSession()
   const navigate = useNavigate()
-  const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [joinAuthModalOpen, setJoinAuthModalOpen] = useState(false)
   const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null)
@@ -45,14 +46,14 @@ function RoomsPage() {
   useLobbyEvents({ isConnected, send, on })
 
   // Fetch rooms
-  const { data: roomsData, isLoading: roomsLoading } = useQuery({
+  const { data: roomsData, isLoading: roomsLoading, isError: roomsError } = useQuery({
     queryKey: ['rooms'],
     queryFn: () => api.get<RoomsResponse>('/api/rooms'),
     refetchOnWindowFocus: true,
   })
 
   // Fetch games
-  const { data: gamesData, isLoading: gamesLoading } = useQuery({
+  const { data: gamesData, isLoading: gamesLoading, isError: gamesError } = useQuery({
     queryKey: ['games'],
     queryFn: () => api.get<GamesResponse>('/api/games'),
     staleTime: 60_000,
@@ -82,7 +83,7 @@ function RoomsPage() {
       navigate({ to: '/rooms/$code', params: { code: roomCode } })
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : 'Failed to join room')
+      toast.error(getUserFriendlyError(err))
     },
   })
 
@@ -219,9 +220,12 @@ function RoomsPage() {
         )}
       </div>
 
-      {error && (
+      {(roomsError || gamesError) && (
         <div className="mb-6">
-          <AlertBox type="error" message={error} onClose={() => setError(null)} />
+          <AlertBox
+            type="error"
+            message="Failed to load rooms. Please refresh the page."
+          />
         </div>
       )}
 
@@ -286,7 +290,6 @@ function RoomsPage() {
                   if (room.isMember) {
                     navigate({ to: '/rooms/$code', params: { code } })
                   } else if (!session?.user) {
-                    setError(null)
                     setPendingJoinCode(code)
                     setJoinAuthModalOpen(true)
                   } else {

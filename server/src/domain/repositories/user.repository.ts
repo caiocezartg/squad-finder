@@ -2,6 +2,7 @@ import type { CreateUserInput, UpdateUserInput, User } from '@domain/entities/us
 
 export interface IUserRepository {
   findById(id: string): Promise<User | null>
+  findByIds(ids: string[]): Promise<User[]>
   findByEmail(email: string): Promise<User | null>
   findAll(): Promise<User[]>
   create(input: CreateUserInput): Promise<User>

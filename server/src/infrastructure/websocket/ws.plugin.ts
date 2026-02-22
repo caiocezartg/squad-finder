@@ -1,6 +1,12 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify'
 import type { WebSocket } from '@fastify/websocket'
 import fp from 'fastify-plugin'
+import type { IRoomBroadcaster } from '@domain/services/room-broadcaster.interface'
+import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository'
+import { DrizzleRoomMemberRepository } from '@infrastructure/repositories/drizzle-room-member.repository'
+import { DrizzleUserRepository } from '@infrastructure/repositories/drizzle-user.repository'
+import { WsConnectionManager } from './ws-connection-manager'
+import { WsRoomBroadcaster } from './room-broadcaster.service'
 import { wsIncomingMessageSchema, type PongMessage, type WsClient } from './types'
 import {
   handleJoinRoom,
@@ -9,10 +15,20 @@ import {
   handleSubscribeLobby,
   handleUnsubscribeLobby,
   sendError,
-  setClientData,
 } from './handlers/room.handler'
 
+declare module 'fastify' {
+  interface FastifyInstance {
+    broadcaster: IRoomBroadcaster
+  }
+}
+
 async function wsPlugin(fastify: FastifyInstance): Promise<void> {
+  const connectionManager = new WsConnectionManager()
+  const broadcaster = new WsRoomBroadcaster(connectionManager)
+
+  fastify.decorate('broadcaster', broadcaster)
+
   fastify.get('/ws', { websocket: true }, async (socket: WebSocket, request: FastifyRequest) => {
     fastify.log.info(
       {
@@ -44,9 +60,12 @@ async function wsPlugin(fastify: FastifyInstance): Promise<void> {
       },
     }
 
-    setClientData(socket, client)
+    connectionManager.setClientData(socket, client)
 
     const db = fastify.db
+    const roomRepository = new DrizzleRoomRepository(db)
+    const roomMemberRepository = new DrizzleRoomMemberRepository(db)
+    const userRepository = new DrizzleUserRepository(db)
 
     socket.on('message', async (rawData: Buffer | ArrayBuffer | Buffer[]) => {
       try {
@@ -62,16 +81,23 @@ async function wsPlugin(fastify: FastifyInstance): Promise<void> {
 
         switch (message.type) {
           case 'join_room':
-            await handleJoinRoom(socket, message, db)
+            await handleJoinRoom(
+              socket,
+              message,
+              connectionManager,
+              roomRepository,
+              roomMemberRepository,
+              userRepository
+            )
             break
           case 'leave_room':
-            await handleLeaveRoom(socket, message, db)
+            await handleLeaveRoom(socket, message, connectionManager)
             break
           case 'subscribe_lobby':
-            handleSubscribeLobby(socket)
+            handleSubscribeLobby(socket, connectionManager)
             break
           case 'unsubscribe_lobby':
-            handleUnsubscribeLobby(socket)
+            handleUnsubscribeLobby(socket, connectionManager)
             break
           case 'ping': {
             const pongMessage: PongMessage = {
@@ -89,12 +115,12 @@ async function wsPlugin(fastify: FastifyInstance): Promise<void> {
     })
 
     socket.on('close', () => {
-      handleDisconnect(socket)
+      handleDisconnect(socket, connectionManager)
     })
 
     socket.on('error', (error: Error) => {
       fastify.log.error(error, 'WebSocket error')
-      handleDisconnect(socket)
+      handleDisconnect(socket, connectionManager)
     })
   })
 }

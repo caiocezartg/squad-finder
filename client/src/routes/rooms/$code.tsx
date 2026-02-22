@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { useSession } from '@/lib/auth-client'
 import { api } from '@/lib/api'
+import { getUserFriendlyError } from '@/lib/error-messages'
 import { useWebSocket } from '@/hooks/use-websocket'
 import { useRoomsCache } from '@/hooks/use-rooms-cache'
 import { useTimeAgo } from '@/hooks/use-time-ago'
@@ -134,7 +136,7 @@ function RoomLobbyPage() {
       await queryClient.invalidateQueries({ queryKey: ['rooms'] })
       navigate({ to: '/rooms' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to leave room')
+      toast.error(getUserFriendlyError(err))
     }
   }
 

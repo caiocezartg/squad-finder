@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { api } from '@/lib/api'
+import { getUserFriendlyError } from '@/lib/error-messages'
 import type { NotificationsResponse } from '@/types'
 
 interface UseNotificationsOptions {
@@ -26,6 +28,9 @@ export function useNotifications(options: UseNotificationsOptions) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
+    onError: (err) => {
+      toast.error(getUserFriendlyError(err))
+    },
   })
 
   const markAllAsReadMutation = useMutation({
@@ -34,6 +39,9 @@ export function useNotifications(options: UseNotificationsOptions) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notifications'] })
     },
+    onError: (err) => {
+      toast.error(getUserFriendlyError(err))
+    },
   })
 
   const deleteNotificationMutation = useMutation({
@@ -41,6 +49,9 @@ export function useNotifications(options: UseNotificationsOptions) {
       api.delete<{ success: boolean }>(`/api/notifications/${notificationId}`),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['notifications'] })
+    },
+    onError: (err) => {
+      toast.error(getUserFriendlyError(err))
     },
   })
 

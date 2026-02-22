@@ -1,10 +1,28 @@
 import { and, eq, count, desc, gte, isNull, lte, ne, or } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
+import { z } from 'zod'
 import type { CreateRoomInput, Room, UpdateRoomInput } from '@domain/entities/room.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { Database } from '@infrastructure/database/drizzle'
 import { rooms, type RoomRow } from '@infrastructure/database/schema/rooms'
 import { roomMembers } from '@infrastructure/database/schema/room-members'
+import { ROOM } from '@config/constants'
+
+const languageSchema = z.enum(['en', 'pt-br']).catch('pt-br')
+
+export function activeRoomCondition() {
+  return and(
+    or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
+    isNull(rooms.completedAt)
+  )
+}
+
+export function activeRoomWithGraceCondition(graceMs: number) {
+  return and(
+    eq(rooms.status, 'waiting'),
+    or(isNull(rooms.completedAt), gte(rooms.completedAt, new Date(Date.now() - graceMs)))
+  )
+}
 
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -26,7 +44,7 @@ function mapRowToEntity(row: RoomRow): Room {
     maxPlayers: row.maxPlayers,
     discordLink: row.discordLink,
     tags: row.tags,
-    language: row.language as 'en' | 'pt-br',
+    language: languageSchema.parse(row.language),
     completedAt: row.completedAt,
     readyNotifiedAt: row.readyNotifiedAt,
     createdAt: row.createdAt,
@@ -67,12 +85,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
       })
       .from(rooms)
       .leftJoin(roomMembers, eq(rooms.id, roomMembers.roomId))
-      .where(
-        and(
-          eq(rooms.status, 'waiting'),
-          or(isNull(rooms.completedAt), gte(rooms.completedAt, new Date(Date.now() - 5 * 60_000)))
-        )
-      )
+      .where(activeRoomWithGraceCondition(ROOM.GRACE_WINDOW_MS))
       .groupBy(rooms.id)
 
     return result.map((row) => ({
@@ -85,14 +98,8 @@ export class DrizzleRoomRepository implements IRoomRepository {
     const result = await this.db
       .select({ count: count() })
       .from(rooms)
-      .where(
-        and(
-          eq(rooms.hostId, hostId),
-          or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
-          // Note: unlike findAvailable(), no grace window — a room with completedAt set is done.
-          isNull(rooms.completedAt)
-        )
-      )
+      // Note: unlike findAvailable(), no grace window — a room with completedAt set is done.
+      .where(and(eq(rooms.hostId, hostId), activeRoomCondition()))
     return result[0]?.count ?? 0
   }
 
@@ -102,10 +109,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
 
     // Note: unlike findAvailable(), we use strict isNull(completedAt) here with no grace window.
     // My Rooms shows only genuinely active rooms (not ones in the 5-min deletion window).
-    const activeCondition = and(
-      or(eq(rooms.status, 'waiting'), eq(rooms.status, 'playing')),
-      isNull(rooms.completedAt)
-    )
+    const activeCondition = activeRoomCondition()
 
     const selectFields = {
       id: rooms.id,
@@ -174,7 +178,7 @@ export class DrizzleRoomRepository implements IRoomRepository {
         name: input.name,
         hostId: input.hostId,
         gameId: input.gameId,
-        maxPlayers: input.maxPlayers ?? 5,
+        maxPlayers: input.maxPlayers,
         discordLink: input.discordLink ?? null,
         tags: input.tags ?? [],
         language: input.language ?? 'pt-br',

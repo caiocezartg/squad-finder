@@ -2,12 +2,13 @@ import { useForm, Controller } from 'react-hook-form'
 import { useState, useRef, type ChangeEvent, type KeyboardEvent } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 import { Dialog } from '@base-ui-components/react/dialog'
 import { Select } from '@base-ui-components/react/select'
 import * as motion from 'motion/react-client'
 import { X, Loader2, ChevronsUpDown, Check } from 'lucide-react'
 import { createRoomInputSchema } from '@squadfinder/schemas'
-import { AlertBox } from '@/components/ui/alert-box'
+import { getUserFriendlyError } from '@/lib/error-messages'
 import type { Game } from '@/types'
 import type { CreateRoomInput } from '@squadfinder/schemas'
 
@@ -133,8 +134,6 @@ export function CreateRoomModal({
     control,
     watch,
     reset,
-    setError,
-    clearErrors,
     formState: { errors },
   } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(formSchema),
@@ -157,12 +156,9 @@ export function CreateRoomModal({
 
   const onFormSubmit = handleSubmit(async (data) => {
     try {
-      clearErrors('root')
       await onSubmit(data as unknown as CreateRoomInput)
     } catch (err) {
-      setError('root', {
-        message: err instanceof Error ? err.message : 'Failed to create room',
-      })
+      toast.error(getUserFriendlyError(err))
     }
   })
 
@@ -382,14 +378,6 @@ export function CreateRoomModal({
                   {errors.language && <p className="field-error">{errors.language.message}</p>}
                 </div>
               </div>
-
-              {errors.root && (
-                <AlertBox
-                  type="error"
-                  message={errors.root.message ?? 'An error occurred'}
-                  onClose={() => clearErrors('root')}
-                />
-              )}
 
               <button type="submit" disabled={isLoading} className="btn-accent mt-1 w-full py-3">
                 {isLoading ? (

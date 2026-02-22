@@ -21,6 +21,7 @@ export type MockUserRepository = {
 export function createMockUserRepository(): MockUserRepository {
   return {
     findById: vi.fn<(id: string) => Promise<User | null>>().mockResolvedValue(null),
+    findByIds: vi.fn<(ids: string[]) => Promise<User[]>>().mockResolvedValue([]),
     findByEmail: vi.fn<(email: string) => Promise<User | null>>().mockResolvedValue(null),
     findAll: vi.fn<() => Promise<User[]>>().mockResolvedValue([]),
     create: vi.fn<(input: CreateUserInput) => Promise<User>>().mockImplementation((input) =>
