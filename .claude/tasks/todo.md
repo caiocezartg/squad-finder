@@ -2,6 +2,641 @@
 
 ## Current Task
 
+### Codebase Refactoring — SOLID / Clean Architecture Cleanup (2026-02-21)
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Eliminate SOLID/Clean Architecture violations, extract scattered magic constants, add HTTP-layer integration tests, and add toast-based error feedback on the client — without altering any business logic.
+
+**Architecture:** Fix-First approach: backend violations are corrected before tests are written, so integration tests validate clean code. Client Sonner integration delivers consistent user-facing error messages. No new features.
+
+**Tech Stack:** Bun · TypeScript strict · Fastify 5 · Drizzle ORM · Vitest · React 18 · TanStack Query · Sonner
+
+---
+
+#### Task 1: Extract Magic Constants
+
+**Problem:** `ROOM_CREATE_LIMIT`, `ROOM_JOIN_LIMIT`, `CLEANUP_INTERVAL_MS`, `EXPIRATION_MINUTES` are hardcoded inline in use-case and plugin files.
+
+**Files:**
+- Create: `server/src/config/constants.ts`
+- Modify: `server/src/application/use-cases/room/create-room.use-case.ts` (line 8)
+- Modify: `server/src/application/use-cases/room/join-room.use-case.ts` (line 11)
+- Modify: `server/src/infrastructure/plugins/room-cleanup.plugin.ts` (lines 7-8)
+
+**Step 1.1:** Create `server/src/config/constants.ts`:
+```typescript
+/** Maximum number of active rooms a user can host simultaneously. */
+export const ROOM_CREATE_LIMIT = 3
+
+/** Maximum number of active rooms a user can be a member of simultaneously. */
+export const ROOM_JOIN_LIMIT = 5
+
+/** Interval (ms) between room cleanup runs. */
+export const CLEANUP_INTERVAL_MS = 60_000
+
+/** Time (minutes) after completedAt before a room is deleted. */
+export const ROOM_EXPIRATION_MINUTES = 60
+```
+
+**Step 1.2:** In `create-room.use-case.ts`, replace `const ROOM_CREATE_LIMIT = 3` with:
+```typescript
+import { ROOM_CREATE_LIMIT } from '@config/constants'
+```
+
+**Step 1.3:** In `join-room.use-case.ts`, replace `const ROOM_JOIN_LIMIT = 5` with:
+```typescript
+import { ROOM_JOIN_LIMIT } from '@config/constants'
+```
+
+**Step 1.4:** In `room-cleanup.plugin.ts`, replace the two inline consts with:
+```typescript
+import { CLEANUP_INTERVAL_MS, ROOM_EXPIRATION_MINUTES } from '@config/constants'
+```
+Update the `useCase.execute` call argument from `EXPIRATION_MINUTES` to `ROOM_EXPIRATION_MINUTES`.
+
+**Step 1.5:** `cd server && bun run typecheck` → 0 errors
+
+**Step 1.6:** `cd server && bun run test` → all pass
+
+**Step 1.7:** Commit:
+```bash
+git add server/src/config/constants.ts \
+        server/src/application/use-cases/room/create-room.use-case.ts \
+        server/src/application/use-cases/room/join-room.use-case.ts \
+        server/src/infrastructure/plugins/room-cleanup.plugin.ts
+git commit -m "refactor(config): extract magic constants to config/constants.ts"
+```
+
+- [ ] Task 1 complete
+
+---
+
+#### Task 2: Fix WebSocket Handler DI Violation
+
+**Problem:** `room.handler.ts:87-89` directly instantiates `DrizzleRoomRepository`, `DrizzleRoomMemberRepository`, and `DrizzleUserRepository` inside `handleJoinRoom`. `handleLeaveRoom` receives `_db` it never uses. This bypasses the factory/DI pattern.
+
+**Files:**
+- Create: `server/src/interface/factories/ws.factory.ts`
+- Modify: `server/src/infrastructure/websocket/handlers/room.handler.ts`
+- Modify: `server/src/infrastructure/websocket/ws.plugin.ts`
+
+**Step 2.1:** Create `server/src/interface/factories/ws.factory.ts`:
+```typescript
+import type { Database } from '@infrastructure/database/drizzle'
+import { DrizzleRoomRepository } from '@infrastructure/repositories/drizzle-room.repository'
+import { DrizzleRoomMemberRepository } from '@infrastructure/repositories/drizzle-room-member.repository'
+import { DrizzleUserRepository } from '@infrastructure/repositories/drizzle-user.repository'
+import type { IRoomRepository } from '@domain/repositories/room.repository'
+import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository'
+import type { IUserRepository } from '@domain/repositories/user.repository'
+
+export interface WsHandlerDeps {
+  roomRepository: IRoomRepository
+  roomMemberRepository: IRoomMemberRepository
+  userRepository: IUserRepository
+}
+
+export function createWsHandlerDeps(db: Database): WsHandlerDeps {
+  return {
+    roomRepository: new DrizzleRoomRepository(db),
+    roomMemberRepository: new DrizzleRoomMemberRepository(db),
+    userRepository: new DrizzleUserRepository(db),
+  }
+}
+```
+
+**Step 2.2:** In `room.handler.ts`:
+- Remove infrastructure imports (lines 3-5: `DrizzleRoomRepository`, `DrizzleRoomMemberRepository`, `DrizzleUserRepository`)
+- Remove `import type { Database } from '@infrastructure/database/drizzle'`
+- Add: `import type { WsHandlerDeps } from '@interface/factories/ws.factory'`
+- Change `handleJoinRoom(socket, message, db: Database)` → `handleJoinRoom(socket, message, deps: WsHandlerDeps)`
+- Replace lines 87-89 (the three `new Drizzle*` calls) with: `const { roomRepository, roomMemberRepository, userRepository } = deps`
+- Change `handleLeaveRoom(socket, message, _db: Database)` → `handleLeaveRoom(socket, message)`
+
+**Step 2.3:** In `ws.plugin.ts`:
+- Add: `import { createWsHandlerDeps } from '@interface/factories/ws.factory'`
+- After `const db = fastify.db` (line 49), add: `const wsDeps = createWsHandlerDeps(db)`
+- Change `handleJoinRoom(socket, message, db)` → `handleJoinRoom(socket, message, wsDeps)`
+- Change `handleLeaveRoom(socket, message, db)` → `handleLeaveRoom(socket, message)`
+
+**Step 2.4:** `cd server && bun run typecheck` → 0 errors
+
+**Step 2.5:** `cd server && bun run test` → all pass
+
+**Step 2.6:** Commit:
+```bash
+git add server/src/interface/factories/ws.factory.ts \
+        server/src/infrastructure/websocket/handlers/room.handler.ts \
+        server/src/infrastructure/websocket/ws.plugin.ts
+git commit -m "refactor(websocket): inject repository deps into WS handlers via factory"
+```
+
+- [ ] Task 2 complete
+
+---
+
+#### Task 3: Atomic Room Completion
+
+**Problem:** `join-room.use-case.ts:74-78` makes two separate DB calls when a room becomes full (`update(completedAt)` and `markReadyNotified()`). A failure between them leaves the room in a partially-completed state. Fix: merge both into a single `markCompleted` method that does one UPDATE setting both columns atomically.
+
+**Files:**
+- Read first: `server/src/domain/repositories/room.repository.ts`
+- Read first: `server/src/infrastructure/repositories/drizzle-room.repository.ts`
+- Modify: `server/src/domain/repositories/room.repository.ts`
+- Modify: `server/src/infrastructure/repositories/drizzle-room.repository.ts`
+- Modify: `server/src/application/use-cases/room/join-room.use-case.ts`
+- Modify (if needed): `server/src/test/mocks/room.repository.mock.ts`
+
+**Step 3.1:** Read both repository files to understand the existing signatures.
+
+**Step 3.2:** In `room.repository.ts` interface, add:
+```typescript
+/** Atomically sets completedAt and readyNotifiedAt in a single operation. */
+markCompleted(roomId: string, now: Date): Promise<void>
+```
+
+**Step 3.3:** In `drizzle-room.repository.ts`, add implementation:
+```typescript
+async markCompleted(roomId: string, now: Date): Promise<void> {
+  await this.db
+    .update(rooms)
+    .set({ completedAt: now, readyNotifiedAt: now })
+    .where(eq(rooms.id, roomId))
+}
+```
+
+**Step 3.4:** In `join-room.use-case.ts`, replace lines 74-79:
+```typescript
+// Before:
+if (isRoomNowFull) {
+  await this.roomRepository.update(input.roomId, { completedAt: new Date() })
+  await this.roomRepository.markReadyNotified(input.roomId, new Date())
+}
+// After:
+if (isRoomNowFull) {
+  await this.roomRepository.markCompleted(input.roomId, new Date())
+}
+```
+
+**Step 3.5:** `cd server && bun run test` — if join-room tests fail because mock is missing `markCompleted`, add to `room.repository.mock.ts`:
+```typescript
+markCompleted: vi.fn().mockResolvedValue(undefined),
+```
+
+**Step 3.6:** `cd server && bun run typecheck` → 0 errors, `bun run test` → all pass
+
+**Step 3.7:** Commit:
+```bash
+git add server/src/domain/repositories/room.repository.ts \
+        server/src/infrastructure/repositories/drizzle-room.repository.ts \
+        server/src/application/use-cases/room/join-room.use-case.ts \
+        server/src/test/mocks/room.repository.mock.ts
+git commit -m "refactor(room): merge completedAt+readyNotifiedAt into atomic markCompleted"
+```
+
+- [ ] Task 3 complete
+
+---
+
+#### Task 4: Backend Integration Test Infrastructure
+
+**Goal:** Create a reusable test server using Fastify's `inject()` that exercises routes → controllers → use cases → repositories → DB. Auth is mocked.
+
+**Files:**
+- Create: `server/src/test/helpers/build-test-app.ts`
+
+**Step 4.1:** Read `server/src/index.ts` to confirm plugin registration order.
+
+**Step 4.2:** Create `server/src/test/helpers/build-test-app.ts`:
+```typescript
+import Fastify from 'fastify'
+import cors from '@fastify/cors'
+import websocket from '@fastify/websocket'
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod'
+import errorHandlerPlugin from '@infrastructure/plugins/error-handler.plugin'
+import databasePlugin from '@infrastructure/plugins/database.plugin'
+import swaggerPlugin from '@infrastructure/plugins/swagger.plugin'
+import wsPlugin from '@infrastructure/websocket/ws.plugin'
+import { registerRoutes } from '@interface/routes'
+
+export async function buildTestApp(authenticatedUserId?: string) {
+  const app = Fastify({ logger: false })
+
+  app.setValidatorCompiler(validatorCompiler)
+  app.setSerializerCompiler(serializerCompiler)
+
+  await app.register(errorHandlerPlugin)
+  await app.register(cors, { origin: true, credentials: true })
+  await app.register(websocket)
+  await app.register(swaggerPlugin)
+  await app.register(databasePlugin)
+
+  // Mock auth: inject userId into request so requireAuth passes
+  app.addHook('preHandler', async (request) => {
+    if (authenticatedUserId) {
+      ;(request as any).userId = authenticatedUserId
+      ;(request as any).session = { user: { id: authenticatedUserId } }
+    }
+  })
+
+  await app.register(wsPlugin)
+  await registerRoutes(app)
+  await app.ready()
+  return app
+}
+```
+
+**Step 4.3:** `cd server && bun run typecheck` → 0 errors
+
+**Step 4.4:** Commit:
+```bash
+git add server/src/test/helpers/build-test-app.ts
+git commit -m "test(infra): add buildTestApp helper for route integration tests"
+```
+
+- [ ] Task 4 complete
+
+---
+
+#### Task 5: Room Route Integration Tests
+
+**Files:**
+- Read first: `server/src/interface/routes/room.routes.ts`
+- Create: `server/src/interface/routes/room.routes.test.ts`
+
+**Step 5.1:** Read `room.routes.ts` to confirm endpoint paths and response shapes.
+
+**Step 5.2:** Create `server/src/interface/routes/room.routes.test.ts`:
+```typescript
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { buildTestApp } from '@test/helpers/build-test-app'
+import type { FastifyInstance } from 'fastify'
+
+describe('GET /api/rooms', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 200 with rooms array', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/rooms' })
+    expect(res.statusCode).toBe(200)
+    expect(Array.isArray(res.json<{ rooms: unknown[] }>().rooms)).toBe(true)
+  })
+})
+
+describe('GET /api/rooms/my — unauthenticated', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 401', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/rooms/my' })
+    expect(res.statusCode).toBe(401)
+  })
+})
+
+describe('GET /api/rooms/:code', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 404 for non-existent code', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/rooms/ZZZZZZ' })
+    expect(res.statusCode).toBe(404)
+    expect(res.json<{ error: string }>().error).toBeDefined()
+  })
+})
+
+describe('POST /api/rooms — unauthenticated', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 401', async () => {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/rooms',
+      payload: { name: 'Test', gameId: 'fake', discordLink: 'https://discord.gg/test' },
+    })
+    expect(res.statusCode).toBe(401)
+  })
+})
+
+describe('POST /api/rooms/:code/join — unauthenticated', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 401', async () => {
+    const res = await app.inject({ method: 'POST', url: '/api/rooms/AAAAAA/join' })
+    expect(res.statusCode).toBe(401)
+  })
+})
+
+describe('POST /api/rooms/:code/leave — unauthenticated', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 401', async () => {
+    const res = await app.inject({ method: 'POST', url: '/api/rooms/AAAAAA/leave' })
+    expect(res.statusCode).toBe(401)
+  })
+})
+```
+
+**Step 5.3:** `cd server && bun run test src/interface/routes/room.routes.test.ts` → all pass
+
+**Step 5.4:** Commit:
+```bash
+git add server/src/interface/routes/room.routes.test.ts
+git commit -m "test(routes): add room route integration tests"
+```
+
+- [ ] Task 5 complete
+
+---
+
+#### Task 6: User + Game + Health Route Integration Tests
+
+**Files:**
+- Read first: `server/src/interface/routes/user.routes.ts`, `server/src/interface/routes/health.routes.ts`
+- Create: `server/src/interface/routes/user.routes.test.ts`
+- Create: `server/src/interface/routes/game.routes.test.ts`
+- Create: `server/src/interface/routes/health.routes.test.ts`
+
+**Step 6.1:** Read user and health route files for endpoint paths.
+
+**Step 6.2:** Create `user.routes.test.ts`:
+```typescript
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { buildTestApp } from '@test/helpers/build-test-app'
+import type { FastifyInstance } from 'fastify'
+
+describe('GET /api/users/me — unauthenticated', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 401', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/users/me' })
+    expect(res.statusCode).toBe(401)
+  })
+})
+
+describe('GET /api/users/notifications — unauthenticated', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 401', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/users/notifications' })
+    expect(res.statusCode).toBe(401)
+  })
+})
+```
+
+**Step 6.3:** Create `game.routes.test.ts`:
+```typescript
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { buildTestApp } from '@test/helpers/build-test-app'
+import type { FastifyInstance } from 'fastify'
+
+describe('GET /api/games', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('returns 200 with games array', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/games' })
+    expect(res.statusCode).toBe(200)
+    expect(Array.isArray(res.json<{ games: unknown[] }>().games)).toBe(true)
+  })
+})
+```
+
+**Step 6.4:** Create `health.routes.test.ts`:
+```typescript
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { buildTestApp } from '@test/helpers/build-test-app'
+import type { FastifyInstance } from 'fastify'
+
+describe('Health routes', () => {
+  let app: FastifyInstance
+  beforeAll(async () => { app = await buildTestApp() })
+  afterAll(async () => { await app.close() })
+
+  it('GET /health returns 200', async () => {
+    const res = await app.inject({ method: 'GET', url: '/health' })
+    expect(res.statusCode).toBe(200)
+    expect(res.json<{ status: string }>().status).toBe('ok')
+  })
+
+  it('GET /health/ready returns 200 when DB connected', async () => {
+    const res = await app.inject({ method: 'GET', url: '/health/ready' })
+    expect(res.statusCode).toBe(200)
+  })
+})
+```
+
+**Step 6.5:** `cd server && bun run test` → all pass
+
+**Step 6.6:** Commit:
+```bash
+git add server/src/interface/routes/user.routes.test.ts \
+        server/src/interface/routes/game.routes.test.ts \
+        server/src/interface/routes/health.routes.test.ts
+git commit -m "test(routes): add user, game, and health route integration tests"
+```
+
+- [ ] Task 6 complete
+
+---
+
+#### Task 7: Install Sonner + Toast Infrastructure (Client)
+
+**Files:**
+- Modify: `client/package.json` (via bun add)
+- Modify: `client/src/routes/__root.tsx`
+- Modify: `client/src/lib/api.ts`
+
+**Step 7.1:** Install Sonner:
+```bash
+cd client && bun add sonner
+```
+
+**Step 7.2:** In `client/src/routes/__root.tsx`, add import:
+```typescript
+import { Toaster } from 'sonner'
+```
+Add `<Toaster>` just before the closing `</div>` of the root layout return:
+```tsx
+<Toaster
+  position="bottom-right"
+  toastOptions={{
+    classNames: {
+      toast: 'bg-surface border border-border text-offwhite',
+      error: 'border-red-500/30',
+      success: 'border-accent/30',
+    },
+  }}
+/>
+```
+
+**Step 7.3:** In `client/src/lib/api.ts`, add at the top:
+```typescript
+import { toast } from 'sonner'
+```
+After the `ApiClientError` class, add:
+```typescript
+export function handleApiError(error: unknown): void {
+  if (error instanceof ApiClientError) {
+    switch (error.status) {
+      case 401:
+        toast.error('Sign in to continue')
+        break
+      case 404:
+        toast.error('Not found')
+        break
+      case 409:
+        toast.error(error.message || 'Already exists')
+        break
+      case 422:
+        toast.error(error.message || 'Action not allowed')
+        break
+      default:
+        toast.error(error.message || 'Something went wrong')
+    }
+    return
+  }
+  toast.error('Something went wrong')
+}
+```
+Also export `ApiClientError` (add to the bottom or where class is defined):
+```typescript
+export { ApiClientError }
+```
+
+**Step 7.4:** `cd client && bun run typecheck` → 0 errors
+
+**Step 7.5:** Commit:
+```bash
+git add client/package.json client/src/routes/__root.tsx client/src/lib/api.ts bun.lock
+git commit -m "feat(ui): add sonner toast infrastructure and handleApiError utility"
+```
+
+- [ ] Task 7 complete
+
+---
+
+#### Task 8: Wire Toast Error Handling into Mutation Hooks
+
+**Step 8.1:** Find all error handlers in the client:
+```bash
+grep -rn "onError\|\.catch\|console\.error" client/src --include="*.ts" --include="*.tsx"
+```
+Review output to identify which files use inline error handling.
+
+**Step 8.2:** For each identified file, replace inline error handling with:
+```typescript
+import { handleApiError } from '@/lib/api'
+// ...
+onError: (error) => {
+  handleApiError(error)
+}
+```
+
+**Step 8.3:** `cd client && bun run typecheck` → 0 errors
+`cd client && bun run lint` → 0 errors
+
+**Step 8.4:** Commit:
+```bash
+git add -p  # stage only changed client hook/component files
+git commit -m "feat(ui): wire handleApiError into mutation onError callbacks"
+```
+
+- [ ] Task 8 complete
+
+---
+
+#### Task 9: Remove passWithNoTests + Add Minimal Client Tests
+
+**Files:**
+- Modify: `client/package.json`
+- Create: `client/src/lib/api.test.ts`
+
+**Step 9.1:** In `client/package.json`, change:
+```json
+"test": "vitest run --passWithNoTests"
+```
+to:
+```json
+"test": "vitest run"
+```
+
+**Step 9.2:** Create `client/src/lib/api.test.ts`:
+```typescript
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+vi.mock('@/env', () => ({ env: { VITE_API_URL: 'http://localhost:3000' } }))
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
+
+import { handleApiError, ApiClientError } from './api'
+import { toast } from 'sonner'
+
+describe('handleApiError', () => {
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it('shows "Sign in to continue" for 401', () => {
+    handleApiError(new ApiClientError('Unauthorized', 401))
+    expect(toast.error).toHaveBeenCalledWith('Sign in to continue')
+  })
+
+  it('shows "Not found" for 404', () => {
+    handleApiError(new ApiClientError('Not Found', 404))
+    expect(toast.error).toHaveBeenCalledWith('Not found')
+  })
+
+  it('shows the error message for 422', () => {
+    handleApiError(new ApiClientError('Room is full', 422))
+    expect(toast.error).toHaveBeenCalledWith('Room is full')
+  })
+
+  it('shows generic message for unknown errors', () => {
+    handleApiError(new Error('network failure'))
+    expect(toast.error).toHaveBeenCalledWith('Something went wrong')
+  })
+})
+```
+
+**Step 9.3:** `cd client && bun run test` → 4 tests pass
+
+**Step 9.4:** `bun run test` (root) → all server and client tests pass
+
+**Step 9.5:** Commit:
+```bash
+git add client/package.json client/src/lib/api.test.ts
+git commit -m "test(client): remove passWithNoTests and add handleApiError unit tests"
+```
+
+- [ ] Task 9 complete
+
+---
+
+#### Task 10: Final Verification
+
+**Step 10.1:** `bun run typecheck` → 0 errors (all packages)
+**Step 10.2:** `bun run lint` → 0 errors
+**Step 10.3:** `bun run test` → all tests pass
+**Step 10.4:** Confirm business rules unchanged (magic numbers are the same values, just in constants.ts)
+
+- [ ] Task 10 complete
+
+---
+
+## Completed Tasks
+
 ### My Rooms — Tab Switcher UI (2026-02-20)
 
 **Goal:** Replace the two stacked sections on `/rooms/my` with a Base UI tab switcher showing "Created (N)" and "Joined (N)" tabs.

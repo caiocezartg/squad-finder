@@ -27,7 +27,7 @@ const sorts = [
 const languages = [
   { value: 'all', label: 'ALL LANGUAGES' },
   { value: 'pt-br', label: 'PT-BR' },
-  { value: 'en', label: 'EN' },
+  { value: 'en', label: 'EN-US' },
 ]
 
 export function RoomFilters({

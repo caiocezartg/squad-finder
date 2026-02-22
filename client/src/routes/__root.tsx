@@ -160,7 +160,7 @@ function RootLayout() {
         </footer>
       )}
 
-      <Toaster theme="dark" position="bottom-right" richColors />
+      <Toaster theme="dark" position="top-center" richColors />
     </div>
   )
 }

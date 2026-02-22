@@ -118,7 +118,7 @@ function TagsChipInput({ value: tags, onChange, onBlur, hasError }: TagsChipInpu
 
 const languageOptions = [
   { value: 'pt-br', label: 'PT-BR' },
-  { value: 'en', label: 'EN' },
+  { value: 'en', label: 'EN-US' },
 ] as const
 
 export function CreateRoomModal({

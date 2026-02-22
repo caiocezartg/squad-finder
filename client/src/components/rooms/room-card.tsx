@@ -111,7 +111,7 @@ export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: Room
           <h3 className="truncate font-heading text-base font-bold leading-snug">{room.name}</h3>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             <span className="badge-muted px-1.5 py-0.5 text-[10px]">
-              {room.language === 'pt-br' ? 'PT-BR' : 'EN'}
+              {room.language === 'pt-br' ? 'PT-BR' : 'EN-US'}
             </span>
             {roomTags.map((tag) => (
               <span
