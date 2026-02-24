@@ -1,4 +1,5 @@
 import * as motion from 'motion/react-client'
+import { useTranslation } from 'react-i18next'
 import { useTimeAgo } from '@/hooks/use-time-ago'
 import { Check, Users } from 'lucide-react'
 import type { Room, Game } from '@/types'
@@ -34,6 +35,7 @@ const COVER_POSITION_Y: Record<string, string> = {
 }
 
 export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: RoomCardProps) {
+  const { t } = useTranslation()
   const timeAgo = useTimeAgo(room.createdAt)
   const members = currentMembers ?? 1
   const isFull = members >= room.maxPlayers
@@ -85,21 +87,21 @@ export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: Room
         {room.isMember && (
           <span className="absolute right-3 top-2 flex items-center gap-1 rounded-md border border-accent/20 bg-surface/80 px-2 py-0.5 text-[10px] font-semibold text-accent backdrop-blur-sm">
             <Check className="size-3" />
-            Joined
+            {t('rooms.card.joined')}
           </span>
         )}
 
         {!isDisabled && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/80 opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
             <span className="font-heading text-xl font-bold uppercase tracking-widest text-accent drop-shadow-[0_0_24px_rgba(0,255,162,0.7)]">
-              {room.isMember ? 'SEE ROOM' : 'JOIN ROOM'}
+              {room.isMember ? t('rooms.card.seeRoom') : t('rooms.card.joinRoom')}
             </span>
           </div>
         )}
 
         {isFull && !room.isMember && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-            <span className="text-lg font-bold uppercase tracking-[0.2em] text-offwhite">Full</span>
+            <span className="text-lg font-bold uppercase tracking-[0.2em] text-offwhite">{t('rooms.card.full')}</span>
           </div>
         )}
       </div>

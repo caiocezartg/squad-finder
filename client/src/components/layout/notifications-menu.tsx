@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from '@tanstack/react-router'
 import { Bell, CheckCheck, Gamepad2, Users, X } from 'lucide-react'
 import { useNotifications } from '@/hooks/use-notifications'
@@ -23,6 +24,7 @@ function NotificationItem({
   onDismiss: (e: React.MouseEvent) => void
   disabled: boolean
 }) {
+  const { t } = useTranslation()
   const timeAgo = useTimeAgo(notification.createdAt)
   const isUnread = !notification.readAt
   const playerCount = notification.payload.players?.length ?? 0
@@ -73,7 +75,7 @@ function NotificationItem({
             </div>
 
             <p className="mt-1 text-[11px] text-muted/80 leading-snug line-clamp-1">
-              Your squad is ready — Discord invite available
+              {t('notifications.squadReady')}
             </p>
           </div>
         </div>
@@ -84,7 +86,7 @@ function NotificationItem({
         onClick={onDismiss}
         disabled={disabled}
         className="absolute right-1.5 top-1.5 p-1 rounded-md text-muted/40 opacity-0 group-hover:opacity-100 hover:text-offwhite hover:bg-surface-light transition-all"
-        title="Dismiss"
+        title={t('notifications.dismiss')}
       >
         <X className="size-3" />
       </button>
@@ -93,6 +95,7 @@ function NotificationItem({
 }
 
 export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: NotificationsMenuProps) {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const {
     notifications,
@@ -152,7 +155,7 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-offwhite">Notifications</h3>
+              <h3 className="text-sm font-semibold text-offwhite">{t('notifications.title')}</h3>
               {unreadCount > 0 && (
                 <span className="inline-flex items-center justify-center rounded-full bg-accent/15 px-1.5 text-[10px] font-semibold text-accent">
                   {unreadCount}
@@ -167,7 +170,7 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
                 className="flex items-center gap-1 text-[11px] text-muted hover:text-accent transition-colors disabled:opacity-50"
               >
                 <CheckCheck className="size-3" />
-                Mark all read
+                {t('notifications.markAllRead')}
               </button>
             )}
           </div>
@@ -179,9 +182,9 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
                 <div className="size-10 rounded-full bg-surface-light flex items-center justify-center">
                   <Bell className="size-4 text-muted/50" />
                 </div>
-                <p className="text-xs text-muted">No notifications yet</p>
+                <p className="text-xs text-muted">{t('notifications.empty')}</p>
                 <p className="text-[11px] text-muted/60">
-                  You&apos;ll be notified when your squad is ready
+                  {t('notifications.emptySubtitle')}
                 </p>
               </div>
             ) : (
@@ -203,8 +206,7 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
           {notifications.length > 0 && (
             <div className="border-t border-border px-4 py-2">
               <p className="text-center text-[10px] text-muted/50">
-                Showing last {notifications.length} notification
-                {notifications.length !== 1 ? 's' : ''}
+                {t('notifications.showing', { count: notifications.length })}
               </p>
             </div>
           )}
