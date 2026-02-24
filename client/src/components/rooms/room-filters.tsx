@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface RoomFiltersProps {
   search: string
@@ -13,23 +14,6 @@ interface RoomFiltersProps {
   onTagFilterChange: (value: string) => void
 }
 
-const filters = [
-  { value: 'all', label: 'ALL' },
-  { value: 'has-space', label: 'HAS SPACE' },
-  { value: 'almost-full', label: 'ALMOST FULL' },
-]
-
-const sorts = [
-  { value: 'newest', label: 'NEWEST' },
-  { value: 'oldest', label: 'OLDEST' },
-]
-
-const languages = [
-  { value: 'all', label: 'ALL LANGUAGES' },
-  { value: 'pt-br', label: 'PT-BR' },
-  { value: 'en', label: 'EN-US' },
-]
-
 export function RoomFilters({
   search,
   onSearchChange,
@@ -42,6 +26,25 @@ export function RoomFilters({
   tagFilter,
   onTagFilterChange,
 }: RoomFiltersProps) {
+  const { t } = useTranslation()
+
+  const filters = [
+    { value: 'all', label: t('rooms.filters.statusAll') },
+    { value: 'has-space', label: t('rooms.filters.statusHasSpace') },
+    { value: 'almost-full', label: t('rooms.filters.statusAlmostFull') },
+  ]
+
+  const sorts = [
+    { value: 'newest', label: t('rooms.filters.sortNewest') },
+    { value: 'oldest', label: t('rooms.filters.sortOldest') },
+  ]
+
+  const languages = [
+    { value: 'all', label: t('rooms.filters.langAll') },
+    { value: 'pt-br', label: t('rooms.filters.langPtBr') },
+    { value: 'en', label: t('rooms.filters.langEn') },
+  ]
+
   return (
     <div className="flex flex-col gap-3 mb-6">
       {/* Row 1: Search + Sort */}
@@ -52,7 +55,7 @@ export function RoomFilters({
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by game or room name..."
+            placeholder={t('rooms.filters.searchPlaceholder')}
             className="input-field pl-10"
           />
         </div>
@@ -63,7 +66,7 @@ export function RoomFilters({
             type="text"
             value={tagFilter}
             onChange={(e) => onTagFilterChange(e.target.value)}
-            placeholder="filter by tag..."
+            placeholder={t('rooms.filters.tagPlaceholder')}
             className="input-field pl-7"
           />
         </div>
@@ -103,7 +106,7 @@ export function RoomFilters({
 
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-medium uppercase tracking-wider text-muted/60">
-            Lang
+            {t('rooms.filters.lang')}
           </span>
           {languages.map((l) => (
             <button

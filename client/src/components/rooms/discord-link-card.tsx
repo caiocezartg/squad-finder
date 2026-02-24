@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import * as motion from 'motion/react-client'
 import { Copy, ExternalLink } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { DiscordIcon } from '@/components/ui/icons'
 
 interface DiscordLinkCardProps {
@@ -9,6 +10,7 @@ interface DiscordLinkCardProps {
 }
 
 export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardProps) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -40,9 +42,9 @@ export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardPro
             <DiscordIcon className="size-6 text-discord" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-heading text-base font-bold text-offwhite">Your squad is ready!</h3>
+            <h3 className="font-heading text-base font-bold text-offwhite">{t('rooms.discordCard.title')}</h3>
             <p className="text-sm text-muted mt-0.5">
-              Join the Discord server to start playing together.
+              {t('rooms.discordCard.description')}
             </p>
           </div>
         </div>
@@ -54,7 +56,7 @@ export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardPro
             className="flex items-center gap-1.5 rounded-lg bg-surface border border-border-light px-3 py-2 text-xs font-medium text-muted hover:text-offwhite hover:border-muted/30 transition-colors"
           >
             <Copy className="size-3.5" />
-            {copied ? 'Copied!' : 'Copy link'}
+            {copied ? t('rooms.discordCard.copied') : t('rooms.discordCard.copyLink')}
           </button>
           <a
             href={discordLink}
@@ -63,7 +65,7 @@ export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardPro
             className="btn-discord gap-2 px-5 py-2.5"
           >
             <ExternalLink className="size-4" />
-            Join Discord
+            {t('rooms.discordCard.joinDiscord')}
           </a>
         </div>
       </div>
