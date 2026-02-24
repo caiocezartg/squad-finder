@@ -1,9 +1,33 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { getUserFriendlyError } from '@/lib/error-messages'
 import type { NotificationsResponse } from '@/types'
+
+function playNotificationSound() {
+  const ctx = new AudioContext()
+  const tones = [880, 1100]
+
+  tones.forEach((freq, i) => {
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+
+    osc.type = 'sine'
+    osc.frequency.value = freq
+
+    const start = ctx.currentTime + i * 0.15
+    gain.gain.setValueAtTime(0, start)
+    gain.gain.linearRampToValueAtTime(0.25, start + 0.01)
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35)
+
+    osc.start(start)
+    osc.stop(start + 0.35)
+  })
+}
 
 interface UseNotificationsOptions {
   enabled: boolean
@@ -56,6 +80,26 @@ export function useNotifications(options: UseNotificationsOptions) {
   })
 
   const notifications = useMemo(() => query.data?.notifications ?? [], [query.data?.notifications])
+
+  const previousIdsRef = useRef<Set<string> | null>(null)
+
+  useEffect(() => {
+    if (notifications.length === 0 && previousIdsRef.current === null) return
+
+    const currentIds = new Set(notifications.map((n) => n.id))
+
+    if (previousIdsRef.current === null) {
+      previousIdsRef.current = currentIds
+      return
+    }
+
+    const prevIds = previousIdsRef.current
+    const hasNew = notifications.some((n) => !prevIds.has(n.id))
+    if (hasNew) playNotificationSound()
+
+    previousIdsRef.current = currentIds
+  }, [notifications])
+
   const unreadCount = useMemo(
     () => notifications.filter((notification) => notification.readAt === null).length,
     [notifications]
