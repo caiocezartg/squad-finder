@@ -5,12 +5,15 @@ import { Users, ChevronDown, LogOut } from 'lucide-react'
 import { Toaster } from 'sonner'
 import { DiscordIcon } from '@/components/ui/icons'
 import { NotificationsMenu } from '@/components/layout/notifications-menu'
+import { useTranslation } from 'react-i18next'
+import { LanguageToggle } from '@/components/layout/language-toggle'
 
 export const Route = createRootRoute({
   component: RootLayout,
 })
 
 function RootLayout() {
+  const { t } = useTranslation()
   const { data: session } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -52,7 +55,7 @@ function RootLayout() {
                   className: '!text-accent',
                 }}
               >
-                ALL ROOMS
+                {t('nav.allRooms')}
               </Link>
               {session?.user && (
                 <Link
@@ -63,19 +66,20 @@ function RootLayout() {
                     className: '!text-accent',
                   }}
                 >
-                  MY ROOMS
+                  {t('nav.myRooms')}
                 </Link>
               )}
             </nav>
           </div>
 
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             {session?.user ? (
               <>
                 {(menuOpen || notificationsOpen) && (
                   <button
                     type="button"
-                    aria-label="Close menu"
+                    aria-label={t('nav.closeMenu')}
                     className="fixed inset-0 z-40 cursor-default appearance-none border-none bg-transparent"
                     onClick={() => {
                       setMenuOpen(false)
@@ -132,7 +136,7 @@ function RootLayout() {
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted hover:text-offwhite hover:bg-surface-hover transition-colors"
                       >
                         <LogOut className="size-4" />
-                        Sign Out
+                        {t('common.signOut')}
                       </button>
                     </div>
                   )}
@@ -141,7 +145,7 @@ function RootLayout() {
             ) : (
               <button onClick={handleSignIn} className="btn-discord gap-2">
                 <DiscordIcon className="size-4" />
-                Sign In
+                {t('common.signIn')}
               </button>
             )}
           </div>
@@ -155,7 +159,7 @@ function RootLayout() {
       {!isLanding && (
         <footer className="border-t border-border/50 py-6">
           <div className="mx-auto max-w-7xl px-4 text-center text-xs text-muted sm:px-6 lg:px-8">
-            SquadFinder &mdash; Find your gaming squad
+            SquadFinder &mdash; {t('footer.tagline')}
           </div>
         </footer>
       )}
