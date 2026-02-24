@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { signIn, useSession } from '@/lib/auth-client'
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/rooms/')({
 })
 
 function RoomsPage() {
+  const { t } = useTranslation()
   const { data: session } = useSession()
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
@@ -215,22 +217,22 @@ function RoomsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-heading text-2xl font-bold sm:text-3xl">Explore rooms</h1>
+          <h1 className="font-heading text-2xl font-bold sm:text-3xl">{t('rooms.page.title')}</h1>
           <p className="mt-1 text-sm text-muted">
-            {roomCount} room{roomCount !== 1 ? 's' : ''} available
+            {t('rooms.page.subtitle', { count: roomCount })}
           </p>
         </div>
         {session?.user && (
           <button onClick={() => setModalOpen(true)} className="btn-accent gap-2">
             <Plus className="size-4" />
-            Create new room
+            {t('common.createNewRoom')}
           </button>
         )}
       </div>
 
       {(roomsError || gamesError) && (
         <div className="mb-6">
-          <AlertBox type="error" message="Failed to load rooms. Please refresh the page." />
+          <AlertBox type="error" message={t('rooms.page.loadError')} />
         </div>
       )}
 
@@ -267,17 +269,19 @@ function RoomsPage() {
       {filteredRooms.length === 0 ? (
         <EmptyState
           title={
-            search || language !== 'all' || tagFilter.trim() ? 'No rooms found' : 'No rooms yet'
+            search || language !== 'all' || tagFilter.trim()
+              ? t('rooms.page.emptyTitleFiltered')
+              : t('rooms.page.emptyTitle')
           }
           description={
             search || language !== 'all' || tagFilter.trim()
-              ? 'No rooms match your filters. Try adjusting your search or filters.'
-              : 'Be the first to create a room and start a squad!'
+              ? t('rooms.page.emptyDescriptionFiltered')
+              : t('rooms.page.emptyDescription')
           }
           action={
             session?.user
               ? {
-                  label: 'Create Room',
+                  label: t('common.createRoom'),
                   onClick: () => setModalOpen(true),
                 }
               : undefined

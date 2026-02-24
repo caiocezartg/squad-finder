@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Tabs } from '@base-ui-components/react'
 import { toast } from 'sonner'
@@ -18,6 +19,7 @@ export const Route = createFileRoute('/rooms/my')({
 })
 
 function MyRoomsPage() {
+  const { t } = useTranslation()
   const { data: session, isPending: sessionLoading } = useSession()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -164,18 +166,18 @@ function MyRoomsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-heading text-2xl font-bold sm:text-3xl">My Rooms</h1>
-          <p className="mt-1 text-sm text-muted">Rooms you created or joined</p>
+          <h1 className="font-heading text-2xl font-bold sm:text-3xl">{t('rooms.myRooms.title')}</h1>
+          <p className="mt-1 text-sm text-muted">{t('rooms.myRooms.subtitle')}</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="btn-accent gap-2">
           <Plus className="size-4" />
-          Create new room
+          {t('common.createNewRoom')}
         </button>
       </div>
 
       {myRoomsError && (
         <div className="mb-6">
-          <AlertBox type="error" message="Failed to load your rooms. Please refresh the page." />
+          <AlertBox type="error" message={t('rooms.myRooms.loadError')} />
         </div>
       )}
 
@@ -200,13 +202,13 @@ function MyRoomsPage() {
             value="created"
             className="px-4 py-2.5 text-sm font-medium text-white/50 transition-colors cursor-pointer data-[selected]:text-accent data-[selected]:border-b-2 data-[selected]:border-accent hover:text-white/80 -mb-px outline-none"
           >
-            Created ({hostedCount})
+            {t('rooms.myRooms.tabCreated', { count: hostedCount })}
           </Tabs.Tab>
           <Tabs.Tab
             value="joined"
             className="px-4 py-2.5 text-sm font-medium text-white/50 transition-colors cursor-pointer data-[selected]:text-accent data-[selected]:border-b-2 data-[selected]:border-accent hover:text-white/80 -mb-px outline-none"
           >
-            Joined ({joinedCount})
+            {t('rooms.myRooms.tabJoined', { count: joinedCount })}
           </Tabs.Tab>
         </Tabs.List>
 
@@ -214,7 +216,7 @@ function MyRoomsPage() {
         <Tabs.Panel value="created">
           {filteredHosted.length === 0 ? (
             <p className="text-white/40 text-sm py-6">
-              {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+              {hasActiveFilters ? t('rooms.myRooms.noRoomsFiltered') : t('rooms.myRooms.noRoomsYet')}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -238,7 +240,7 @@ function MyRoomsPage() {
         <Tabs.Panel value="joined">
           {filteredJoined.length === 0 ? (
             <p className="text-white/40 text-sm py-6">
-              {hasActiveFilters ? 'No rooms match your filters.' : 'No rooms here yet.'}
+              {hasActiveFilters ? t('rooms.myRooms.noRoomsFiltered') : t('rooms.myRooms.noRoomsYet')}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

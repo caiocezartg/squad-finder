@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useSession } from '@/lib/auth-client'
@@ -27,6 +28,7 @@ export const Route = createFileRoute('/rooms/$code')({
 })
 
 function RoomLobbyPage() {
+  const { t } = useTranslation()
   const { code } = Route.useParams()
   const { data: session, isPending: sessionPending } = useSession()
   const navigate = useNavigate()
@@ -166,7 +168,7 @@ function RoomLobbyPage() {
   if (!session?.user) {
     return (
       <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
-        <p className="text-muted">Please sign in to view this room.</p>
+        <p className="text-muted">{t('rooms.lobby.pleaseSignIn')}</p>
       </div>
     )
   }
@@ -176,7 +178,7 @@ function RoomLobbyPage() {
       <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
         <p className="text-danger mb-4">{roomError instanceof Error ? roomError.message : error}</p>
         <Link to="/rooms" className="btn-ghost">
-          Back to rooms
+          {t('rooms.lobby.backToRooms')}
         </Link>
       </div>
     )
@@ -191,16 +193,16 @@ function RoomLobbyPage() {
           className="flex items-center gap-2 rounded-lg border border-border-light bg-surface px-4 py-2 text-sm text-muted hover:text-offwhite hover:border-muted/30 hover:bg-surface-hover transition-all"
         >
           <ArrowLeft className="size-4" />
-          Back to rooms
+          {t('rooms.lobby.backToRooms')}
         </Link>
         <button
           onClick={handleLeaveRoom}
           disabled={isRoomReady}
           className="flex items-center gap-2 rounded-lg border border-danger/20 bg-danger/5 px-4 py-2 text-sm text-danger/80 hover:text-danger hover:bg-danger/10 hover:border-danger/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-          title={isRoomReady ? 'Cannot leave a full room' : undefined}
+          title={isRoomReady ? t('rooms.lobby.cannotLeave') : undefined}
         >
           <LogOut className="size-4" />
-          {isRoomReady ? 'Squad locked' : 'Leave room'}
+          {isRoomReady ? t('rooms.lobby.squadLocked') : t('rooms.lobby.leaveRoom')}
         </button>
       </div>
 
@@ -256,10 +258,10 @@ function RoomLobbyPage() {
                 >
                   <span className="font-mono font-bold text-offwhite">{code}</span>
                   <Copy className="size-3.5" />
-                  {codeCopied && <span className="text-xs text-accent">Copied!</span>}
+                  {codeCopied && <span className="text-xs text-accent">{t('rooms.lobby.copied')}</span>}
                 </button>
                 <span className="text-sm text-muted">
-                  {players.length}/{maxPlayers} players
+                  {t('rooms.lobby.playerCount', { current: players.length, max: maxPlayers })}
                 </span>
               </div>
             </div>
@@ -292,7 +294,7 @@ function RoomLobbyPage() {
       {/* Players — full width */}
       <div className="card p-5">
         <h2 className="font-heading text-sm font-bold text-muted mb-4 uppercase tracking-wider">
-          Players ({players.length}/{maxPlayers})
+          {t('rooms.lobby.players', { current: players.length, max: maxPlayers })}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {players.map((player, i) => (
