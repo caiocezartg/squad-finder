@@ -40,11 +40,12 @@ async function roomCleanupPlugin(fastify: FastifyInstance): Promise<void> {
       `Room cleanup scheduler started (interval: ${ROOM.CLEANUP_INTERVAL_MS / 1000}s, expiration: ${ROOM.EXPIRATION_MINUTES}min)`
     )
 
+    const cleanupRepository = new DrizzleRoomRepository(fastify.db)
+    const cleanupUseCase = new DeleteExpiredRoomsUseCase(cleanupRepository)
+
     intervalId = setInterval(async () => {
       try {
-        const repository = new DrizzleRoomRepository(fastify.db)
-        const useCase = new DeleteExpiredRoomsUseCase(repository)
-        const result = await useCase.execute({ expirationMinutes: ROOM.EXPIRATION_MINUTES })
+        const result = await cleanupUseCase.execute({ expirationMinutes: ROOM.EXPIRATION_MINUTES })
 
         for (const room of result.deletedRooms) {
           fastify.broadcaster.broadcastRoomDeleted(room.id, room.code)

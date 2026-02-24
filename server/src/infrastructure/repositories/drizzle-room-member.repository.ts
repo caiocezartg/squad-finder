@@ -78,6 +78,37 @@ export class DrizzleRoomMemberRepository implements IRoomMemberRepository {
     return result[0]?.count ?? 0
   }
 
+  async createIfCapacityAvailable(
+    input: CreateRoomMemberInput,
+    maxPlayers: number
+  ): Promise<{ member: RoomMember | null; memberCount: number }> {
+    return this.db.transaction(async (tx) => {
+      // Lock the room row to serialize concurrent join attempts on the same room
+      await tx.select({ id: rooms.id }).from(rooms).where(eq(rooms.id, input.roomId)).for('update')
+
+      const countResult = await tx
+        .select({ currentCount: count() })
+        .from(roomMembers)
+        .where(eq(roomMembers.roomId, input.roomId))
+
+      const currentCount = countResult[0]?.currentCount ?? 0
+
+      if (currentCount >= maxPlayers) {
+        return { member: null, memberCount: currentCount }
+      }
+
+      const result = await tx
+        .insert(roomMembers)
+        .values({ roomId: input.roomId, userId: input.userId })
+        .returning()
+
+      const row = result[0]
+      if (!row) throw new Error('Failed to create room member')
+
+      return { member: mapRowToEntity(row), memberCount: currentCount + 1 }
+    })
+  }
+
   async countActiveByUserId(userId: string): Promise<number> {
     // A room can be status='waiting' with completedAt set (full, pending deletion).
     // Exclude those — they are not genuinely active from the member's perspective.

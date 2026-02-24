@@ -8,8 +8,7 @@ export type { CreateRoomInput as CreateRoomRequestDto } from '@squadfinder/schem
 export const roomCodeParamSchema = z.object({
   code: z
     .string()
-    .min(1)
-    .max(6)
+    .length(6)
     .transform((val) => val.toUpperCase()),
 })
 

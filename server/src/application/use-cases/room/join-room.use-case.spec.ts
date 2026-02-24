@@ -27,44 +27,37 @@ describe('JoinRoomUseCase', () => {
   describe('execute', () => {
     it('should join room successfully', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 5 })
-      const expectedMember = createMockRoomMember({
-        roomId: 'room-1',
-        userId: 'user-1',
-      })
+      const expectedMember = createMockRoomMember({ roomId: 'room-1', userId: 'user-1' })
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
-      mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(2).mockResolvedValueOnce(3)
-      mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
-
-      const result = await useCase.execute({
-        roomId: 'room-1',
-        userId: 'user-1',
+      mockRoomMemberRepository.createIfCapacityAvailable.mockResolvedValue({
+        member: expectedMember,
+        memberCount: 3,
       })
+
+      const result = await useCase.execute({ roomId: 'room-1', userId: 'user-1' })
 
       expect(result.roomMember).toEqual(expectedMember)
       expect(result.memberCount).toBe(3)
       expect(result.isRoomNowFull).toBe(false)
       expect(mockRoomRepository.findById).toHaveBeenCalledWith('room-1')
       expect(mockRoomMemberRepository.findByRoomAndUser).toHaveBeenCalledWith('room-1', 'user-1')
-      expect(mockRoomMemberRepository.create).toHaveBeenCalledWith({
-        roomId: 'room-1',
-        userId: 'user-1',
-      })
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).toHaveBeenCalledWith(
+        { roomId: 'room-1', userId: 'user-1' },
+        5
+      )
     })
 
     it('should throw RoomNotFoundError if room not found', async () => {
       mockRoomRepository.findById.mockResolvedValue(null)
 
       await expect(
-        useCase.execute({
-          roomId: 'non-existent-room',
-          userId: 'user-1',
-        })
+        useCase.execute({ roomId: 'non-existent-room', userId: 'user-1' })
       ).rejects.toThrow(RoomNotFoundError)
 
       expect(mockRoomRepository.findById).toHaveBeenCalledWith('non-existent-room')
-      expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).not.toHaveBeenCalled()
     })
 
     it('should throw RoomFullError if room is full', async () => {
@@ -72,62 +65,53 @@ describe('JoinRoomUseCase', () => {
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
-      mockRoomMemberRepository.countByRoomId.mockResolvedValue(5)
+      mockRoomMemberRepository.createIfCapacityAvailable.mockResolvedValue({
+        member: null,
+        memberCount: 5,
+      })
 
       await expect(
-        useCase.execute({
-          roomId: 'room-1',
-          userId: 'user-1',
-        })
+        useCase.execute({ roomId: 'room-1', userId: 'user-1' })
       ).rejects.toThrow(RoomFullError)
 
-      expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).toHaveBeenCalledWith(
+        { roomId: 'room-1', userId: 'user-1' },
+        5
+      )
     })
 
     it('should return existing member if user already in room (idempotent)', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 5 })
-      const existingMember = createMockRoomMember({
-        roomId: 'room-1',
-        userId: 'user-1',
-      })
+      const existingMember = createMockRoomMember({ roomId: 'room-1', userId: 'user-1' })
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(existingMember)
       mockRoomMemberRepository.countByRoomId.mockResolvedValue(3)
 
-      const result = await useCase.execute({
-        roomId: 'room-1',
-        userId: 'user-1',
-      })
+      const result = await useCase.execute({ roomId: 'room-1', userId: 'user-1' })
 
       expect(result.roomMember).toEqual(existingMember)
       expect(result.memberCount).toBe(3)
       expect(result.isRoomNowFull).toBe(false)
-      expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).not.toHaveBeenCalled()
     })
 
     it('should set completedAt and markReadyNotified when last player joins', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 3 })
-      const expectedMember = createMockRoomMember({
-        roomId: 'room-1',
-        userId: 'user-3',
-      })
+      const expectedMember = createMockRoomMember({ roomId: 'room-1', userId: 'user-3' })
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
-      // First call (before create): 2 members, room not full yet
-      // Second call (after create): 3 members, room is now full
-      mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(2).mockResolvedValueOnce(3)
-      mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
+      mockRoomMemberRepository.createIfCapacityAvailable.mockResolvedValue({
+        member: expectedMember,
+        memberCount: 3,
+      })
       mockRoomRepository.update.mockResolvedValue(
         createMockRoom({ ...room, completedAt: new Date() })
       )
       mockRoomRepository.markReadyNotified.mockResolvedValue(true)
 
-      const result = await useCase.execute({
-        roomId: 'room-1',
-        userId: 'user-3',
-      })
+      const result = await useCase.execute({ roomId: 'room-1', userId: 'user-3' })
 
       expect(result.roomMember).toEqual(expectedMember)
       expect(result.memberCount).toBe(3)
@@ -140,20 +124,16 @@ describe('JoinRoomUseCase', () => {
 
     it('should not set completedAt when room is not full after join', async () => {
       const room = createMockRoom({ id: 'room-1', status: 'waiting', maxPlayers: 5 })
-      const expectedMember = createMockRoomMember({
-        roomId: 'room-1',
-        userId: 'user-2',
-      })
+      const expectedMember = createMockRoomMember({ roomId: 'room-1', userId: 'user-2' })
 
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
-      mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(1).mockResolvedValueOnce(2)
-      mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
-
-      const result = await useCase.execute({
-        roomId: 'room-1',
-        userId: 'user-2',
+      mockRoomMemberRepository.createIfCapacityAvailable.mockResolvedValue({
+        member: expectedMember,
+        memberCount: 2,
       })
+
+      const result = await useCase.execute({ roomId: 'room-1', userId: 'user-2' })
 
       expect(result.isRoomNowFull).toBe(false)
       expect(mockRoomRepository.update).not.toHaveBeenCalled()
@@ -166,28 +146,25 @@ describe('JoinRoomUseCase', () => {
       mockRoomRepository.findById.mockResolvedValue(room)
 
       await expect(
-        useCase.execute({
-          roomId: 'room-1',
-          userId: 'user-1',
-        })
+        useCase.execute({ roomId: 'room-1', userId: 'user-1' })
       ).rejects.toThrow(RoomNotWaitingError)
 
       expect(mockRoomMemberRepository.findByRoomAndUser).not.toHaveBeenCalled()
-      expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).not.toHaveBeenCalled()
     })
 
     it('should throw RoomJoinLimitReachedError when user is already in 5 active rooms', async () => {
       const room = createMockRoom({ id: 'room-id', status: 'waiting', maxPlayers: 5 })
 
       mockRoomRepository.findById.mockResolvedValue(room)
-      mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null) // not already in this room
+      mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
       mockRoomMemberRepository.countActiveByUserId.mockResolvedValue(5)
 
       await expect(useCase.execute({ roomId: 'room-id', userId: 'user-id' })).rejects.toThrow(
         RoomJoinLimitReachedError
       )
 
-      expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).not.toHaveBeenCalled()
     })
 
     it('should allow joining when user is in 4 active rooms (below limit)', async () => {
@@ -197,12 +174,14 @@ describe('JoinRoomUseCase', () => {
       mockRoomRepository.findById.mockResolvedValue(room)
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null)
       mockRoomMemberRepository.countActiveByUserId.mockResolvedValue(4)
-      mockRoomMemberRepository.countByRoomId.mockResolvedValueOnce(2).mockResolvedValueOnce(3)
-      mockRoomMemberRepository.create.mockResolvedValue(expectedMember)
+      mockRoomMemberRepository.createIfCapacityAvailable.mockResolvedValue({
+        member: expectedMember,
+        memberCount: 3,
+      })
 
       const result = await useCase.execute({ roomId: 'room-id', userId: 'user-id' })
 
-      expect(mockRoomMemberRepository.create).toHaveBeenCalledOnce()
+      expect(mockRoomMemberRepository.createIfCapacityAvailable).toHaveBeenCalledOnce()
       expect(result.roomMember).toBeDefined()
     })
   })

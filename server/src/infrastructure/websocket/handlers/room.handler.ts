@@ -1,4 +1,6 @@
 import type { WebSocket } from '@fastify/websocket'
+import type { RoomMember } from '@domain/entities/room-member.entity'
+import type { User } from '@domain/entities/user.entity'
 import type { IRoomRepository } from '@domain/repositories/room.repository'
 import type { IRoomMemberRepository } from '@domain/repositories/room-member.repository'
 import type { IUserRepository } from '@domain/repositories/user.repository'
@@ -16,6 +18,8 @@ import type {
 } from '../types'
 import type { WsConnectionManager } from '../ws-connection-manager'
 
+type Player = { id: string; name: string; image: string | null; isHost: boolean }
+
 function sendToSocket(socket: WebSocket, message: unknown): void {
   if (socket.readyState === socket.OPEN) {
     socket.send(JSON.stringify(message))
@@ -29,6 +33,35 @@ export function sendError(socket: WebSocket, code: string, message: string): voi
     payload: { code, message },
   }
   sendToSocket(socket, errorMessage)
+}
+
+function buildPlayerList(members: RoomMember[], users: User[], hostId: string): Player[] {
+  const usersById = new Map(users.map((u) => [u.id, u]))
+  return members.map((member) => {
+    const u = usersById.get(member.userId)
+    return {
+      id: member.userId,
+      name: u?.name ?? 'Unknown',
+      image: u?.avatarUrl ?? null,
+      isHost: member.userId === hostId,
+    }
+  })
+}
+
+function broadcastRoomReadyIfFull(
+  roomCode: string,
+  roomId: string,
+  memberCount: number,
+  maxPlayers: number,
+  connectionManager: WsConnectionManager
+): void {
+  if (memberCount < maxPlayers) return
+  const msg: RoomReadyMessage = {
+    type: 'room_ready',
+    timestamp: Date.now(),
+    payload: { roomId, roomCode, message: 'Room is full! Time to play!' },
+  }
+  connectionManager.broadcastToRoom(roomCode, msg)
 }
 
 export async function handleJoinRoom(
@@ -46,46 +79,30 @@ export async function handleJoinRoom(
     sendError(socket, 'INVALID_CLIENT', 'Client not initialized')
     return
   }
-
   if (!client.userId) {
     sendError(socket, 'UNAUTHORIZED', 'Authentication required')
     return
   }
 
-  // Validate room exists
   const room = await roomRepository.findByCode(roomCode)
   if (!room) {
     sendError(socket, 'ROOM_NOT_FOUND', `Room "${roomCode}" not found`)
     return
   }
 
-  // Validate user is a member of the room
   const membership = await roomMemberRepository.findByRoomAndUser(room.id, client.userId)
   if (!membership) {
     sendError(socket, 'NOT_ROOM_MEMBER', 'You are not a member of this room')
     return
   }
 
-  // Add socket to room
   connectionManager.addToRoom(roomCode, socket)
   client.roomCode = roomCode
 
-  // Fetch all room members with user data (single query)
   const members = await roomMemberRepository.findByRoomId(room.id)
-  const userIds = members.map((m) => m.userId)
-  const users = await userRepository.findByIds(userIds)
-  const usersById = new Map(users.map((u) => [u.id, u]))
-  const players = members.map((member) => {
-    const u = usersById.get(member.userId)
-    return {
-      id: member.userId,
-      name: u?.name ?? 'Unknown',
-      image: u?.avatarUrl ?? null,
-      isHost: member.userId === room.hostId,
-    }
-  })
+  const users = await userRepository.findByIds(members.map((m) => m.userId))
+  const players = buildPlayerList(members, users, room.hostId)
 
-  // Send room_joined to the joining client
   const joinedMessage: RoomJoinedMessage = {
     type: 'room_joined',
     timestamp: Date.now(),
@@ -93,7 +110,6 @@ export async function handleJoinRoom(
   }
   sendToSocket(socket, joinedMessage)
 
-  // Broadcast player_joined to other clients in the room
   const playerJoinedMessage: PlayerJoinedMessage = {
     type: 'player_joined',
     timestamp: Date.now(),
@@ -108,20 +124,8 @@ export async function handleJoinRoom(
   }
   connectionManager.broadcastToRoom(roomCode, playerJoinedMessage, socket)
 
-  // Check if room is now full
   const memberCount = await roomMemberRepository.countByRoomId(room.id)
-  if (memberCount >= room.maxPlayers) {
-    const roomReadyMessage: RoomReadyMessage = {
-      type: 'room_ready',
-      timestamp: Date.now(),
-      payload: {
-        roomId: room.id,
-        roomCode: room.code,
-        message: 'Room is full! Time to play!',
-      },
-    }
-    connectionManager.broadcastToRoom(roomCode, roomReadyMessage)
-  }
+  broadcastRoomReadyIfFull(roomCode, room.id, memberCount, room.maxPlayers, connectionManager)
 }
 
 export async function handleLeaveRoom(

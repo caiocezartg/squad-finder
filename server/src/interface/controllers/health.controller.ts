@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import type { FastifyReply, FastifyRequest } from 'fastify'
 
 export interface HealthResponse {
@@ -21,7 +22,7 @@ export class HealthController {
 
   async readiness(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
-      await request.server.db.execute({ sql: 'SELECT 1', params: [] } as never)
+      await request.server.db.execute(sql`SELECT 1`)
 
       const response: HealthResponse = {
         status: 'ok',

@@ -56,18 +56,17 @@ export class JoinRoomUseCase implements IJoinRoomUseCase {
       throw new RoomJoinLimitReachedError(ROOM.JOIN_LIMIT)
     }
 
-    const memberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
-    if (memberCount >= room.maxPlayers) {
+    // Atomically check capacity and insert — prevents concurrent overfill via SELECT FOR UPDATE
+    const { member: roomMember, memberCount: newMemberCount } =
+      await this.roomMemberRepository.createIfCapacityAvailable(
+        { roomId: input.roomId, userId: input.userId },
+        room.maxPlayers
+      )
+
+    if (!roomMember) {
       throw new RoomFullError(input.roomId)
     }
 
-    const roomMember = await this.roomMemberRepository.create({
-      roomId: input.roomId,
-      userId: input.userId,
-    })
-
-    // Set completedAt when room reaches max players (triggers auto-deletion after 5 min)
-    const newMemberCount = await this.roomMemberRepository.countByRoomId(input.roomId)
     const isRoomNowFull = newMemberCount >= room.maxPlayers
 
     if (isRoomNowFull) {

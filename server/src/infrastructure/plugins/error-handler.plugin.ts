@@ -50,11 +50,14 @@ function parseError(error: FastifyError | Error): ParsedError {
   }
 
   if ('statusCode' in error && typeof error.statusCode === 'number') {
+    // Only propagate the original message for expected client errors (4xx).
+    // Server errors (5xx) get a generic message to avoid leaking internals.
+    const isServerError = error.statusCode >= 500
     return {
       statusCode: error.statusCode,
       response: {
-        error: 'INTERNAL_ERROR',
-        message: error.message,
+        error: isServerError ? 'INTERNAL_ERROR' : 'REQUEST_ERROR',
+        message: isServerError ? 'An unexpected error occurred' : error.message,
       },
     }
   }

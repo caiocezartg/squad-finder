@@ -10,4 +10,13 @@ export interface IRoomMemberRepository {
   countByRoomId(roomId: string): Promise<number>
   /** Counts memberships where the room is still active (status waiting|playing, completedAt null). */
   countActiveByUserId(userId: string): Promise<number>
+  /**
+   * Atomically checks room capacity and inserts the member if space is available.
+   * Uses a SELECT FOR UPDATE on the room row to prevent concurrent overfill.
+   * Returns the new member or null if the room is at/over maxPlayers.
+   */
+  createIfCapacityAvailable(
+    input: CreateRoomMemberInput,
+    maxPlayers: number
+  ): Promise<{ member: RoomMember | null; memberCount: number }>
 }

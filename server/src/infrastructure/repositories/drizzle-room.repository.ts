@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto'
 import { and, eq, count, desc, gte, isNull, lte, ne, or } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 import { z } from 'zod'
@@ -27,10 +28,30 @@ export function activeRoomWithGraceCondition(graceMs: number) {
 function generateRoomCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   let code = ''
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  for (let i = 0; i < ROOM.CODE_LENGTH; i++) {
+    code += chars.charAt(randomInt(chars.length))
   }
   return code
+}
+
+function isUniqueConstraintViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code: string }).code === '23505'
+  )
+}
+
+type MyRoomRow = RoomRow & { memberCount: number }
+
+function mapMyRoomRow(r: MyRoomRow): Room {
+  const { memberCount, ...roomRow } = r
+  return {
+    ...mapRowToEntity(roomRow),
+    memberCount,
+    isMember: true as const,
+  }
 }
 
 function mapRowToEntity(row: RoomRow): Room {
@@ -150,16 +171,10 @@ export class DrizzleRoomRepository implements IRoomRepository {
         .orderBy(desc(rooms.createdAt)),
     ])
 
-    const mapRow = (r: (typeof hostedRows)[0]) => {
-      const { memberCount, ...roomRow } = r
-      return {
-        ...mapRowToEntity(roomRow as RoomRow),
-        memberCount,
-        isMember: true as const,
-      }
+    return {
+      hosted: hostedRows.map((r) => mapMyRoomRow(r as MyRoomRow)),
+      joined: joinedRows.map((r) => mapMyRoomRow(r as MyRoomRow)),
     }
-
-    return { hosted: hostedRows.map(mapRow), joined: joinedRows.map(mapRow) }
   }
 
   async findExpiredRooms(beforeDate: Date): Promise<Room[]> {
@@ -169,27 +184,32 @@ export class DrizzleRoomRepository implements IRoomRepository {
   }
 
   async create(input: CreateRoomInput): Promise<Room> {
-    const code = generateRoomCode()
+    const MAX_ATTEMPTS = 5
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      try {
+        const result = await this.db
+          .insert(rooms)
+          .values({
+            code: generateRoomCode(),
+            name: input.name,
+            hostId: input.hostId,
+            gameId: input.gameId,
+            maxPlayers: input.maxPlayers,
+            discordLink: input.discordLink ?? null,
+            tags: input.tags ?? [],
+            language: input.language ?? 'pt-br',
+          })
+          .returning()
 
-    const result = await this.db
-      .insert(rooms)
-      .values({
-        code,
-        name: input.name,
-        hostId: input.hostId,
-        gameId: input.gameId,
-        maxPlayers: input.maxPlayers,
-        discordLink: input.discordLink ?? null,
-        tags: input.tags ?? [],
-        language: input.language ?? 'pt-br',
-      })
-      .returning()
-
-    const row = result[0]
-    if (!row) {
-      throw new Error('Failed to create room')
+        const row = result[0]
+        if (!row) throw new Error('Failed to create room')
+        return mapRowToEntity(row)
+      } catch (error) {
+        if (attempt < MAX_ATTEMPTS - 1 && isUniqueConstraintViolation(error)) continue
+        throw error
+      }
     }
-    return mapRowToEntity(row)
+    throw new Error('Failed to generate a unique room code after 5 attempts')
   }
 
   async update(id: string, input: UpdateRoomInput): Promise<Room | null> {

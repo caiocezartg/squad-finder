@@ -47,26 +47,21 @@ export class NotifyRoomReadyUseCase implements INotifyRoomReadyUseCase {
     const title = 'Room ready: your squad is full'
     const message = `${room.name} is ready. Your Discord invite is now available.`
 
-    let inAppCreated = 0
-
-    for (const userId of userIds) {
-      await this.userNotificationRepository.create({
-        userId,
-        type: 'room_ready',
-        title,
-        message,
-        payload: {
-          roomId: room.id,
-          roomCode: room.code,
-          roomName: room.name,
-          gameName,
-          players,
-          discordLink: room.discordLink,
-        },
-      })
-      inAppCreated++
+    const payload = {
+      roomId: room.id,
+      roomCode: room.code,
+      roomName: room.name,
+      gameName,
+      players,
+      discordLink: room.discordLink,
     }
 
-    return { inAppCreated }
+    await Promise.all(
+      userIds.map((userId) =>
+        this.userNotificationRepository.create({ userId, type: 'room_ready', title, message, payload })
+      )
+    )
+
+    return { inAppCreated: userIds.length }
   }
 }
