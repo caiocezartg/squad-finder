@@ -2,8 +2,10 @@ import { Link } from '@tanstack/react-router'
 import { signIn, useSession } from '@/lib/auth-client'
 import * as motion from 'motion/react-client'
 import { DiscordIcon } from '@/components/ui/icons'
+import { useTranslation, Trans } from 'react-i18next'
 
 export function CTABanner() {
+  const { t } = useTranslation()
   const { data: session } = useSession()
 
   const handleSignIn = () => {
@@ -28,20 +30,23 @@ export function CTABanner() {
         transition={{ duration: 0.5 }}
       >
         <h2 className="font-heading text-3xl font-bold sm:text-5xl">
-          Ready to find your <span className="text-accent">squad</span>?
+          <Trans
+            i18nKey="cta.title"
+            components={{ accent: <span className="text-accent" /> }}
+          />
         </h2>
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
-          Join hundreds of players already using SquadFinder to build the perfect team.
+          {t('cta.subtitle')}
         </p>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/rooms" className="btn-accent gap-2 text-base px-8 py-3">
-            Browse Rooms
+            {t('cta.browseRooms')}
           </Link>
           {!session?.user && (
             <button onClick={handleSignIn} className="btn-ghost gap-2 text-base px-8 py-3">
               <DiscordIcon className="size-5" />
-              Create Account
+              {t('cta.createAccount')}
             </button>
           )}
         </div>

@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import * as motion from 'motion/react-client'
 import type { GamesResponse } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function PopularGames() {
+  const { t } = useTranslation()
   const { data, isLoading } = useQuery({
     queryKey: ['games'],
     queryFn: () => api.get<GamesResponse>('/api/games'),
@@ -26,10 +28,10 @@ export function PopularGames() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="section-label">Supported Games</span>
-          <h2 className="font-heading text-3xl font-bold sm:text-4xl">Play what you love</h2>
+          <span className="section-label">{t('popularGames.label')}</span>
+          <h2 className="font-heading text-3xl font-bold sm:text-4xl">{t('popularGames.title')}</h2>
           <p className="mt-4 text-muted max-w-lg mx-auto">
-            Find teammates across the most popular multiplayer titles.
+            {t('popularGames.subtitle')}
           </p>
         </motion.div>
 
@@ -63,7 +65,7 @@ export function PopularGames() {
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <h3 className="font-heading text-sm font-bold truncate">{game.name}</h3>
                   <p className="text-xs text-muted mt-0.5">
-                    {game.minPlayers}-{game.maxPlayers} players
+                    {t('popularGames.playerRange', { min: game.minPlayers, max: game.maxPlayers })}
                   </p>
                 </div>
 
@@ -81,7 +83,7 @@ export function PopularGames() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.5 }}
         >
-          <p className="mt-8 text-muted text-lg max-w-lg mx-auto">And many other games!</p>
+          <p className="mt-8 text-muted text-lg max-w-lg mx-auto">{t('popularGames.moreGames')}</p>
         </motion.div>
       </div>
     </section>

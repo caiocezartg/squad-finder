@@ -1,10 +1,13 @@
 import * as motion from 'motion/react-client'
 import { Check, Link as LinkIcon } from 'lucide-react'
 import { DiscordIcon } from '@/components/ui/icons'
+import { useTranslation } from 'react-i18next'
 
 /* ─── Illustration: Step 1 — Discord Sign In ─── */
 
 function DiscordClickIllustration() {
+  const { t } = useTranslation()
+
   return (
     <div className="relative h-32 sm:h-40 flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(88,101,242,0.06),transparent_70%)]" />
@@ -17,7 +20,7 @@ function DiscordClickIllustration() {
         transition={{ duration: 2.2, times: [0, 0.45, 0.5, 0.55, 1] }}
       >
         <DiscordIcon className="size-3.5" />
-        Sign in
+        {t('howItWorks.signInButton')}
       </motion.div>
 
       {/* Animated cursor */}
@@ -110,6 +113,7 @@ function RoomBrowseIllustration() {
 /* ─── Illustration: Step 3 — Squad Fill ─── */
 
 function SquadFillIllustration() {
+  const { t } = useTranslation()
   const totalSlots = 5
 
   return (
@@ -158,38 +162,31 @@ function SquadFillIllustration() {
         transition={{ delay: 2.1, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
       >
         <LinkIcon className="size-3" strokeWidth={2.5} />
-        Discord link ready
+        {t('howItWorks.discordLinkReady')}
       </motion.div>
     </div>
   )
 }
 
-/* ─── Steps Data ─── */
+/* ─── Illustrations ─── */
 
-const steps = [
-  {
-    number: 1,
-    title: 'Sign In with Discord',
-    description: 'One click. No forms, no passwords. Your Discord avatar is your identity.',
-    Illustration: DiscordClickIllustration,
-  },
-  {
-    number: 2,
-    title: 'Find or Create a Room',
-    description: 'Browse rooms by game or spin up your own with a Discord invite link.',
-    Illustration: RoomBrowseIllustration,
-  },
-  {
-    number: 3,
-    title: 'Squad Up & Play',
-    description: 'Room fills up, Discord link unlocks. Join voice and dominate together.',
-    Illustration: SquadFillIllustration,
-  },
-]
+const ILLUSTRATIONS = [DiscordClickIllustration, RoomBrowseIllustration, SquadFillIllustration] as const
 
 /* ─── Main Component ─── */
 
 export function HowItWorks() {
+  const { t } = useTranslation()
+
+  const stepData = t('howItWorks.steps', { returnObjects: true }) as Array<{
+    title: string
+    description: string
+  }>
+  const steps = stepData.map((step, i) => ({
+    ...step,
+    number: i + 1,
+    Illustration: ILLUSTRATIONS[i]!,
+  }))
+
   return (
     <section className="relative py-24 border-t border-border/50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -201,9 +198,9 @@ export function HowItWorks() {
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.5 }}
         >
-          <span className="section-label">How It Works</span>
+          <span className="section-label">{t('howItWorks.label')}</span>
           <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-            From login to full squad in under a minute.
+            {t('howItWorks.title')}
           </h2>
         </motion.div>
 

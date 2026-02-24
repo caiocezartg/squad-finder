@@ -6,10 +6,12 @@ import * as motion from 'motion/react-client'
 import type { GamesResponse } from '@/types'
 import { Search } from 'lucide-react'
 import { DiscordIcon } from '@/components/ui/icons'
+import { useTranslation, Trans } from 'react-i18next'
 import { BackgroundRipple } from './background-ripple'
 import { HeroRoomShowcase } from './hero-room-showcase'
 
 export function HeroSection() {
+  const { t } = useTranslation()
   const { data: session } = useSession()
 
   const { data: gamesData } = useQuery({
@@ -43,7 +45,7 @@ export function HeroSection() {
             {gameCount > 0 && (
               <span className="inline-flex items-center gap-2 rounded-full bg-accent/5 border border-accent/15 px-4 py-1.5 text-xs font-semibold text-accent mb-2">
                 <span className="size-1.5 rounded-full bg-accent animate-pulse" />
-                {gameCount} GAMES SUPPORTED
+                {t('hero.badge', { count: gameCount })}
               </span>
             )}
           </motion.div>
@@ -54,11 +56,11 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            STOP PLAYING
+            {t('hero.titleLine1')}
             <br />
-            GAMES&nbsp;
+            {t('hero.titleLine2')}&nbsp;
             <span className="relative text-accent">
-              ALONE
+              {t('hero.titleAccent')}
               <motion.span
                 className="absolute bottom-0 left-0 h-[3px] bg-accent/60 rounded-full"
                 initial={{ width: 0 }}
@@ -74,9 +76,10 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <strong className="text-offwhite">Create</strong> or{' '}
-            <strong className="text-offwhite">join rooms</strong>, fill your squad, and get a
-            Discord invite the second your team is ready.
+            <Trans
+              i18nKey="hero.subtitle"
+              components={{ bold: <strong className="text-offwhite" /> }}
+            />
           </motion.p>
 
           {/* CTAs */}
@@ -88,7 +91,7 @@ export function HeroSection() {
           >
             <Link to="/rooms" className="btn-accent gap-2 text-base px-7 py-3 w-full md:w-auto">
               <Search className="size-5" strokeWidth={2.5} />
-              Explore rooms
+              {t('hero.exploreRooms')}
             </Link>
             {!session?.user && (
               <button
@@ -96,7 +99,7 @@ export function HeroSection() {
                 className="btn-discord gap-2 text-base px-7 py-3 w-full md:w-auto"
               >
                 <DiscordIcon className="size-5" />
-                Sign in with Discord
+                {t('hero.signInWithDiscord')}
               </button>
             )}
           </motion.div>
