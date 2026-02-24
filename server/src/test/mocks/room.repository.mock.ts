@@ -33,9 +33,7 @@ export function createMockRoomRepository(): MockRoomRepository {
     findByHostId: vi.fn<(hostId: string) => Promise<Room[]>>().mockResolvedValue([]),
     findAll: vi.fn<() => Promise<Room[]>>().mockResolvedValue([]),
     findAvailable: vi.fn<() => Promise<Room[]>>().mockResolvedValue([]),
-    countActiveByHostId: vi
-      .fn<(hostId: string) => Promise<number>>()
-      .mockResolvedValue(0),
+    countActiveByHostId: vi.fn<(hostId: string) => Promise<number>>().mockResolvedValue(0),
     findMyRooms: vi
       .fn<(userId: string) => Promise<{ hosted: Room[]; joined: Room[] }>>()
       .mockResolvedValue({ hosted: [], joined: [] }),

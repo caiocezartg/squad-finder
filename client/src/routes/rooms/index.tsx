@@ -46,14 +46,22 @@ function RoomsPage() {
   useLobbyEvents({ isConnected, send, on })
 
   // Fetch rooms
-  const { data: roomsData, isLoading: roomsLoading, isError: roomsError } = useQuery({
+  const {
+    data: roomsData,
+    isLoading: roomsLoading,
+    isError: roomsError,
+  } = useQuery({
     queryKey: ['rooms'],
     queryFn: () => api.get<RoomsResponse>('/api/rooms'),
     refetchOnWindowFocus: true,
   })
 
   // Fetch games
-  const { data: gamesData, isLoading: gamesLoading, isError: gamesError } = useQuery({
+  const {
+    data: gamesData,
+    isLoading: gamesLoading,
+    isError: gamesError,
+  } = useQuery({
     queryKey: ['games'],
     queryFn: () => api.get<GamesResponse>('/api/games'),
     staleTime: 60_000,
@@ -222,10 +230,7 @@ function RoomsPage() {
 
       {(roomsError || gamesError) && (
         <div className="mb-6">
-          <AlertBox
-            type="error"
-            message="Failed to load rooms. Please refresh the page."
-          />
+          <AlertBox type="error" message="Failed to load rooms. Please refresh the page." />
         </div>
       )}
 

@@ -36,7 +36,9 @@ async function roomCleanupPlugin(fastify: FastifyInstance): Promise<void> {
       fastify.log.error(error, 'Failed to mark legacy full rooms')
     }
 
-    fastify.log.info(`Room cleanup scheduler started (interval: ${ROOM.CLEANUP_INTERVAL_MS / 1000}s, expiration: ${ROOM.EXPIRATION_MINUTES}min)`)
+    fastify.log.info(
+      `Room cleanup scheduler started (interval: ${ROOM.CLEANUP_INTERVAL_MS / 1000}s, expiration: ${ROOM.EXPIRATION_MINUTES}min)`
+    )
 
     intervalId = setInterval(async () => {
       try {

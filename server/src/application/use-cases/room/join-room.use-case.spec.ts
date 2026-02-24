@@ -183,9 +183,9 @@ describe('JoinRoomUseCase', () => {
       mockRoomMemberRepository.findByRoomAndUser.mockResolvedValue(null) // not already in this room
       mockRoomMemberRepository.countActiveByUserId.mockResolvedValue(5)
 
-      await expect(
-        useCase.execute({ roomId: 'room-id', userId: 'user-id' })
-      ).rejects.toThrow(RoomJoinLimitReachedError)
+      await expect(useCase.execute({ roomId: 'room-id', userId: 'user-id' })).rejects.toThrow(
+        RoomJoinLimitReachedError
+      )
 
       expect(mockRoomMemberRepository.create).not.toHaveBeenCalled()
     })

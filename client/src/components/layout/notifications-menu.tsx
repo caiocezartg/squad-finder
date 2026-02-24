@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Bell, CheckCheck, Gamepad2, Users, X } from 'lucide-react'
 import { useNotifications } from '@/hooks/use-notifications'
@@ -103,6 +104,10 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
     deleteNotification,
     isDeletingNotification,
   } = useNotifications({ enabled, limit: 10 })
+
+  useEffect(() => {
+    document.title = unreadCount > 0 ? `(${unreadCount}) SquadFinder` : 'SquadFinder'
+  }, [unreadCount])
 
   const isBusy = isMarkingAsRead || isMarkingAllAsRead || isDeletingNotification
 

@@ -135,7 +135,10 @@ function MyRoomsPage() {
   )
 
   const hasActiveFilters =
-    search.trim().length > 0 || filter !== 'all' || language !== 'all' || tagFilter.trim().length > 0
+    search.trim().length > 0 ||
+    filter !== 'all' ||
+    language !== 'all' ||
+    tagFilter.trim().length > 0
 
   const hostedCount = myRoomsData?.hosted.length ?? 0
   const joinedCount = myRoomsData?.joined.length ?? 0

@@ -1,11 +1,7 @@
 import type { Room } from '@domain/entities/room.entity'
 import type { IRoomBroadcaster } from '@domain/services/room-broadcaster.interface'
 import type { WsConnectionManager } from './ws-connection-manager'
-import type {
-  RoomCreatedMessage,
-  RoomUpdatedMessage,
-  RoomDeletedMessage,
-} from './types'
+import type { RoomCreatedMessage, RoomUpdatedMessage, RoomDeletedMessage } from './types'
 
 export class WsRoomBroadcaster implements IRoomBroadcaster {
   constructor(private readonly connectionManager: WsConnectionManager) {}

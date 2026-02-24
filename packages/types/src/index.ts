@@ -56,7 +56,7 @@ export type UserNotificationPayload = {
   roomCode: string
   roomName: string
   gameName: string
-  players: string[]
+  players: { name: string; image: string | null }[]
   discordLink: string | null
 }
 

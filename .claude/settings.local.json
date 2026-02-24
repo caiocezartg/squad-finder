@@ -1,21 +1,4 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(bun run typecheck:*)",
-      "Bash(bun test:*)",
-      "WebFetch(domain:turborepo.dev)",
-      "Bash(bun add:*)",
-      "Bash(bun run test:*)",
-      "Bash(bun run lint:*)",
-      "Bash(git status:*)",
-      "Bash(git add:*)",
-      "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_context7_context7__query-docs",
-      "Bash(git commit:*)"
-    ]
-  },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "context7"
-  ]
+  "enabledMcpjsonServers": ["context7"],
+  "enableAllProjectMcpServers": true
 }
