@@ -63,3 +63,6 @@ drizzle/meta/
 # Debug
 debug/
 *.log
+
+# Git worktrees
+.worktrees/
