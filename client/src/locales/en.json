@@ -1,0 +1,208 @@
+{
+  "common": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "createRoom": "Create Room",
+    "createNewRoom": "Create new room"
+  },
+  "nav": {
+    "allRooms": "ALL ROOMS",
+    "myRooms": "MY ROOMS",
+    "closeMenu": "Close menu"
+  },
+  "footer": {
+    "tagline": "Find your gaming squad"
+  },
+  "hero": {
+    "badge": "{{count}} GAMES SUPPORTED",
+    "titleLine1": "STOP PLAYING",
+    "titleLine2": "GAMES",
+    "titleAccent": "ALONE",
+    "subtitle": "<bold>Create</bold> or <bold>join rooms</bold>, fill your squad, and get a Discord invite the second your team is ready.",
+    "exploreRooms": "Explore rooms",
+    "signInWithDiscord": "Sign in with Discord"
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know before building your squad.",
+    "items": [
+      {
+        "question": "Is SquadFinder free?",
+        "answer": "Yes, 100% free. No credit card required, no premium plans. Just sign in with your Discord account and start playing."
+      },
+      {
+        "question": "Do I need to create an account?",
+        "answer": "You sign in with your Discord account in one click — no forms, no extra passwords. Your Discord avatar and username are your identity on SquadFinder."
+      },
+      {
+        "question": "How many rooms can I create?",
+        "answer": "There is no limit. You can create as many rooms as you want, for any game available on the platform."
+      },
+      {
+        "question": "When is the Discord link shared?",
+        "answer": "The Discord server invite is shared as soon as the room reaches its max player count. When the last slot is filled, all members get access to the invite link."
+      },
+      {
+        "question": "What happens if the host leaves?",
+        "answer": "If the room creator leaves, the room is closed and all members are removed. Regular members can leave without affecting the room."
+      },
+      {
+        "question": "Can I choose the number of players?",
+        "answer": "Yes. By default, the player count matches the selected game's max players, but you can customize it between 2 and 20 when creating a room."
+      },
+      {
+        "question": "What games are supported?",
+        "answer": "We currently support 19 popular games including League of Legends, Valorant, CS2, Dota 2, Fortnite, Overwatch 2, and more. The list is constantly updated."
+      },
+      {
+        "question": "Can I join a room by code?",
+        "answer": "Yes. Every room has a unique 6-character code that can be shared. Just enter the code to join the room directly."
+      }
+    ]
+  },
+  "howItWorks": {
+    "label": "How It Works",
+    "title": "From login to full squad in under a minute.",
+    "signInButton": "Sign in",
+    "discordLinkReady": "Discord link ready",
+    "steps": [
+      {
+        "title": "Sign In with Discord",
+        "description": "One click. No forms, no passwords. Your Discord avatar is your identity."
+      },
+      {
+        "title": "Find or Create a Room",
+        "description": "Browse rooms by game or spin up your own with a Discord invite link."
+      },
+      {
+        "title": "Squad Up & Play",
+        "description": "Room fills up, Discord link unlocks. Join voice and dominate together."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to find your <accent>squad</accent>?",
+    "subtitle": "Join hundreds of players already using SquadFinder to build the perfect team.",
+    "browseRooms": "Browse Rooms",
+    "createAccount": "Create Account"
+  },
+  "popularGames": {
+    "label": "Supported Games",
+    "title": "Play what you love",
+    "subtitle": "Find teammates across the most popular multiplayer titles.",
+    "playerRange": "{{min}}-{{max}} players",
+    "moreGames": "And many other games!"
+  },
+  "rooms": {
+    "page": {
+      "title": "Explore rooms",
+      "subtitle_one": "{{count}} room available",
+      "subtitle_other": "{{count}} rooms available",
+      "loadError": "Failed to load rooms. Please refresh the page.",
+      "emptyTitle": "No rooms yet",
+      "emptyTitleFiltered": "No rooms found",
+      "emptyDescription": "Be the first to create a room and start a squad!",
+      "emptyDescriptionFiltered": "No rooms match your filters. Try adjusting your search or filters."
+    },
+    "myRooms": {
+      "title": "My Rooms",
+      "subtitle": "Rooms you created or joined",
+      "loadError": "Failed to load your rooms. Please refresh the page.",
+      "tabCreated": "Created ({{count}})",
+      "tabJoined": "Joined ({{count}})",
+      "noRoomsYet": "No rooms here yet.",
+      "noRoomsFiltered": "No rooms match your filters."
+    },
+    "lobby": {
+      "backToRooms": "Back to rooms",
+      "leaveRoom": "Leave room",
+      "squadLocked": "Squad locked",
+      "cannotLeave": "Cannot leave a full room",
+      "pleaseSignIn": "Please sign in to view this room.",
+      "playerCount": "{{current}}/{{max}} players",
+      "players": "Players ({{current}}/{{max}})",
+      "copied": "Copied!"
+    },
+    "card": {
+      "joined": "Joined",
+      "seeRoom": "SEE ROOM",
+      "joinRoom": "JOIN ROOM",
+      "full": "Full"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by game or room name...",
+      "tagPlaceholder": "filter by tag...",
+      "lang": "Lang",
+      "statusAll": "ALL",
+      "statusHasSpace": "HAS SPACE",
+      "statusAlmostFull": "ALMOST FULL",
+      "sortNewest": "NEWEST",
+      "sortOldest": "OLDEST",
+      "langAll": "ALL LANGUAGES",
+      "langPtBr": "PT-BR",
+      "langEn": "EN-US"
+    },
+    "createModal": {
+      "title": "Create a Room",
+      "roomName": "Room Name",
+      "roomNamePlaceholder": "e.g. Ranked grind tonight",
+      "game": "Game",
+      "selectGame": "Select a game",
+      "gameWithPlayers": "{{name}} ({{min}}-{{max}} players)",
+      "playerLimit": "Player Limit",
+      "optional": "(optional)",
+      "playerLimitHelperWithGame": "Leave empty to use {{maxPlayers}} players ({{gameName}} default).",
+      "playerLimitHelper": "Leave empty to use the selected game max players.",
+      "discordLink": "Discord Invite Link",
+      "discordLinkHelper": "Shared with all players when the room is full.",
+      "tags": "Tags",
+      "tagsHelper": "Press Enter or comma to add - max 5 tags",
+      "tagsPlaceholder": "Type a tag...",
+      "tagsPlaceholderMore": "Add more...",
+      "removeTag": "Remove tag {{tag}}",
+      "language": "Language",
+      "creating": "Creating...",
+      "submit": "Create Room",
+      "selectGameError": "Please select a game"
+    },
+    "authModal": {
+      "title": "Sign in required",
+      "description": "You can explore rooms list as a guest, but joining a room and viewing full details requires signing in with Discord.",
+      "roomCode": "Room you are trying to join:",
+      "maybeLater": "Maybe later",
+      "continueWithDiscord": "Continue with Discord"
+    },
+    "discordCard": {
+      "title": "Your squad is ready!",
+      "description": "Join the Discord server to start playing together.",
+      "copied": "Copied!",
+      "copyLink": "Copy link",
+      "joinDiscord": "Join Discord"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "No notifications yet",
+    "emptySubtitle": "You'll be notified when your squad is ready",
+    "squadReady": "Your squad is ready — Discord invite available",
+    "dismiss": "Dismiss",
+    "showing_one": "Showing last {{count}} notification",
+    "showing_other": "Showing last {{count}} notifications"
+  },
+  "errors": {
+    "ROOM_NOT_FOUND": "This room no longer exists or the code is invalid.",
+    "ROOM_FULL": "This room is already full.",
+    "ROOM_NOT_WAITING": "This room is no longer accepting players.",
+    "ROOM_COMPLETED": "This room has already been completed.",
+    "ALREADY_IN_ROOM": "You are already a member of this room.",
+    "NOT_ROOM_MEMBER": "You are not a member of this room.",
+    "ROOM_CREATE_LIMIT_REACHED": "You have reached the maximum number of active rooms.",
+    "ROOM_JOIN_LIMIT_REACHED": "You have reached the maximum number of rooms you can join.",
+    "VALIDATION_ERROR": "Please check the form fields and try again.",
+    "UNAUTHORIZED": "You need to sign in to do this.",
+    "INTERNAL_ERROR": "Something went wrong. Please try again later.",
+    "DEFAULT": "Something went wrong. Please try again."
+  }
+}

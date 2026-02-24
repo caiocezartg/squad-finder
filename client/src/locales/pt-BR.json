@@ -1,0 +1,208 @@
+{
+  "common": {
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "createRoom": "Criar Sala",
+    "createNewRoom": "Criar nova sala"
+  },
+  "nav": {
+    "allRooms": "TODAS AS SALAS",
+    "myRooms": "MINHAS SALAS",
+    "closeMenu": "Fechar menu"
+  },
+  "footer": {
+    "tagline": "Encontre seu time gamer"
+  },
+  "hero": {
+    "badge": "{{count}} JOGOS DISPONÍVEIS",
+    "titleLine1": "PARE DE JOGAR",
+    "titleLine2": "JOGOS",
+    "titleAccent": "SOZINHO",
+    "subtitle": "<bold>Crie</bold> ou <bold>entre em salas</bold>, complete seu time e receba um convite do Discord assim que o time estiver cheio.",
+    "exploreRooms": "Explorar salas",
+    "signInWithDiscord": "Entrar com Discord"
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "Perguntas Frequentes",
+    "subtitle": "Tudo que você precisa saber antes de montar seu time.",
+    "items": [
+      {
+        "question": "O SquadFinder é gratuito?",
+        "answer": "Sim, 100% gratuito. Sem cartão de crédito, sem planos premium. Basta entrar com sua conta do Discord e começar a jogar."
+      },
+      {
+        "question": "Preciso criar uma conta?",
+        "answer": "Você entra com sua conta do Discord com um clique — sem formulários, sem senhas extras. Seu avatar e nome de usuário do Discord são sua identidade no SquadFinder."
+      },
+      {
+        "question": "Quantas salas posso criar?",
+        "answer": "Sem limite. Você pode criar quantas salas quiser, para qualquer jogo disponível na plataforma."
+      },
+      {
+        "question": "Quando o link do Discord é compartilhado?",
+        "answer": "O convite do servidor Discord é compartilhado assim que a sala atinge o número máximo de jogadores. Quando a última vaga é preenchida, todos os membros recebem acesso ao link."
+      },
+      {
+        "question": "O que acontece se o dono sair?",
+        "answer": "Se o criador da sala sair, a sala é encerrada e todos os membros são removidos. Membros comuns podem sair sem afetar a sala."
+      },
+      {
+        "question": "Posso escolher o número de jogadores?",
+        "answer": "Sim. Por padrão, o número de jogadores corresponde ao máximo do jogo selecionado, mas você pode personalizar entre 2 e 20 ao criar uma sala."
+      },
+      {
+        "question": "Quais jogos são suportados?",
+        "answer": "Atualmente suportamos 19 jogos populares incluindo League of Legends, Valorant, CS2, Dota 2, Fortnite, Overwatch 2 e mais. A lista é constantemente atualizada."
+      },
+      {
+        "question": "Posso entrar em uma sala por código?",
+        "answer": "Sim. Cada sala tem um código único de 6 caracteres que pode ser compartilhado. Basta digitar o código para entrar na sala diretamente."
+      }
+    ]
+  },
+  "howItWorks": {
+    "label": "Como Funciona",
+    "title": "Do login ao time completo em menos de um minuto.",
+    "signInButton": "Entrar",
+    "discordLinkReady": "Link do Discord pronto",
+    "steps": [
+      {
+        "title": "Entre com o Discord",
+        "description": "Um clique. Sem formulários, sem senhas. Seu avatar do Discord é sua identidade."
+      },
+      {
+        "title": "Encontre ou Crie uma Sala",
+        "description": "Navegue pelas salas por jogo ou crie a sua com um link de convite do Discord."
+      },
+      {
+        "title": "Monte o Time & Jogue",
+        "description": "A sala enche, o link do Discord é liberado. Entre na call de voz e dominem juntos."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Pronto para encontrar seu <accent>squad</accent>?",
+    "subtitle": "Junte-se a centenas de jogadores que já usam o SquadFinder para montar o time perfeito.",
+    "browseRooms": "Explorar Salas",
+    "createAccount": "Criar Conta"
+  },
+  "popularGames": {
+    "label": "Jogos Disponíveis",
+    "title": "Jogue o que você ama",
+    "subtitle": "Encontre companheiros nos títulos multiplayer mais populares.",
+    "playerRange": "{{min}}-{{max}} jogadores",
+    "moreGames": "E muitos outros jogos!"
+  },
+  "rooms": {
+    "page": {
+      "title": "Explorar salas",
+      "subtitle_one": "{{count}} sala disponível",
+      "subtitle_other": "{{count}} salas disponíveis",
+      "loadError": "Falha ao carregar salas. Por favor, atualize a página.",
+      "emptyTitle": "Nenhuma sala ainda",
+      "emptyTitleFiltered": "Nenhuma sala encontrada",
+      "emptyDescription": "Seja o primeiro a criar uma sala e montar um time!",
+      "emptyDescriptionFiltered": "Nenhuma sala corresponde aos seus filtros. Tente ajustar sua busca."
+    },
+    "myRooms": {
+      "title": "Minhas Salas",
+      "subtitle": "Salas que você criou ou entrou",
+      "loadError": "Falha ao carregar suas salas. Por favor, atualize a página.",
+      "tabCreated": "Criadas ({{count}})",
+      "tabJoined": "Participando ({{count}})",
+      "noRoomsYet": "Nenhuma sala aqui ainda.",
+      "noRoomsFiltered": "Nenhuma sala corresponde aos seus filtros."
+    },
+    "lobby": {
+      "backToRooms": "Voltar às salas",
+      "leaveRoom": "Sair da sala",
+      "squadLocked": "Time fechado",
+      "cannotLeave": "Não é possível sair de uma sala cheia",
+      "pleaseSignIn": "Por favor, entre com sua conta para ver esta sala.",
+      "playerCount": "{{current}}/{{max}} jogadores",
+      "players": "Jogadores ({{current}}/{{max}})",
+      "copied": "Copiado!"
+    },
+    "card": {
+      "joined": "Entrou",
+      "seeRoom": "VER SALA",
+      "joinRoom": "ENTRAR",
+      "full": "Cheio"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por jogo ou nome da sala...",
+      "tagPlaceholder": "filtrar por tag...",
+      "lang": "Idioma",
+      "statusAll": "TODOS",
+      "statusHasSpace": "COM VAGA",
+      "statusAlmostFull": "QUASE CHEIO",
+      "sortNewest": "MAIS RECENTES",
+      "sortOldest": "MAIS ANTIGOS",
+      "langAll": "TODOS OS IDIOMAS",
+      "langPtBr": "PT-BR",
+      "langEn": "EN-US"
+    },
+    "createModal": {
+      "title": "Criar uma Sala",
+      "roomName": "Nome da Sala",
+      "roomNamePlaceholder": "ex: Grind ranked hoje à noite",
+      "game": "Jogo",
+      "selectGame": "Selecione um jogo",
+      "gameWithPlayers": "{{name}} ({{min}}-{{max}} jogadores)",
+      "playerLimit": "Limite de Jogadores",
+      "optional": "(opcional)",
+      "playerLimitHelperWithGame": "Deixe vazio para usar {{maxPlayers}} jogadores (padrão do {{gameName}}).",
+      "playerLimitHelper": "Deixe vazio para usar o máximo do jogo selecionado.",
+      "discordLink": "Link de Convite do Discord",
+      "discordLinkHelper": "Compartilhado com todos os jogadores quando a sala estiver cheia.",
+      "tags": "Tags",
+      "tagsHelper": "Pressione Enter ou vírgula para adicionar - máx. 5 tags",
+      "tagsPlaceholder": "Digite uma tag...",
+      "tagsPlaceholderMore": "Adicionar mais...",
+      "removeTag": "Remover tag {{tag}}",
+      "language": "Idioma",
+      "creating": "Criando...",
+      "submit": "Criar Sala",
+      "selectGameError": "Por favor, selecione um jogo"
+    },
+    "authModal": {
+      "title": "Login necessário",
+      "description": "Você pode explorar a lista de salas como convidado, mas entrar em uma sala e ver detalhes completos requer login com Discord.",
+      "roomCode": "Sala que você está tentando entrar:",
+      "maybeLater": "Talvez mais tarde",
+      "continueWithDiscord": "Continuar com Discord"
+    },
+    "discordCard": {
+      "title": "Seu time está pronto!",
+      "description": "Entre no servidor do Discord para começar a jogar juntos.",
+      "copied": "Copiado!",
+      "copyLink": "Copiar link",
+      "joinDiscord": "Entrar no Discord"
+    }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "markAllRead": "Marcar todas como lidas",
+    "empty": "Nenhuma notificação ainda",
+    "emptySubtitle": "Você será notificado quando seu time estiver pronto",
+    "squadReady": "Seu time está pronto — convite do Discord disponível",
+    "dismiss": "Dispensar",
+    "showing_one": "Mostrando última {{count}} notificação",
+    "showing_other": "Mostrando últimas {{count}} notificações"
+  },
+  "errors": {
+    "ROOM_NOT_FOUND": "Esta sala não existe mais ou o código é inválido.",
+    "ROOM_FULL": "Esta sala já está cheia.",
+    "ROOM_NOT_WAITING": "Esta sala não está mais aceitando jogadores.",
+    "ROOM_COMPLETED": "Esta sala já foi concluída.",
+    "ALREADY_IN_ROOM": "Você já é membro desta sala.",
+    "NOT_ROOM_MEMBER": "Você não é membro desta sala.",
+    "ROOM_CREATE_LIMIT_REACHED": "Você atingiu o número máximo de salas ativas.",
+    "ROOM_JOIN_LIMIT_REACHED": "Você atingiu o número máximo de salas que pode participar.",
+    "VALIDATION_ERROR": "Por favor, verifique os campos do formulário e tente novamente.",
+    "UNAUTHORIZED": "Você precisa fazer login para fazer isso.",
+    "INTERNAL_ERROR": "Algo deu errado. Por favor, tente novamente mais tarde.",
+    "DEFAULT": "Algo deu errado. Por favor, tente novamente."
+  }
+}
