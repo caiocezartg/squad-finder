@@ -1,25 +1,35 @@
 import { ApiClientError } from './api'
+import i18n from './i18n'
 
-const ERROR_MESSAGES: Record<string, string> = {
-  ROOM_NOT_FOUND: 'This room no longer exists or the code is invalid.',
-  ROOM_FULL: 'This room is already full.',
-  ROOM_NOT_WAITING: 'This room is no longer accepting players.',
-  ROOM_COMPLETED: 'This room has already been completed.',
-  ALREADY_IN_ROOM: 'You are already a member of this room.',
-  NOT_ROOM_MEMBER: 'You are not a member of this room.',
-  ROOM_CREATE_LIMIT_REACHED: 'You have reached the maximum number of active rooms.',
-  ROOM_JOIN_LIMIT_REACHED: 'You have reached the maximum number of rooms you can join.',
-  VALIDATION_ERROR: 'Please check the form fields and try again.',
-  UNAUTHORIZED: 'You need to sign in to do this.',
-  INTERNAL_ERROR: 'Something went wrong. Please try again later.',
+const ERROR_CODE_KEYS = [
+  'ROOM_NOT_FOUND',
+  'ROOM_FULL',
+  'ROOM_NOT_WAITING',
+  'ROOM_COMPLETED',
+  'ALREADY_IN_ROOM',
+  'NOT_ROOM_MEMBER',
+  'ROOM_CREATE_LIMIT_REACHED',
+  'ROOM_JOIN_LIMIT_REACHED',
+  'VALIDATION_ERROR',
+  'UNAUTHORIZED',
+  'INTERNAL_ERROR',
+] as const
+
+type ErrorCode = (typeof ERROR_CODE_KEYS)[number]
+
+function isKnownErrorCode(code: string): code is ErrorCode {
+  return (ERROR_CODE_KEYS as readonly string[]).includes(code)
 }
 
 export function getUserFriendlyError(error: unknown): string {
   if (error instanceof ApiClientError && error.code) {
-    return ERROR_MESSAGES[error.code] ?? error.message
+    if (isKnownErrorCode(error.code)) {
+      return i18n.t(`errors.${error.code}`)
+    }
+    return error.message
   }
   if (error instanceof Error) {
     return error.message
   }
-  return 'Something went wrong. Please try again.'
+  return i18n.t('errors.DEFAULT')
 }
