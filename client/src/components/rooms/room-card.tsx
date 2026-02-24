@@ -6,7 +6,7 @@ import type { Room, Game } from '@/types'
 interface RoomCardProps {
   room: Room
   game: Game | undefined
-  onJoin: (roomCode: string) => void
+  onJoin?: (roomCode: string) => void
   isLoading?: boolean
   currentMembers?: number
 }
@@ -47,7 +47,7 @@ export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: Room
   return (
     <motion.button
       type="button"
-      onClick={() => onJoin(room.code)}
+      onClick={() => onJoin?.(room.code)}
       disabled={isDisabled}
       className={`group relative w-full overflow-hidden rounded-xl border bg-surface text-left transition-all duration-300 ${
         isDisabled

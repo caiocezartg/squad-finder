@@ -261,7 +261,7 @@ export function HowItWorks() {
 
         {/* Mobile: vertical timeline + cards */}
         <div className="md:hidden">
-          <div className="relative pl-10">
+          <div className="relative">
             {/* Vertical line */}
             <motion.div
               className="absolute left-[15px] top-0 bottom-0 w-[2px] bg-border-light origin-top"

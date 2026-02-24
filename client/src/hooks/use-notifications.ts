@@ -32,7 +32,9 @@ function playNotificationSound() {
         osc.onended = () => ctx.close()
       }
     })
-  } catch {}
+  } catch {
+    // AudioContext may be unavailable or suspended in some environments
+  }
 }
 
 interface UseNotificationsOptions {

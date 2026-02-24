@@ -7,6 +7,7 @@ import type { GamesResponse } from '@/types'
 import { Search } from 'lucide-react'
 import { DiscordIcon } from '@/components/ui/icons'
 import { BackgroundRipple } from './background-ripple'
+import { HeroRoomShowcase } from './hero-room-showcase'
 
 export function HeroSection() {
   const { data: session } = useSession()
@@ -32,7 +33,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_50%,rgba(0,255,162,0.06),transparent_55%)] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_80%,rgba(88,101,242,0.04),transparent_50%)] pointer-events-none" />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 sm:pb-24">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-20 sm:pt-28 sm:pb-24">
         <div className="max-w-full flex flex-col items-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -100,18 +101,13 @@ export function HeroSection() {
             )}
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.45 }}
-            className="relative max-w-4xl rounded-xl overflow-hidden mt-12 -mb-8"
-          >
-            <img src="rooms_lp.png" alt="Demonstration of all rooms" className="w-full h-auto" />
-          </motion.div>
+          <div className="relative w-full max-w-5xl mt-12 -mb-8">
+            <HeroRoomShowcase />
+          </div>
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 h-20 lg:h-[400px] bg-gradient-to-t from-background/100 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-20 lg:h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   )
 }
