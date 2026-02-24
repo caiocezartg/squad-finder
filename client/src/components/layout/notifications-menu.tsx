@@ -107,6 +107,9 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
 
   useEffect(() => {
     document.title = unreadCount > 0 ? `(${unreadCount}) SquadFinder` : 'SquadFinder'
+    return () => {
+      document.title = 'SquadFinder'
+    }
   }, [unreadCount])
 
   const isBusy = isMarkingAsRead || isMarkingAllAsRead || isDeletingNotification
@@ -138,7 +141,7 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
         <Bell className="size-4" />
         {unreadCount > 0 && (
           <span className="absolute -right-0.5 -top-0.5 inline-flex size-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-background ring-2 ring-background">
-            {unreadCount > 9 ? '9' : unreadCount}
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>

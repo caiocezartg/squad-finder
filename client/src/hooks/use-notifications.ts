@@ -6,27 +6,33 @@ import { getUserFriendlyError } from '@/lib/error-messages'
 import type { NotificationsResponse } from '@/types'
 
 function playNotificationSound() {
-  const ctx = new AudioContext()
-  const tones = [880, 1100]
+  try {
+    const ctx = new AudioContext()
+    const tones = [880, 1100]
 
-  tones.forEach((freq, i) => {
-    const osc = ctx.createOscillator()
-    const gain = ctx.createGain()
+    tones.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
 
-    osc.connect(gain)
-    gain.connect(ctx.destination)
+      osc.connect(gain)
+      gain.connect(ctx.destination)
 
-    osc.type = 'sine'
-    osc.frequency.value = freq
+      osc.type = 'sine'
+      osc.frequency.value = freq
 
-    const start = ctx.currentTime + i * 0.15
-    gain.gain.setValueAtTime(0, start)
-    gain.gain.linearRampToValueAtTime(0.25, start + 0.01)
-    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35)
+      const start = ctx.currentTime + i * 0.15
+      gain.gain.setValueAtTime(0, start)
+      gain.gain.linearRampToValueAtTime(0.25, start + 0.01)
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35)
 
-    osc.start(start)
-    osc.stop(start + 0.35)
-  })
+      osc.start(start)
+      osc.stop(start + 0.35)
+
+      if (i === tones.length - 1) {
+        osc.onended = () => ctx.close()
+      }
+    })
+  } catch {}
 }
 
 interface UseNotificationsOptions {
@@ -95,7 +101,9 @@ export function useNotifications(options: UseNotificationsOptions) {
 
     const prevIds = previousIdsRef.current
     const hasNew = notifications.some((n) => !prevIds.has(n.id))
-    if (hasNew) playNotificationSound()
+    if (hasNew) {
+      playNotificationSound()
+    }
 
     previousIdsRef.current = currentIds
   }, [notifications])
