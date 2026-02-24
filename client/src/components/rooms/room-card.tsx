@@ -99,9 +99,7 @@ export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: Room
 
         {isFull && !room.isMember && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted/80">
-              Full
-            </span>
+            <span className="text-lg font-bold uppercase tracking-[0.2em] text-offwhite">Full</span>
           </div>
         )}
       </div>
