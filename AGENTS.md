@@ -1,12 +1,54 @@
 # Project Overview
 
-SquadFinder is a real-time web application connecting gamers to complete full teams (premades) for multiplayer games like LoL, Dota, and CS.
+**SquadFinder** — real-time web app connecting gamers to complete full teams (premades) for multiplayer games like LoL, Dota, and CS.
+
+## Tech Stack
+
+**Monorepo**: Turbo + Bun workspaces
+
+| Scope     | Technologies                                                          |
+| --------- | --------------------------------------------------------------------- |
+| Server    | Fastify v5, Drizzle ORM, PostgreSQL, Better Auth, Zod                 |
+| Client    | React 18, Vite, TanStack Router, TanStack Query, Tailwind CSS         |
+| Shared    | `@squadfinder/types` (TS types), `@squadfinder/schemas` (Zod schemas) |
+| Real-time | Fastify WebSocket plugin                                              |
+| Auth      | Better Auth with Discord OAuth                                        |
+| Testing   | Vitest (all workspaces)                                               |
+
+## Project Structure
+
+```
+/server/src/
+  domain/          # Entities + repository interfaces (no external deps)
+  application/     # Use cases + DTOs (depends on domain only)
+  infrastructure/  # Drizzle repos, WebSocket, auth, Fastify plugins
+  interface/       # Controllers, routes, factories (DI wiring)
+  config/          # Zod-validated env vars (env.ts)
+
+/client/src/
+  routes/          # TanStack Router pages (file-based routing)
+  components/      # React UI (landing/, layout/, rooms/, ui/)
+  hooks/           # Custom hooks (WebSocket, notifications, rooms)
+  lib/             # API client, auth-client, ws-client, query-client
+
+/packages/
+  @squadfinder/types    # Shared TypeScript types (entities, DTOs, WS)
+  @squadfinder/schemas  # Shared Zod schemas (rooms, users, WS messages)
+```
 
 ## General Rules
 
 - ALWAYS use `bun` instead of any package manager such as `npm`.
-- NEVER violate the project’s SOLID principles and Clean Architecture. Always analyze and review whether the logic is placed in the correct layer.
-- Do not let functions become too large and obsolete; whenever possible, break them down into smaller, modular pieces for better optimization.
+- NEVER violate the project's SOLID principles and Clean Architecture. Always analyze and review whether the logic is placed in the correct layer.
+- Do not let functions become too large; break them into smaller, modular pieces.
+
+## Architecture Rules
+
+- **Dependency direction**: `interface → application → domain`. Infrastructure implements domain interfaces. Never import outward.
+- **Use cases**: All business logic lives in `application/use-cases/`. They depend only on repository interfaces (domain layer), never on concrete Drizzle implementations.
+- **Factories**: Dependency injection is wired in `interface/factories/`. This is the only place where concrete repositories are instantiated and injected into use cases.
+- **DTOs**: Domain entities are pure interfaces. DTOs in `application/dtos/` handle cross-boundary data transfer.
+- **Shared schemas**: Validation schemas used by both client and server live in `packages/@squadfinder/schemas`, not duplicated per workspace.
 
 ## Workflow Orchestration
 

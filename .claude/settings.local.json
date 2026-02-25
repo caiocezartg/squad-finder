@@ -1,4 +1,7 @@
 {
-  "enabledMcpjsonServers": ["context7"],
-  "enableAllProjectMcpServers": true
+  "permissions": {
+    "allow": ["Bash(cd:*)", "Bash(printf %s\\\\n:*)", "Bash(node:*)"]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["context7"]
 }
