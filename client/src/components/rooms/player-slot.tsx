@@ -1,5 +1,6 @@
 import * as motion from 'motion/react-client'
 import { User } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { Player } from '@/types'
 
 interface PlayerSlotProps {
@@ -8,13 +9,15 @@ interface PlayerSlotProps {
 }
 
 export function PlayerSlot({ player, index }: PlayerSlotProps) {
+  const { t } = useTranslation()
+
   if (!player) {
     return (
       <div className="flex items-center gap-3 rounded-xl border border-dashed border-border-light p-3 opacity-40">
         <div className="size-10 rounded-full bg-surface-light border border-border flex items-center justify-center">
           <User className="size-4 text-muted" />
         </div>
-        <span className="text-sm text-muted">Waiting for player...</span>
+        <span className="text-sm text-muted">{t('rooms.lobby.waitingForPlayer')}</span>
       </div>
     )
   }

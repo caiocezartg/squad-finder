@@ -122,7 +122,8 @@
       "pleaseSignIn": "Please sign in to view this room.",
       "playerCount": "{{current}}/{{max}} players",
       "players": "Players ({{current}}/{{max}})",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "waitingForPlayer": "Waiting for player..."
     },
     "card": {
       "joined": "Joined",

@@ -22,14 +22,8 @@ function isKnownErrorCode(code: string): code is ErrorCode {
 }
 
 export function getUserFriendlyError(error: unknown): string {
-  if (error instanceof ApiClientError && error.code) {
-    if (isKnownErrorCode(error.code)) {
-      return i18n.t(`errors.${error.code}`)
-    }
-    return error.message
-  }
-  if (error instanceof Error) {
-    return error.message
+  if (error instanceof ApiClientError && error.code && isKnownErrorCode(error.code)) {
+    return i18n.t(`errors.${error.code}`)
   }
   return i18n.t('errors.DEFAULT')
 }

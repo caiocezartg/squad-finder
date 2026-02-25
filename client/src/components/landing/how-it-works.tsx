@@ -170,7 +170,11 @@ function SquadFillIllustration() {
 
 /* ─── Illustrations ─── */
 
-const ILLUSTRATIONS = [DiscordClickIllustration, RoomBrowseIllustration, SquadFillIllustration] as const
+const ILLUSTRATIONS = [
+  DiscordClickIllustration,
+  RoomBrowseIllustration,
+  SquadFillIllustration,
+] as const
 
 /* ─── Main Component ─── */
 
@@ -181,10 +185,10 @@ export function HowItWorks() {
     title: string
     description: string
   }>
-  const steps = stepData.map((step, i) => ({
-    ...step,
+  const steps = [...ILLUSTRATIONS].map((Illustration, i) => ({
+    ...(stepData[i] ?? { title: '', description: '' }),
     number: i + 1,
-    Illustration: ILLUSTRATIONS[i]!,
+    Illustration,
   }))
 
   return (
@@ -199,9 +203,7 @@ export function HowItWorks() {
           transition={{ duration: 0.5 }}
         >
           <span className="section-label">{t('howItWorks.label')}</span>
-          <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-            {t('howItWorks.title')}
-          </h2>
+          <h2 className="font-heading text-3xl font-bold sm:text-4xl">{t('howItWorks.title')}</h2>
         </motion.div>
 
         {/* Desktop: horizontal timeline + cards */}

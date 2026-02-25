@@ -16,7 +16,7 @@
   "hero": {
     "badge": "{{count}} JOGOS DISPONÍVEIS",
     "titleLine1": "PARE DE JOGAR",
-    "titleLine2": "JOGOS",
+    "titleLine2": "TUDO",
     "titleAccent": "SOZINHO",
     "subtitle": "<bold>Crie</bold> ou <bold>entre em salas</bold>, complete seu time e receba um convite do Discord assim que o time estiver cheio.",
     "exploreRooms": "Explorar salas",
@@ -122,7 +122,8 @@
       "pleaseSignIn": "Por favor, entre com sua conta para ver esta sala.",
       "playerCount": "{{current}}/{{max}} jogadores",
       "players": "Jogadores ({{current}}/{{max}})",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "waitingForPlayer": "Aguardando jogador..."
     },
     "card": {
       "joined": "Entrou",
@@ -150,7 +151,7 @@
       "game": "Jogo",
       "selectGame": "Selecione um jogo",
       "gameWithPlayers": "{{name}} ({{min}}-{{max}} jogadores)",
-      "playerLimit": "Limite de Jogadores",
+      "playerLimit": "Jogadores",
       "optional": "(opcional)",
       "playerLimitHelperWithGame": "Deixe vazio para usar {{maxPlayers}} jogadores (padrão do {{gameName}}).",
       "playerLimitHelper": "Deixe vazio para usar o máximo do jogo selecionado.",
