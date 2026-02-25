@@ -30,14 +30,9 @@ export function CTABanner() {
         transition={{ duration: 0.5 }}
       >
         <h2 className="font-heading text-3xl font-bold sm:text-5xl">
-          <Trans
-            i18nKey="cta.title"
-            components={{ accent: <span className="text-accent" /> }}
-          />
+          <Trans i18nKey="cta.title" components={{ accent: <span className="text-accent" /> }} />
         </h2>
-        <p className="mt-4 text-muted text-lg max-w-xl mx-auto">
-          {t('cta.subtitle')}
-        </p>
+        <p className="mt-4 text-muted text-lg max-w-xl mx-auto">{t('cta.subtitle')}</p>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to="/rooms" className="btn-accent gap-2 text-base px-8 py-3">

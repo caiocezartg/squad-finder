@@ -11,7 +11,8 @@ import { BackgroundRipple } from './background-ripple'
 import { HeroRoomShowcase } from './hero-room-showcase'
 
 export function HeroSection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.resolvedLanguage || i18n.language
   const { data: session } = useSession()
 
   const { data: gamesData } = useQuery({
@@ -71,7 +72,7 @@ export function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="mt-6 text-base text-muted leading-relaxed sm:text-lg max-w-md text-center"
+            className={`mt-6 text-base text-muted leading-relaxed sm:text-lg ${lang === 'pt-BR' ? 'max-w-lg' : 'max-w-md'} text-center`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}

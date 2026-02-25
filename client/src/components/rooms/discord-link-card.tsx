@@ -42,10 +42,10 @@ export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardPro
             <DiscordIcon className="size-6 text-discord" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-heading text-base font-bold text-offwhite">{t('rooms.discordCard.title')}</h3>
-            <p className="text-sm text-muted mt-0.5">
-              {t('rooms.discordCard.description')}
-            </p>
+            <h3 className="font-heading text-base font-bold text-offwhite">
+              {t('rooms.discordCard.title')}
+            </h3>
+            <p className="text-sm text-muted mt-0.5">{t('rooms.discordCard.description')}</p>
           </div>
         </div>
 

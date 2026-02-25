@@ -258,7 +258,9 @@ function RoomLobbyPage() {
                 >
                   <span className="font-mono font-bold text-offwhite">{code}</span>
                   <Copy className="size-3.5" />
-                  {codeCopied && <span className="text-xs text-accent">{t('rooms.lobby.copied')}</span>}
+                  {codeCopied && (
+                    <span className="text-xs text-accent">{t('rooms.lobby.copied')}</span>
+                  )}
                 </button>
                 <span className="text-sm text-muted">
                   {t('rooms.lobby.playerCount', { current: players.length, max: maxPlayers })}

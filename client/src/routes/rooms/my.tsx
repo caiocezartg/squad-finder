@@ -166,7 +166,9 @@ function MyRoomsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-heading text-2xl font-bold sm:text-3xl">{t('rooms.myRooms.title')}</h1>
+          <h1 className="font-heading text-2xl font-bold sm:text-3xl">
+            {t('rooms.myRooms.title')}
+          </h1>
           <p className="mt-1 text-sm text-muted">{t('rooms.myRooms.subtitle')}</p>
         </div>
         <button onClick={() => setModalOpen(true)} className="btn-accent gap-2">
@@ -216,7 +218,9 @@ function MyRoomsPage() {
         <Tabs.Panel value="created">
           {filteredHosted.length === 0 ? (
             <p className="text-white/40 text-sm py-6">
-              {hasActiveFilters ? t('rooms.myRooms.noRoomsFiltered') : t('rooms.myRooms.noRoomsYet')}
+              {hasActiveFilters
+                ? t('rooms.myRooms.noRoomsFiltered')
+                : t('rooms.myRooms.noRoomsYet')}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -240,7 +244,9 @@ function MyRoomsPage() {
         <Tabs.Panel value="joined">
           {filteredJoined.length === 0 ? (
             <p className="text-white/40 text-sm py-6">
-              {hasActiveFilters ? t('rooms.myRooms.noRoomsFiltered') : t('rooms.myRooms.noRoomsYet')}
+              {hasActiveFilters
+                ? t('rooms.myRooms.noRoomsFiltered')
+                : t('rooms.myRooms.noRoomsYet')}
             </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

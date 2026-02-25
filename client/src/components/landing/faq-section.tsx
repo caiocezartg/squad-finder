@@ -21,9 +21,7 @@ export function FAQSection() {
           transition={{ duration: 0.5 }}
         >
           <span className="section-label">{t('faq.label')}</span>
-          <h2 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">
-            {t('faq.title')}
-          </h2>
+          <h2 className="mt-3 font-heading text-3xl font-bold sm:text-4xl">{t('faq.title')}</h2>
           <p className="mt-3 text-muted">{t('faq.subtitle')}</p>
         </motion.div>
 

@@ -58,7 +58,13 @@ export class NotifyRoomReadyUseCase implements INotifyRoomReadyUseCase {
 
     await Promise.all(
       userIds.map((userId) =>
-        this.userNotificationRepository.create({ userId, type: 'room_ready', title, message, payload })
+        this.userNotificationRepository.create({
+          userId,
+          type: 'room_ready',
+          title,
+          message,
+          payload,
+        })
       )
     )
 

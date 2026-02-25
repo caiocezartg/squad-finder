@@ -41,7 +41,10 @@ export function createMockRoomMemberRepository(): MockRoomMemberRepository {
     countActiveByUserId: vi.fn<(userId: string) => Promise<number>>().mockResolvedValue(0),
     createIfCapacityAvailable: vi
       .fn<
-        (input: CreateRoomMemberInput, maxPlayers: number) => Promise<CreateIfCapacityAvailableResult>
+        (
+          input: CreateRoomMemberInput,
+          maxPlayers: number
+        ) => Promise<CreateIfCapacityAvailableResult>
       >()
       .mockImplementation((input) =>
         Promise.resolve({

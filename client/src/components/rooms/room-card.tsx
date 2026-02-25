@@ -101,7 +101,9 @@ export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: Room
 
         {isFull && !room.isMember && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-            <span className="text-lg font-bold uppercase tracking-[0.2em] text-offwhite">{t('rooms.card.full')}</span>
+            <span className="text-lg font-bold uppercase tracking-[0.2em] text-offwhite">
+              {t('rooms.card.full')}
+            </span>
           </div>
         )}
       </div>

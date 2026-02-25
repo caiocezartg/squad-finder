@@ -110,7 +110,11 @@ function TagsChipInput({ value: tags, onChange, onBlur, hasError }: TagsChipInpu
           onBlur={onBlur}
           maxLength={15}
           className="min-w-[96px] flex-1 bg-transparent text-sm text-offwhite outline-none placeholder:text-muted/60"
-          placeholder={tags.length === 0 ? t('rooms.createModal.tagsPlaceholder') : t('rooms.createModal.tagsPlaceholderMore')}
+          placeholder={
+            tags.length === 0
+              ? t('rooms.createModal.tagsPlaceholder')
+              : t('rooms.createModal.tagsPlaceholderMore')
+          }
           aria-label="Add tag"
         />
       )}
@@ -186,7 +190,9 @@ export function CreateRoomModal({
             transition={{ duration: 0.2 }}
           >
             <div className="flex items-center justify-between border-b border-border px-6 py-4">
-              <Dialog.Title className="font-heading text-lg font-bold">{t('rooms.createModal.title')}</Dialog.Title>
+              <Dialog.Title className="font-heading text-lg font-bold">
+                {t('rooms.createModal.title')}
+              </Dialog.Title>
               <Dialog.Close className="flex size-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-hover hover:text-offwhite">
                 <X className="size-5" />
               </Dialog.Close>
@@ -226,7 +232,11 @@ export function CreateRoomModal({
                         render={({ field }) => {
                           const selectedOption = games.find((game) => game.id === field.value)
                           const selectedLabel = selectedOption
-                            ? t('rooms.createModal.gameWithPlayers', { name: selectedOption.name, min: selectedOption.minPlayers, max: selectedOption.maxPlayers })
+                            ? t('rooms.createModal.gameWithPlayers', {
+                                name: selectedOption.name,
+                                min: selectedOption.minPlayers,
+                                max: selectedOption.maxPlayers,
+                              })
                             : null
 
                           return (
@@ -269,7 +279,11 @@ export function CreateRoomModal({
                                             <Check className="size-3.5" />
                                           </Select.ItemIndicator>
                                           <Select.ItemText className="col-start-2">
-                                            {t('rooms.createModal.gameWithPlayers', { name: game.name, min: game.minPlayers, max: game.maxPlayers })}
+                                            {t('rooms.createModal.gameWithPlayers', {
+                                              name: game.name,
+                                              min: game.minPlayers,
+                                              max: game.maxPlayers,
+                                            })}
                                           </Select.ItemText>
                                         </Select.Item>
                                       ))}
@@ -282,7 +296,9 @@ export function CreateRoomModal({
                           )
                         }}
                       />
-                      {errors.gameId && <p className="field-error">{t('rooms.createModal.selectGameError')}</p>}
+                      {errors.gameId && (
+                        <p className="field-error">{t('rooms.createModal.selectGameError')}</p>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
@@ -290,7 +306,10 @@ export function CreateRoomModal({
                         htmlFor="modal-maxPlayers"
                         className="block whitespace-nowrap text-sm font-medium text-offwhite"
                       >
-                        {t('rooms.createModal.playerLimit')} <span className="font-normal text-muted">{t('rooms.createModal.optional')}</span>
+                        {t('rooms.createModal.playerLimit')}{' '}
+                        <span className="font-normal text-muted">
+                          {t('rooms.createModal.optional')}
+                        </span>
                       </label>
                       <input
                         id="modal-maxPlayers"
@@ -326,9 +345,7 @@ export function CreateRoomModal({
                     placeholder="https://discord.gg/..."
                     {...register('discordLink')}
                   />
-                  <p className="text-xs text-muted">
-                    {t('rooms.createModal.discordLinkHelper')}
-                  </p>
+                  <p className="text-xs text-muted">{t('rooms.createModal.discordLinkHelper')}</p>
                   {errors.discordLink && (
                     <p className="field-error">{errors.discordLink.message}</p>
                   )}
@@ -336,7 +353,10 @@ export function CreateRoomModal({
 
                 <div className="space-y-1.5 lg:col-span-2">
                   <label className="block whitespace-nowrap text-sm font-medium text-offwhite">
-                    {t('rooms.createModal.tags')} <span className="font-normal text-muted">{t('rooms.createModal.optional')}</span>
+                    {t('rooms.createModal.tags')}{' '}
+                    <span className="font-normal text-muted">
+                      {t('rooms.createModal.optional')}
+                    </span>
                   </label>
                   <Controller
                     name="tags"

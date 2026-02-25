@@ -70,9 +70,9 @@ describe('JoinRoomUseCase', () => {
         memberCount: 5,
       })
 
-      await expect(
-        useCase.execute({ roomId: 'room-1', userId: 'user-1' })
-      ).rejects.toThrow(RoomFullError)
+      await expect(useCase.execute({ roomId: 'room-1', userId: 'user-1' })).rejects.toThrow(
+        RoomFullError
+      )
 
       expect(mockRoomMemberRepository.createIfCapacityAvailable).toHaveBeenCalledWith(
         { roomId: 'room-1', userId: 'user-1' },
@@ -145,9 +145,9 @@ describe('JoinRoomUseCase', () => {
 
       mockRoomRepository.findById.mockResolvedValue(room)
 
-      await expect(
-        useCase.execute({ roomId: 'room-1', userId: 'user-1' })
-      ).rejects.toThrow(RoomNotWaitingError)
+      await expect(useCase.execute({ roomId: 'room-1', userId: 'user-1' })).rejects.toThrow(
+        RoomNotWaitingError
+      )
 
       expect(mockRoomMemberRepository.findByRoomAndUser).not.toHaveBeenCalled()
       expect(mockRoomMemberRepository.createIfCapacityAvailable).not.toHaveBeenCalled()

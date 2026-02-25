@@ -30,9 +30,7 @@ export function PopularGames() {
         >
           <span className="section-label">{t('popularGames.label')}</span>
           <h2 className="font-heading text-3xl font-bold sm:text-4xl">{t('popularGames.title')}</h2>
-          <p className="mt-4 text-muted max-w-lg mx-auto">
-            {t('popularGames.subtitle')}
-          </p>
+          <p className="mt-4 text-muted max-w-lg mx-auto">{t('popularGames.subtitle')}</p>
         </motion.div>
 
         {isLoading ? (
