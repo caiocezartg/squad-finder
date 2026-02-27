@@ -8,7 +8,8 @@
   "nav": {
     "allRooms": "ALL ROOMS",
     "myRooms": "MY ROOMS",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu"
   },
   "footer": {
     "tagline": "Find your gaming squad"

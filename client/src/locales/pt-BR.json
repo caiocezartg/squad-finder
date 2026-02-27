@@ -8,7 +8,8 @@
   "nav": {
     "allRooms": "TODAS AS SALAS",
     "myRooms": "MINHAS SALAS",
-    "closeMenu": "Fechar menu"
+    "closeMenu": "Fechar menu",
+    "openMenu": "Abrir menu"
   },
   "footer": {
     "tagline": "Encontre seu time gamer"

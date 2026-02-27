@@ -215,17 +215,21 @@ function RoomsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="min-w-0">
           <h1 className="font-heading text-2xl font-bold sm:text-3xl">{t('rooms.page.title')}</h1>
           <p className="mt-1 text-sm text-muted">
             {t('rooms.page.subtitle', { count: roomCount })}
           </p>
         </div>
         {session?.user && (
-          <button onClick={() => setModalOpen(true)} className="btn-accent gap-2">
+          <button
+            onClick={() => setModalOpen(true)}
+            className="btn-accent gap-2 shrink-0 whitespace-nowrap"
+          >
             <Plus className="size-4" />
-            {t('common.createNewRoom')}
+            <span className="hidden sm:inline">{t('common.createNewRoom')}</span>
+            <span className="sm:hidden">{t('common.createRoom')}</span>
           </button>
         )}
       </div>

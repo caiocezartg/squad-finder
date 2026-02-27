@@ -86,12 +86,12 @@ export function RoomFilters({
 
       {/* Row 2: Status filter chips + Language filter chips */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
           {filters.map((f) => (
             <button
               key={f.value}
               onClick={() => onFilterChange(f.value)}
-              className={`px-4 py-2.5 rounded-lg text-xs font-medium transition-all flex-1 sm:flex-none ${
+              className={`shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                 filter === f.value
                   ? 'bg-accent/10 text-accent border border-accent/20'
                   : 'bg-surface text-muted border border-border hover:border-border-light hover:text-offwhite'
@@ -104,15 +104,15 @@ export function RoomFilters({
 
         <span className="hidden sm:block text-border-light">|</span>
 
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-medium uppercase tracking-wider text-muted/60">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-muted/60">
             {t('rooms.filters.lang')}
           </span>
           {languages.map((l) => (
             <button
               key={l.value}
               onClick={() => onLanguageChange(l.value)}
-              className={`px-4 py-2.5 rounded-lg text-xs font-medium transition-all ${
+              className={`shrink-0 whitespace-nowrap px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                 language === l.value
                   ? 'bg-accent/10 text-accent border border-accent/20'
                   : 'bg-surface text-muted border border-border hover:border-border-light hover:text-offwhite'

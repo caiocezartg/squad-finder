@@ -151,7 +151,7 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
 
       {/* Dropdown panel */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-[340px] rounded-xl border border-border bg-surface shadow-2xl shadow-black/60">
+        <div className="fixed inset-x-3 top-[calc(3.5rem+8px)] z-50 rounded-xl border border-border bg-surface shadow-2xl shadow-black/60 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[340px]">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
@@ -176,7 +176,7 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
           </div>
 
           {/* Notification list */}
-          <div className="max-h-[360px] overflow-y-auto p-1.5">
+          <div className="max-h-[360px] overflow-y-auto p-1.5 scrollbar-thin">
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center gap-2 py-10 text-center">
                 <div className="size-10 rounded-full bg-surface-light flex items-center justify-center">

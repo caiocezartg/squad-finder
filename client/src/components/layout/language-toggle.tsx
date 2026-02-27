@@ -4,18 +4,47 @@ export function LanguageToggle() {
   const { i18n } = useTranslation()
   const isEN = i18n.resolvedLanguage === 'en'
 
-  const handleToggle = () => {
-    void i18n.changeLanguage(isEN ? 'pt-BR' : 'en')
+  const switchTo = (lang: 'en' | 'pt-BR') => {
+    if (i18n.resolvedLanguage !== lang) {
+      void i18n.changeLanguage(lang)
+    }
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      title={isEN ? 'Mudar para Português' : 'Switch to English'}
-      className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted hover:border-border-light hover:text-offwhite transition-colors"
+    <div
+      className="relative flex items-center rounded-lg bg-surface border border-border p-0.5 font-heading"
+      role="radiogroup"
+      aria-label="Language"
     >
-      {isEN ? '🇧🇷 PT' : '🇺🇸 EN'}
-    </button>
+      {/* Sliding highlight */}
+      <div
+        className="absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-md bg-accent/15 border border-accent/30 shadow-[0_0_8px_rgba(0,255,162,0.1)] transition-all duration-300 ease-out"
+        style={{ left: isEN ? '2px' : 'calc(50% + 0px)' }}
+      />
+
+      <button
+        type="button"
+        role="radio"
+        aria-checked={isEN}
+        onClick={() => switchTo('en')}
+        className={`relative z-10 rounded-md px-3 py-1 text-xs font-bold tracking-wide transition-colors duration-200 ${
+          isEN ? 'text-accent' : 'text-muted hover:text-muted-light'
+        }`}
+      >
+        EN
+      </button>
+
+      <button
+        type="button"
+        role="radio"
+        aria-checked={!isEN}
+        onClick={() => switchTo('pt-BR')}
+        className={`relative z-10 rounded-md px-3 py-1 text-xs font-bold tracking-wide transition-colors duration-200 ${
+          !isEN ? 'text-accent' : 'text-muted hover:text-muted-light'
+        }`}
+      >
+        PT
+      </button>
+    </div>
   )
 }
