@@ -21,7 +21,6 @@ export function useTimeAgo(date: Date | string | undefined): string {
   useEffect(() => {
     if (!date) return
     const parsed = new Date(date)
-    setTimeAgo(getTimeAgo(parsed))
 
     const interval = setInterval(() => {
       setTimeAgo(getTimeAgo(parsed))

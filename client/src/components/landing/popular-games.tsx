@@ -1,9 +1,20 @@
-import { useMemo } from 'react'
+import { useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import * as motion from 'motion/react-client'
-import type { GamesResponse } from '@/types'
+import type { GamesResponse, Game } from '@/types'
 import { useTranslation } from 'react-i18next'
+
+function fisherYatesShuffle<T>(arr: T[]): T[] {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const temp = result[i] as T
+    result[i] = result[j] as T
+    result[j] = temp
+  }
+  return result
+}
 
 export function PopularGames() {
   const { t } = useTranslation()
@@ -13,10 +24,15 @@ export function PopularGames() {
     staleTime: 60_000,
   })
 
-  const games = useMemo(() => {
-    const allGames = data?.games ?? []
-    return allGames.sort(() => Math.random() - 0.5).slice(0, 8)
-  }, [data])
+  const prevDataRef = useRef<GamesResponse | undefined>(undefined)
+  const shuffledRef = useRef<Game[]>([])
+
+  if (data !== prevDataRef.current) {
+    prevDataRef.current = data
+    shuffledRef.current = fisherYatesShuffle(data?.games ?? []).slice(0, 8)
+  }
+
+  const games = shuffledRef.current
 
   return (
     <section className="relative py-24 border-t border-border/50">

@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { useSession } from '@/lib/auth-client'
 import { api } from '@/lib/api'
 import { getUserFriendlyError } from '@/lib/error-messages'
+import { useRoomFilters } from '@/hooks/use-room-filters'
 import { RoomCard } from '@/components/rooms/room-card'
 import { RoomFilters } from '@/components/rooms/room-filters'
 import { CreateRoomModal } from '@/components/rooms/create-room-modal'
@@ -25,11 +26,6 @@ function MyRoomsPage() {
   const queryClient = useQueryClient()
 
   const [modalOpen, setModalOpen] = useState(false)
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState('all')
-  const [sort, setSort] = useState('newest')
-  const [language, setLanguage] = useState('all')
-  const [tagFilter, setTagFilter] = useState('')
 
   // Redirect unauthenticated users
   useEffect(() => {
@@ -85,62 +81,23 @@ function MyRoomsPage() {
     [gamesData?.games]
   )
 
-  // Filter and sort helper applied to any room array
-  const applyFilters = useMemo(() => {
-    return (rooms: MyRoomsResponse['hosted']) => {
-      let result = [...rooms]
+  const {
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    sort,
+    setSort,
+    language,
+    setLanguage,
+    tagFilter,
+    setTagFilter,
+    hasActiveFilters,
+    applyFilters,
+  } = useRoomFilters(gamesMap)
 
-      if (search.trim()) {
-        const term = search.toLowerCase()
-        result = result.filter((room) => {
-          const game = gamesMap.get(room.gameId)
-          return game?.name.toLowerCase().includes(term) || room.name.toLowerCase().includes(term)
-        })
-      }
-
-      if (filter === 'has-space') {
-        result = result.filter((room) => (room.memberCount ?? 1) < room.maxPlayers)
-      } else if (filter === 'almost-full') {
-        result = result.filter((room) => {
-          const members = room.memberCount ?? 1
-          return members >= room.maxPlayers - 1 && members < room.maxPlayers
-        })
-      }
-
-      if (language !== 'all') {
-        result = result.filter((room) => room.language === language)
-      }
-
-      if (tagFilter.trim()) {
-        const term = tagFilter.trim().toLowerCase().replace(/^#/, '')
-        result = result.filter((room) => room.tags.some((t) => t.toLowerCase().includes(term)))
-      }
-
-      if (sort === 'newest') {
-        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      } else if (sort === 'oldest') {
-        result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-      }
-
-      return result
-    }
-  }, [search, filter, sort, language, tagFilter, gamesMap])
-
-  const filteredHosted = useMemo(
-    () => applyFilters(myRoomsData?.hosted ?? []),
-    [applyFilters, myRoomsData?.hosted]
-  )
-
-  const filteredJoined = useMemo(
-    () => applyFilters(myRoomsData?.joined ?? []),
-    [applyFilters, myRoomsData?.joined]
-  )
-
-  const hasActiveFilters =
-    search.trim().length > 0 ||
-    filter !== 'all' ||
-    language !== 'all' ||
-    tagFilter.trim().length > 0
+  const filteredHosted = applyFilters(myRoomsData?.hosted ?? [])
+  const filteredJoined = applyFilters(myRoomsData?.joined ?? [])
 
   const hostedCount = myRoomsData?.hosted.length ?? 0
   const joinedCount = myRoomsData?.joined.length ?? 0

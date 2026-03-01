@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState } from 'react'
 
 const DEFAULT_PAGE_SIZE = 6
 
@@ -33,20 +33,14 @@ export function usePagination({
 
   // Clamp current page if totalPages shrinks (e.g., filter changes reduce results)
   const safePage = Math.min(currentPage, totalPages)
-  if (safePage !== currentPage) {
-    setCurrentPage(safePage)
-  }
 
   const startIndex = (safePage - 1) * pageSize
   const endIndex = Math.min(startIndex + pageSize, totalItems)
 
-  const goToPage = useCallback(
-    (page: number) => {
-      const clamped = Math.max(1, Math.min(page, totalPages))
-      setCurrentPage(clamped)
-    },
-    [totalPages]
-  )
+  const goToPage = (page: number) => {
+    const clamped = Math.max(1, Math.min(page, totalPages))
+    setCurrentPage(clamped)
+  }
 
   const nextPage = () => goToPage(safePage + 1)
   const previousPage = () => goToPage(safePage - 1)
@@ -54,20 +48,18 @@ export function usePagination({
 
   // Generate page numbers to display.
   // For <= 7 pages show all; otherwise show first, last, current +-1 with gaps.
-  const pageRange = useMemo(() => {
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1)
-    }
-
+  let pageRange: number[]
+  if (totalPages <= 7) {
+    pageRange = Array.from({ length: totalPages }, (_, i) => i + 1)
+  } else {
     const pages = new Set<number>()
     pages.add(1)
     pages.add(totalPages)
     pages.add(safePage)
     if (safePage > 1) pages.add(safePage - 1)
     if (safePage < totalPages) pages.add(safePage + 1)
-
-    return Array.from(pages).sort((a, b) => a - b)
-  }, [totalPages, safePage])
+    pageRange = Array.from(pages).sort((a, b) => a - b)
+  }
 
   return {
     currentPage: safePage,

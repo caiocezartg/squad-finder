@@ -8,6 +8,7 @@ import { api } from '@/lib/api'
 import { getUserFriendlyError } from '@/lib/error-messages'
 import { useWebSocket } from '@/hooks/use-websocket'
 import { useLobbyEvents } from '@/hooks/use-lobby-events'
+import { useRoomFilters } from '@/hooks/use-room-filters'
 import { RoomCard } from '@/components/rooms/room-card'
 import { RoomFilters } from '@/components/rooms/room-filters'
 import { CreateRoomModal } from '@/components/rooms/create-room-modal'
@@ -23,6 +24,36 @@ export const Route = createFileRoute('/rooms/')({
   component: RoomsPage,
 })
 
+function useAutoJoin({
+  session,
+  mutate,
+}: {
+  session: ReturnType<typeof useSession>['data']
+  mutate: (code: string, options: { onSettled: () => void }) => void
+}) {
+  const autoJoinCodeRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!session?.user) return
+
+    const params = new URLSearchParams(window.location.search)
+    const joinCode = params.get('join')
+
+    if (!joinCode || autoJoinCodeRef.current === joinCode) return
+
+    autoJoinCodeRef.current = joinCode
+    mutate(joinCode, {
+      onSettled: () => {
+        const nextParams = new URLSearchParams(window.location.search)
+        nextParams.delete('join')
+        const searchString = nextParams.toString()
+        const nextUrl = `${window.location.pathname}${searchString ? `?${searchString}` : ''}`
+        window.history.replaceState({}, '', nextUrl)
+      },
+    })
+  }, [session?.user, mutate])
+}
+
 function RoomsPage() {
   const { t } = useTranslation()
   const { data: session } = useSession()
@@ -30,12 +61,7 @@ function RoomsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [joinAuthModalOpen, setJoinAuthModalOpen] = useState(false)
   const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
-  const [filter, setFilter] = useState('all')
-  const [sort, setSort] = useState('newest')
-  const [language, setLanguage] = useState('all')
-  const [tagFilter, setTagFilter] = useState('')
-  const autoJoinCodeRef = useRef<string | null>(null)
+  const [joiningRoomCode, setJoiningRoomCode] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
   // WebSocket for real-time room list updates
@@ -94,30 +120,11 @@ function RoomsPage() {
     },
     onError: (err) => {
       toast.error(getUserFriendlyError(err))
+      setJoiningRoomCode(null)
     },
   })
 
-  useEffect(() => {
-    if (!session?.user) return
-
-    const params = new URLSearchParams(window.location.search)
-    const joinCode = params.get('join')
-
-    if (!joinCode || autoJoinCodeRef.current === joinCode) {
-      return
-    }
-
-    autoJoinCodeRef.current = joinCode
-    joinRoomMutation.mutate(joinCode, {
-      onSettled: () => {
-        const nextParams = new URLSearchParams(window.location.search)
-        nextParams.delete('join')
-        const searchString = nextParams.toString()
-        const nextUrl = `${window.location.pathname}${searchString ? `?${searchString}` : ''}`
-        window.history.replaceState({}, '', nextUrl)
-      },
-    })
-  }, [session?.user, joinRoomMutation])
+  useAutoJoin({ session, mutate: joinRoomMutation.mutate })
 
   const handleSignInToJoin = () => {
     if (!pendingJoinCode) return
@@ -136,49 +143,21 @@ function RoomsPage() {
     [gamesData?.games]
   )
 
-  // Filter and sort rooms
-  const filteredRooms = useMemo(() => {
-    let result = [...(roomsData?.rooms ?? [])]
+  const {
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    sort,
+    setSort,
+    language,
+    setLanguage,
+    tagFilter,
+    setTagFilter,
+    applyFilters,
+  } = useRoomFilters(gamesMap)
 
-    // Search by game name or room name
-    if (search.trim()) {
-      const term = search.toLowerCase()
-      result = result.filter((room) => {
-        const game = gamesMap.get(room.gameId)
-        return game?.name.toLowerCase().includes(term) || room.name.toLowerCase().includes(term)
-      })
-    }
-
-    // Filter
-    if (filter === 'has-space') {
-      result = result.filter((room) => (room.memberCount ?? 1) < room.maxPlayers)
-    } else if (filter === 'almost-full') {
-      result = result.filter((room) => {
-        const members = room.memberCount ?? 1
-        return members >= room.maxPlayers - 1 && members < room.maxPlayers
-      })
-    }
-
-    // Filter by language
-    if (language !== 'all') {
-      result = result.filter((room) => room.language === language)
-    }
-
-    // Filter by tag
-    if (tagFilter.trim()) {
-      const term = tagFilter.trim().toLowerCase().replace(/^#/, '')
-      result = result.filter((room) => room.tags.some((t) => t.toLowerCase().includes(term)))
-    }
-
-    // Sort
-    if (sort === 'newest') {
-      result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    } else if (sort === 'oldest') {
-      result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-    }
-
-    return result
-  }, [roomsData?.rooms, search, filter, sort, gamesMap, language, tagFilter])
+  const filteredRooms = applyFilters(roomsData?.rooms ?? [])
 
   const {
     currentPage,
@@ -306,10 +285,11 @@ function RoomsPage() {
                     setPendingJoinCode(code)
                     setJoinAuthModalOpen(true)
                   } else {
+                    setJoiningRoomCode(code)
                     joinRoomMutation.mutate(code)
                   }
                 }}
-                isLoading={!room.isMember && joinRoomMutation.isPending}
+                isLoading={!room.isMember && joiningRoomCode === room.code}
                 currentMembers={room.memberCount}
               />
             ))}

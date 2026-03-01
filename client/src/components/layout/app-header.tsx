@@ -49,7 +49,7 @@ export function AppHeader() {
     })
   }
 
-  const closeSidebar = useCallback(() => setSidebarOpen(false), [])
+  const closeSidebar = () => setSidebarOpen(false)
 
   return (
     <>

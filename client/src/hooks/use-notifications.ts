@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { getUserFriendlyError } from '@/lib/error-messages'
-import type { NotificationsResponse } from '@/types'
+import type { NotificationsResponse, UserNotification } from '@/types'
+
+const EMPTY_NOTIFICATIONS: UserNotification[] = []
 
 function playNotificationSound() {
   try {
@@ -87,7 +89,7 @@ export function useNotifications(options: UseNotificationsOptions) {
     },
   })
 
-  const notifications = useMemo(() => query.data?.notifications ?? [], [query.data?.notifications])
+  const notifications = query.data?.notifications ?? EMPTY_NOTIFICATIONS
 
   const previousIdsRef = useRef<Set<string> | null>(null)
 
@@ -110,10 +112,7 @@ export function useNotifications(options: UseNotificationsOptions) {
     previousIdsRef.current = currentIds
   }, [notifications])
 
-  const unreadCount = useMemo(
-    () => notifications.filter((notification) => notification.readAt === null).length,
-    [notifications]
-  )
+  const unreadCount = notifications.filter((n) => n.readAt === null).length
 
   return {
     notifications,

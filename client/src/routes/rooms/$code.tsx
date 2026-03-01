@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -39,6 +39,13 @@ function RoomLobbyPage() {
   const [error, setError] = useState<string | null>(null)
   const [isRoomReady, setIsRoomReady] = useState(false)
   const [codeCopied, setCodeCopied] = useState(false)
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current)
+    }
+  }, [])
 
   // Fetch room data
   const {
@@ -145,7 +152,8 @@ function RoomLobbyPage() {
   const handleCopyCode = async () => {
     await navigator.clipboard.writeText(code)
     setCodeCopied(true)
-    setTimeout(() => setCodeCopied(false), 2000)
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current)
+    copyTimeoutRef.current = setTimeout(() => setCodeCopied(false), 2000)
   }
 
   // Build empty slots
