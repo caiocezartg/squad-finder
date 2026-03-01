@@ -58,13 +58,13 @@
 - **DTOs**: Domain entities are pure interfaces. DTOs in `application/dtos/` handle cross-boundary data transfer.
 - **Shared schemas**: Validation schemas used by both client and server live in `packages/@squadfinder/schemas`, not duplicated per workspace.
 
-## Agents
+## Agents (only Claude Code)
 
 Agents are located in `.claude/agents/` and should be used according to their specialization.
 
 ## Rules
 
-Project rules are defined in `.claude/rules/` and must always be followed.
+Project rules are defined in `.agents/rules/` and MUST always be followed.
 
 ## Important Skills
 
