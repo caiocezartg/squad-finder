@@ -36,12 +36,6 @@
   @/schemas  # Shared Zod schemas (rooms, users, WS messages)
 ```
 
-## Core Principles
-
-- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
-- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
-
 ## General Rules
 
 - ALWAYS use `bun` instead of any package manager such as `npm`.
@@ -83,3 +77,10 @@ Project rules are defined in `.agents/rules/` and MUST always be followed.
 5. Upon completing any new task, always run every relevant verification/check to ensure no errors or bugs are left behind. All existing flows must continue working after new implementations.
 6. If you find any new bug, fix it immediately using the best approach that does not add unnecessary complexity to the codebase.
 7. If the task has been successfully implemented and is free of bugs, you may commit the changes. Do not combine multiple tasks into a single commit each completed task must have its own separate commit.
+8. After completing the task, write a report of the new implementations or fixes, explaining every piece of code that was modified, created, or removed.
+
+## Core Principles
+
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
