@@ -22,6 +22,8 @@ export function useTimeAgo(date: Date | string | undefined): string {
     if (!date) return
     const parsed = new Date(date)
 
+    setTimeAgo(getTimeAgo(parsed))
+
     const interval = setInterval(() => {
       setTimeAgo(getTimeAgo(parsed))
     }, 30_000)
