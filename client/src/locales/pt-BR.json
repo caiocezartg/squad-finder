@@ -1,4 +1,10 @@
 {
+  "timeAgo": {
+    "justNow": "agora mesmo",
+    "minutesAgo": "há {{count}}min",
+    "hoursAgo": "há {{count}}h",
+    "daysAgo": "há {{count}}d"
+  },
   "common": {
     "signIn": "Entrar",
     "signOut": "Sair",
