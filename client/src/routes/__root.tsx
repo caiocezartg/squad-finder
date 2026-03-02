@@ -2,9 +2,11 @@ import { createRootRoute, Outlet, useMatches } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { AppHeader } from '@/components/layout/app-header'
+import { NotFound } from '@/components/ui/not-found'
 
 export const Route = createRootRoute({
   component: RootLayout,
+  notFoundComponent: NotFound,
 })
 
 function RootLayout() {
