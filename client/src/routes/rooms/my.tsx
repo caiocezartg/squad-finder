@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { roomsSearchSchema } from '@/lib/rooms-search'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -17,6 +18,7 @@ import type { MyRoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@
 
 export const Route = createFileRoute('/rooms/my')({
   component: MyRoomsPage,
+  validateSearch: (raw) => roomsSearchSchema.parse(raw),
 })
 
 function MyRoomsPage() {
@@ -94,7 +96,7 @@ function MyRoomsPage() {
     setTagFilter,
     hasActiveFilters,
     applyFilters,
-  } = useRoomFilters(gamesMap)
+  } = useRoomFilters(gamesMap, '/rooms/my')
 
   const filteredHosted = applyFilters(myRoomsData?.hosted ?? [])
   const filteredJoined = applyFilters(myRoomsData?.joined ?? [])

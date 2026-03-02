@@ -38,9 +38,12 @@ interface UseRoomFiltersReturn {
   applyFilters: (rooms: Room[]) => Room[]
 }
 
-export function useRoomFilters(gamesMap: Map<string, Game>): UseRoomFiltersReturn {
-  const searchParams = useSearch({ from: '/rooms/' })
-  const navigate = useNavigate({ from: '/rooms/' })
+export function useRoomFilters(
+  gamesMap: Map<string, Game>,
+  from: '/rooms/' | '/rooms/my' = '/rooms/'
+): UseRoomFiltersReturn {
+  const searchParams = useSearch({ from })
+  const navigate = useNavigate({ from })
 
   const setParams = useCallback(
     (updates: Partial<SearchParams>) => {

@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -19,17 +18,8 @@ import { Pagination } from '@/components/ui/pagination'
 import { usePagination } from '@/hooks/use-pagination'
 import { AlertBox } from '@/components/ui/alert-box'
 import { Plus } from 'lucide-react'
+import { roomsSearchSchema } from '@/lib/rooms-search'
 import type { RoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@/types'
-
-const roomsSearchSchema = z.object({
-  search: z.string().optional(),
-  filter: z.enum(['all', 'has-space', 'almost-full']).optional(),
-  sort: z.enum(['newest', 'oldest']).optional(),
-  language: z.enum(['all', 'pt-br', 'en']).optional(),
-  tag: z.string().optional(),
-  page: z.coerce.number().int().min(1).optional(),
-  join: z.string().optional(),
-})
 
 export const Route = createFileRoute('/rooms/')({
   component: RoomsPage,
