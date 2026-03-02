@@ -8,7 +8,7 @@
   "common": {
     "signIn": "Entrar",
     "signOut": "Sair",
-    "createRoom": "Criar Squad",
+    "createRoom": "Criar novo squad",
     "createNewRoom": "Criar novo squad"
   },
   "nav": {
@@ -126,7 +126,7 @@
       "description": "Este squad não existe mais ou o código é inválido. Verifique o código e tente novamente.",
       "codeLabel": "Código informado:",
       "backToRooms": "Voltar para Squads",
-      "createRoom": "Criar Novo Squad"
+      "createRoom": "Criar squad"
     },
     "lobby": {
       "backToRooms": "Voltar aos squads",
