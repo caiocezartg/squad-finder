@@ -173,7 +173,13 @@
       "language": "Idioma",
       "creating": "Criando...",
       "submit": "Criar Sala",
-      "selectGameError": "Por favor, selecione um jogo"
+      "selectGameError": "Por favor, selecione um jogo",
+      "nameRequired": "Nome da sala é obrigatório",
+      "nameTooLong": "Nome da sala muito longo (máx. 30 caracteres)",
+      "discordLinkInvalid": "Por favor, insira uma URL válida",
+      "discordLinkNotValid": "Deve ser um convite válido do Discord (discord.gg ou discord.com/invite)",
+      "maxPlayersTooFew": "Mínimo de 2 jogadores",
+      "maxPlayersTooMany": "Máximo de 20 jogadores"
     },
     "authModal": {
       "title": "Login necessário",
@@ -189,6 +195,12 @@
       "copyLink": "Copiar link",
       "joinDiscord": "Entrar no Discord"
     }
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "Parece que você saiu do mapa. A página que você procura não existe ou foi movida.",
+    "backToHome": "Voltar ao Início",
+    "exploreRooms": "Explorar Salas"
   },
   "notifications": {
     "title": "Notificações",

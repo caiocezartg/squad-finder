@@ -214,7 +214,13 @@ export function CreateRoomModal({
                     placeholder={t('rooms.createModal.roomNamePlaceholder')}
                     {...register('name')}
                   />
-                  {errors.name && <p className="field-error">{errors.name.message}</p>}
+                  {errors.name && (
+                    <p className="field-error">
+                      {errors.name.type === 'too_small'
+                        ? t('rooms.createModal.nameRequired')
+                        : t('rooms.createModal.nameTooLong')}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5 lg:col-span-2">
@@ -324,7 +330,11 @@ export function CreateRoomModal({
                         })}
                       />
                       {errors.maxPlayers && (
-                        <p className="field-error">{errors.maxPlayers.message}</p>
+                        <p className="field-error">
+                          {errors.maxPlayers.type === 'too_small'
+                            ? t('rooms.createModal.maxPlayersTooFew')
+                            : t('rooms.createModal.maxPlayersTooMany')}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -347,7 +357,11 @@ export function CreateRoomModal({
                   />
                   <p className="text-xs text-muted">{t('rooms.createModal.discordLinkHelper')}</p>
                   {errors.discordLink && (
-                    <p className="field-error">{errors.discordLink.message}</p>
+                    <p className="field-error">
+                      {errors.discordLink.type === 'custom'
+                        ? t('rooms.createModal.discordLinkNotValid')
+                        : t('rooms.createModal.discordLinkInvalid')}
+                    </p>
                   )}
                 </div>
 

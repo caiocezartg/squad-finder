@@ -173,7 +173,13 @@
       "language": "Language",
       "creating": "Creating...",
       "submit": "Create Room",
-      "selectGameError": "Please select a game"
+      "selectGameError": "Please select a game",
+      "nameRequired": "Room name is required",
+      "nameTooLong": "Room name is too long (max 30 characters)",
+      "discordLinkInvalid": "Please enter a valid URL",
+      "discordLinkNotValid": "Must be a valid Discord invite (discord.gg or discord.com/invite)",
+      "maxPlayersTooFew": "Must be at least 2 players",
+      "maxPlayersTooMany": "Max 20 players"
     },
     "authModal": {
       "title": "Sign in required",
@@ -189,6 +195,12 @@
       "copyLink": "Copy link",
       "joinDiscord": "Join Discord"
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "Looks like you've wandered off the map. The page you're looking for doesn't exist or has been moved.",
+    "backToHome": "Back to Home",
+    "exploreRooms": "Explore Rooms"
   },
   "notifications": {
     "title": "Notifications",
