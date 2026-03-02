@@ -26,11 +26,11 @@ client.interceptors.response.use(
       throw new ApiClientError(
         body.message ?? error.response.statusText,
         error.response.status,
-        body.error,
+        body.error
       )
     }
     throw error
-  },
+  }
 )
 
 export const api = {
