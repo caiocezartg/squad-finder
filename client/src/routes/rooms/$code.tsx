@@ -10,6 +10,7 @@ import { useWebSocket } from '@/hooks/use-websocket'
 import { useRoomsCache } from '@/hooks/use-rooms-cache'
 import { useTimeAgo } from '@/hooks/use-time-ago'
 import { PlayerSlot } from '@/components/rooms/player-slot'
+import { RoomNotFound } from '@/components/rooms/room-not-found'
 import { DiscordLinkCard } from '@/components/rooms/discord-link-card'
 import { AlertBox } from '@/components/ui/alert-box'
 import { parseWsPayload } from '@/lib/ws-validators'
@@ -181,15 +182,8 @@ function RoomLobbyPage() {
     )
   }
 
-  if (roomError || (error && !room)) {
-    return (
-      <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
-        <p className="text-danger mb-4">{roomError instanceof Error ? roomError.message : error}</p>
-        <Link to="/rooms" className="btn-ghost">
-          {t('rooms.lobby.backToRooms')}
-        </Link>
-      </div>
-    )
+  if (roomError) {
+    return <RoomNotFound code={code} />
   }
 
   return (

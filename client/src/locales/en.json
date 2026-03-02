@@ -107,13 +107,20 @@
       "emptyDescriptionFiltered": "No rooms match your filters. Try adjusting your search or filters."
     },
     "myRooms": {
-      "title": "My Rooms",
+      "title": "My rooms",
       "subtitle": "Rooms you created or joined",
       "loadError": "Failed to load your rooms. Please refresh the page.",
       "tabCreated": "Created ({{count}})",
       "tabJoined": "Joined ({{count}})",
       "noRoomsYet": "No rooms here yet.",
       "noRoomsFiltered": "No rooms match your filters."
+    },
+    "notFound": {
+      "title": "Room not found",
+      "description": "This room no longer exists or the code is invalid. Check the code and try again.",
+      "codeLabel": "Code entered:",
+      "backToRooms": "Back to Rooms",
+      "createRoom": "Create New Room"
     },
     "lobby": {
       "backToRooms": "Back to rooms",

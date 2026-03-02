@@ -107,13 +107,20 @@
       "emptyDescriptionFiltered": "Nenhuma sala corresponde aos seus filtros. Tente ajustar sua busca."
     },
     "myRooms": {
-      "title": "Minhas Salas",
+      "title": "Minhas salas",
       "subtitle": "Salas que você criou ou entrou",
       "loadError": "Falha ao carregar suas salas. Por favor, atualize a página.",
       "tabCreated": "Criadas ({{count}})",
       "tabJoined": "Participando ({{count}})",
       "noRoomsYet": "Nenhuma sala aqui ainda.",
       "noRoomsFiltered": "Nenhuma sala corresponde aos seus filtros."
+    },
+    "notFound": {
+      "title": "Sala não encontrada",
+      "description": "Esta sala não existe mais ou o código é inválido. Verifique o código e tente novamente.",
+      "codeLabel": "Código informado:",
+      "backToRooms": "Voltar para Salas",
+      "createRoom": "Criar Nova Sala"
     },
     "lobby": {
       "backToRooms": "Voltar às salas",
