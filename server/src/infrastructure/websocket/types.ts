@@ -1,5 +1,5 @@
 // Re-export all WS schemas and types from shared package
-export * from '@squadfinder/schemas/ws'
+export * from '@squadzr/schemas/ws'
 
 // Server-specific: WebSocket client state (not shared with client)
 export interface WsClient {

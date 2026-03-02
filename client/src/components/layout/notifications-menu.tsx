@@ -109,9 +109,9 @@ export function NotificationsMenu({ enabled, isOpen, onToggle, onClose }: Notifi
   } = useNotifications({ enabled, limit: 10 })
 
   useEffect(() => {
-    document.title = unreadCount > 0 ? `(${unreadCount}) SquadFinder` : 'SquadFinder'
+    document.title = unreadCount > 0 ? `(${unreadCount}) Squadzr` : 'Squadzr'
     return () => {
-      document.title = 'SquadFinder'
+      document.title = 'Squadzr'
     }
   }, [unreadCount])
 

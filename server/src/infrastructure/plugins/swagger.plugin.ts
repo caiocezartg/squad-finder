@@ -16,7 +16,7 @@ async function swaggerPlugin(fastify: FastifyInstance): Promise<void> {
     openapi: {
       openapi: '3.1.0',
       info: {
-        title: 'SquadFinder API',
+        title: 'Squadzr API',
         description:
           'API for connecting gamers to form complete teams (premades) for multiplayer games.',
         version: '0.1.0',

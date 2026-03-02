@@ -5,7 +5,7 @@ import {
   roomCreatedPayloadSchema,
   roomUpdatedPayloadSchema,
   roomDeletedPayloadSchema,
-} from '@squadfinder/schemas/ws'
+} from '@squadzr/schemas/ws'
 import type { WebSocketEventHandler } from '@/lib/ws-client'
 
 interface UseLobbyEventsOptions {

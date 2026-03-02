@@ -3,7 +3,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { requireAuth } from '@interface/hooks/auth.hook'
 import { createUserController } from '@interface/factories/user.factory'
-import { userSchema, userNotificationSchema } from '@squadfinder/schemas'
+import { userSchema, userNotificationSchema } from '@squadzr/schemas'
 import { listNotificationsQuerySchema, notificationIdParamSchema } from '@application/dtos'
 
 const errorResponse = z.object({

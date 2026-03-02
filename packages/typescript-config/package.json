@@ -1,5 +1,5 @@
 {
-  "name": "@squadfinder/typescript-config",
+  "name": "@squadzr/typescript-config",
   "version": "0.1.0",
   "private": true,
   "exports": {

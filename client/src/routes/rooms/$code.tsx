@@ -20,7 +20,7 @@ import {
   playerLeftPayloadSchema,
   errorPayloadSchema,
   roomDeletedPayloadSchema,
-} from '@squadfinder/schemas/ws'
+} from '@squadzr/schemas/ws'
 import { ArrowLeft, Copy, LogOut } from 'lucide-react'
 import type { RoomResponse, GamesResponse, Player } from '@/types'
 

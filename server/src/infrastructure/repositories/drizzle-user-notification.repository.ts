@@ -1,5 +1,5 @@
 import { and, desc, eq, isNull } from 'drizzle-orm'
-import { userNotificationPayloadSchema, userNotificationTypeSchema } from '@squadfinder/schemas'
+import { userNotificationPayloadSchema, userNotificationTypeSchema } from '@squadzr/schemas'
 import type {
   CreateUserNotificationInput,
   UserNotification,

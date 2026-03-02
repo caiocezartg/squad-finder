@@ -8,12 +8,12 @@
   "common": {
     "signIn": "Entrar",
     "signOut": "Sair",
-    "createRoom": "Criar Sala",
-    "createNewRoom": "Criar nova sala"
+    "createRoom": "Criar Squad",
+    "createNewRoom": "Criar novo squad"
   },
   "nav": {
-    "allRooms": "TODAS AS SALAS",
-    "myRooms": "MINHAS SALAS",
+    "allRooms": "TODOS OS SQUADS",
+    "myRooms": "MEUS SQUADS",
     "closeMenu": "Fechar menu",
     "openMenu": "Abrir menu"
   },
@@ -25,8 +25,8 @@
     "titleLine1": "PARE DE JOGAR",
     "titleLine2": "TUDO",
     "titleAccent": "SOZINHO",
-    "subtitle": "<bold>Crie</bold> ou <bold>entre em salas</bold>, complete seu time e receba um convite do Discord assim que o time estiver cheio.",
-    "exploreRooms": "Explorar salas",
+    "subtitle": "<bold>Crie</bold> ou <bold>entre em squads</bold>, complete seu time e receba um convite do Discord assim que o time estiver cheio.",
+    "exploreRooms": "Explorar squads",
     "signInWithDiscord": "Entrar com Discord"
   },
   "faq": {
@@ -35,36 +35,36 @@
     "subtitle": "Tudo que você precisa saber antes de montar seu time.",
     "items": [
       {
-        "question": "O SquadFinder é gratuito?",
+        "question": "O Squadzr é gratuito?",
         "answer": "Sim, 100% gratuito. Sem cartão de crédito, sem planos premium. Basta entrar com sua conta do Discord e começar a jogar."
       },
       {
         "question": "Preciso criar uma conta?",
-        "answer": "Você entra com sua conta do Discord com um clique — sem formulários, sem senhas extras. Seu avatar e nome de usuário do Discord são sua identidade no SquadFinder."
+        "answer": "Você entra com sua conta do Discord com um clique — sem formulários, sem senhas extras. Seu avatar e nome de usuário do Discord são sua identidade no Squadzr."
       },
       {
-        "question": "Quantas salas posso criar?",
-        "answer": "Sem limite. Você pode criar quantas salas quiser, para qualquer jogo disponível na plataforma."
+        "question": "Quantos squads posso criar?",
+        "answer": "Sem limite. Você pode criar quantos squads quiser, para qualquer jogo disponível na plataforma."
       },
       {
         "question": "Quando o link do Discord é compartilhado?",
-        "answer": "O convite do servidor Discord é compartilhado assim que a sala atinge o número máximo de jogadores. Quando a última vaga é preenchida, todos os membros recebem acesso ao link."
+        "answer": "O convite do servidor Discord é compartilhado assim que o squad atinge o número máximo de jogadores. Quando a última vaga é preenchida, todos os membros recebem acesso ao link."
       },
       {
         "question": "O que acontece se o dono sair?",
-        "answer": "Se o criador da sala sair, a sala é encerrada e todos os membros são removidos. Membros comuns podem sair sem afetar a sala."
+        "answer": "Se o criador do squad sair, o squad é encerrado e todos os membros são removidos. Membros comuns podem sair sem afetar o squad."
       },
       {
         "question": "Posso escolher o número de jogadores?",
-        "answer": "Sim. Por padrão, o número de jogadores corresponde ao máximo do jogo selecionado, mas você pode personalizar entre 2 e 20 ao criar uma sala."
+        "answer": "Sim. Por padrão, o número de jogadores corresponde ao máximo do jogo selecionado, mas você pode personalizar entre 2 e 20 ao criar um squad."
       },
       {
         "question": "Quais jogos são suportados?",
         "answer": "Atualmente suportamos 19 jogos populares incluindo League of Legends, Valorant, CS2, Dota 2, Fortnite, Overwatch 2 e mais. A lista é constantemente atualizada."
       },
       {
-        "question": "Posso entrar em uma sala por código?",
-        "answer": "Sim. Cada sala tem um código único de 6 caracteres que pode ser compartilhado. Basta digitar o código para entrar na sala diretamente."
+        "question": "Posso entrar em um squad por código?",
+        "answer": "Sim. Cada squad tem um código único de 6 caracteres que pode ser compartilhado. Basta digitar o código para entrar no squad diretamente."
       }
     ]
   },
@@ -79,19 +79,19 @@
         "description": "Um clique. Sem formulários, sem senhas. Seu avatar do Discord é sua identidade."
       },
       {
-        "title": "Encontre ou Crie uma Sala",
-        "description": "Navegue pelas salas por jogo ou crie a sua com um link de convite do Discord."
+        "title": "Encontre ou Crie um Squad",
+        "description": "Navegue pelos squads por jogo ou crie o seu com um link de convite do Discord."
       },
       {
         "title": "Monte o Time & Jogue",
-        "description": "A sala enche, o link do Discord é liberado. Entre na call de voz e dominem juntos."
+        "description": "O squad enche, o link do Discord é liberado. Entre na call de voz e dominem juntos."
       }
     ]
   },
   "cta": {
     "title": "Pronto para encontrar seu <accent>squad</accent>?",
-    "subtitle": "Junte-se a centenas de jogadores que já usam o SquadFinder para montar o time perfeito.",
-    "browseRooms": "Explorar Salas",
+    "subtitle": "Junte-se a centenas de jogadores que já usam o Squadzr para montar o time perfeito.",
+    "browseRooms": "Explorar Squads",
     "createAccount": "Criar Conta"
   },
   "popularGames": {
@@ -103,37 +103,37 @@
   },
   "rooms": {
     "page": {
-      "title": "Explorar salas",
-      "subtitle_one": "{{count}} sala disponível",
-      "subtitle_other": "{{count}} salas disponíveis",
-      "loadError": "Falha ao carregar salas. Por favor, atualize a página.",
-      "emptyTitle": "Nenhuma sala ainda",
-      "emptyTitleFiltered": "Nenhuma sala encontrada",
-      "emptyDescription": "Seja o primeiro a criar uma sala e montar um time!",
-      "emptyDescriptionFiltered": "Nenhuma sala corresponde aos seus filtros. Tente ajustar sua busca."
+      "title": "Explorar squads",
+      "subtitle_one": "{{count}} squad disponível",
+      "subtitle_other": "{{count}} squads disponíveis",
+      "loadError": "Falha ao carregar squads. Por favor, atualize a página.",
+      "emptyTitle": "Nenhum squad ainda",
+      "emptyTitleFiltered": "Nenhum squad encontrado",
+      "emptyDescription": "Seja o primeiro a criar um squad e montar um time!",
+      "emptyDescriptionFiltered": "Nenhum squad corresponde aos seus filtros. Tente ajustar sua busca."
     },
     "myRooms": {
-      "title": "Minhas salas",
-      "subtitle": "Salas que você criou ou entrou",
-      "loadError": "Falha ao carregar suas salas. Por favor, atualize a página.",
-      "tabCreated": "Criadas ({{count}})",
+      "title": "Meus squads",
+      "subtitle": "Squads que você criou ou entrou",
+      "loadError": "Falha ao carregar seus squads. Por favor, atualize a página.",
+      "tabCreated": "Criados ({{count}})",
       "tabJoined": "Participando ({{count}})",
-      "noRoomsYet": "Nenhuma sala aqui ainda.",
-      "noRoomsFiltered": "Nenhuma sala corresponde aos seus filtros."
+      "noRoomsYet": "Nenhum squad aqui ainda.",
+      "noRoomsFiltered": "Nenhum squad corresponde aos seus filtros."
     },
     "notFound": {
-      "title": "Sala não encontrada",
-      "description": "Esta sala não existe mais ou o código é inválido. Verifique o código e tente novamente.",
+      "title": "Squad não encontrado",
+      "description": "Este squad não existe mais ou o código é inválido. Verifique o código e tente novamente.",
       "codeLabel": "Código informado:",
-      "backToRooms": "Voltar para Salas",
-      "createRoom": "Criar Nova Sala"
+      "backToRooms": "Voltar para Squads",
+      "createRoom": "Criar Novo Squad"
     },
     "lobby": {
-      "backToRooms": "Voltar às salas",
-      "leaveRoom": "Sair da sala",
+      "backToRooms": "Voltar aos squads",
+      "leaveRoom": "Sair do squad",
       "squadLocked": "Time fechado",
-      "cannotLeave": "Não é possível sair de uma sala cheia",
-      "pleaseSignIn": "Por favor, entre com sua conta para ver esta sala.",
+      "cannotLeave": "Não é possível sair de um squad cheio",
+      "pleaseSignIn": "Por favor, entre com sua conta para ver este squad.",
       "playerCount": "{{current}}/{{max}} jogadores",
       "players": "Jogadores ({{current}}/{{max}})",
       "copied": "Copiado!",
@@ -141,12 +141,12 @@
     },
     "card": {
       "joined": "Entrou",
-      "seeRoom": "VER SALA",
+      "seeRoom": "VER SQUAD",
       "joinRoom": "ENTRAR",
       "full": "Cheio"
     },
     "filters": {
-      "searchPlaceholder": "Buscar por jogo ou nome da sala...",
+      "searchPlaceholder": "Buscar por jogo ou nome do squad...",
       "tagPlaceholder": "filtrar por tag...",
       "lang": "Idioma",
       "statusAll": "TODOS",
@@ -159,8 +159,8 @@
       "langEn": "EN-US"
     },
     "createModal": {
-      "title": "Criar uma Sala",
-      "roomName": "Nome da Sala",
+      "title": "Criar um Squad",
+      "roomName": "Nome do Squad",
       "roomNamePlaceholder": "ex: Grind ranked hoje à noite",
       "game": "Jogo",
       "selectGame": "Selecione um jogo",
@@ -170,7 +170,7 @@
       "playerLimitHelperWithGame": "Deixe vazio para usar {{maxPlayers}} jogadores (padrão do {{gameName}}).",
       "playerLimitHelper": "Deixe vazio para usar o máximo do jogo selecionado.",
       "discordLink": "Link de Convite do Discord",
-      "discordLinkHelper": "Compartilhado com todos os jogadores quando a sala estiver cheia.",
+      "discordLinkHelper": "Compartilhado com todos os jogadores quando o squad estiver cheio.",
       "tags": "Tags",
       "tagsHelper": "Pressione Enter ou vírgula para adicionar - máx. 5 tags",
       "tagsPlaceholder": "Digite uma tag...",
@@ -178,10 +178,10 @@
       "removeTag": "Remover tag {{tag}}",
       "language": "Idioma",
       "creating": "Criando...",
-      "submit": "Criar Sala",
+      "submit": "Criar Squad",
       "selectGameError": "Por favor, selecione um jogo",
-      "nameRequired": "Nome da sala é obrigatório",
-      "nameTooLong": "Nome da sala muito longo (máx. 30 caracteres)",
+      "nameRequired": "Nome do squad é obrigatório",
+      "nameTooLong": "Nome do squad muito longo (máx. 30 caracteres)",
       "discordLinkInvalid": "Por favor, insira uma URL válida",
       "discordLinkNotValid": "Deve ser um convite válido do Discord (discord.gg ou discord.com/invite)",
       "maxPlayersTooFew": "Mínimo de 2 jogadores",
@@ -189,8 +189,8 @@
     },
     "authModal": {
       "title": "Login necessário",
-      "description": "Você pode explorar a lista de salas como convidado, mas entrar em uma sala e ver detalhes completos requer login com Discord.",
-      "roomCode": "Sala que você está tentando entrar:",
+      "description": "Você pode explorar a lista de squads como convidado, mas entrar em um squad e ver detalhes completos requer login com Discord.",
+      "roomCode": "Squad que você está tentando entrar:",
       "maybeLater": "Talvez mais tarde",
       "continueWithDiscord": "Continuar com Discord"
     },
@@ -206,7 +206,7 @@
     "title": "Página não encontrada",
     "description": "Parece que você saiu do mapa. A página que você procura não existe ou foi movida.",
     "backToHome": "Voltar ao Início",
-    "exploreRooms": "Explorar Salas"
+    "exploreRooms": "Explorar Squads"
   },
   "notifications": {
     "title": "Notificações",
@@ -219,14 +219,14 @@
     "showing_other": "Mostrando últimas {{count}} notificações"
   },
   "errors": {
-    "ROOM_NOT_FOUND": "Esta sala não existe mais ou o código é inválido.",
-    "ROOM_FULL": "Esta sala já está cheia.",
-    "ROOM_NOT_WAITING": "Esta sala não está mais aceitando jogadores.",
-    "ROOM_COMPLETED": "Esta sala já foi concluída.",
-    "ALREADY_IN_ROOM": "Você já é membro desta sala.",
-    "NOT_ROOM_MEMBER": "Você não é membro desta sala.",
-    "ROOM_CREATE_LIMIT_REACHED": "Você atingiu o número máximo de salas ativas.",
-    "ROOM_JOIN_LIMIT_REACHED": "Você atingiu o número máximo de salas que pode participar.",
+    "ROOM_NOT_FOUND": "Este squad não existe mais ou o código é inválido.",
+    "ROOM_FULL": "Este squad já está cheio.",
+    "ROOM_NOT_WAITING": "Este squad não está mais aceitando jogadores.",
+    "ROOM_COMPLETED": "Este squad já foi concluído.",
+    "ALREADY_IN_ROOM": "Você já é membro deste squad.",
+    "NOT_ROOM_MEMBER": "Você não é membro deste squad.",
+    "ROOM_CREATE_LIMIT_REACHED": "Você atingiu o número máximo de squads ativos.",
+    "ROOM_JOIN_LIMIT_REACHED": "Você atingiu o número máximo de squads que pode participar.",
     "VALIDATION_ERROR": "Por favor, verifique os campos do formulário e tente novamente.",
     "UNAUTHORIZED": "Você precisa fazer login para fazer isso.",
     "INTERNAL_ERROR": "Algo deu errado. Por favor, tente novamente mais tarde.",

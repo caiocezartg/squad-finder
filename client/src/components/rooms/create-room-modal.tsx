@@ -8,10 +8,10 @@ import { Select } from '@base-ui-components/react/select'
 import * as motion from 'motion/react-client'
 import { X, Loader2, ChevronsUpDown, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { createRoomInputSchema } from '@squadfinder/schemas'
+import { createRoomInputSchema } from '@squadzr/schemas'
 import { getUserFriendlyError } from '@/lib/error-messages'
 import type { Game } from '@/types'
-import type { CreateRoomInput } from '@squadfinder/schemas'
+import type { CreateRoomInput } from '@squadzr/schemas'
 
 const formSchema = createRoomInputSchema.extend({
   gameId: z.uuid({ error: 'Please select a game' }),

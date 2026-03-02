@@ -1,5 +1,5 @@
 {
-  "extends": "@squadfinder/typescript-config/react.json",
+  "extends": "@squadzr/typescript-config/react.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

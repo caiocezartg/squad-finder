@@ -25,7 +25,7 @@ function RootLayout() {
       {!isLanding && (
         <footer className="border-t border-border/50 py-6">
           <div className="mx-auto max-w-7xl px-4 text-center text-xs text-muted sm:px-6 lg:px-8">
-            SquadFinder &mdash; {t('footer.tagline')}
+            Squadzr &mdash; {t('footer.tagline')}
           </div>
         </footer>
       )}

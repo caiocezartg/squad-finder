@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 // Re-export shared schema for room creation
-export { createRoomInputSchema as createRoomRequestSchema } from '@squadfinder/schemas'
-export type { CreateRoomInput as CreateRoomRequestDto } from '@squadfinder/schemas'
+export { createRoomInputSchema as createRoomRequestSchema } from '@squadzr/schemas'
+export type { CreateRoomInput as CreateRoomRequestDto } from '@squadzr/schemas'
 
 // Server-specific: URL param validation with uppercase transform
 export const roomCodeParamSchema = z.object({

@@ -22,11 +22,9 @@ function HomePage() {
       <footer className="border-t border-border/50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="font-heading text-sm font-bold text-muted">
-              Squad<span className="text-accent">Finder</span>
-            </span>
+            <span className="font-heading text-sm font-bold text-muted">Squadzr</span>
             <p className="text-xs text-muted/60">
-              &copy; {new Date().getFullYear()} SquadFinder. Built for gamers.
+              &copy; {new Date().getFullYear()} Squadzr. Built for gamers.
             </p>
           </div>
         </div>

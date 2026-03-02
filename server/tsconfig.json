@@ -1,5 +1,5 @@
 {
-  "extends": "@squadfinder/typescript-config/server.json",
+  "extends": "@squadzr/typescript-config/server.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {

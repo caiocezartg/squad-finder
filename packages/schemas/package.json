@@ -1,5 +1,5 @@
 {
-  "name": "@squadfinder/schemas",
+  "name": "@squadzr/schemas",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "zod": "4.3.6"
   },
   "devDependencies": {
-    "@squadfinder/typescript-config": "workspace:*",
+    "@squadzr/typescript-config": "workspace:*",
     "typescript": "^5.6.0"
   }
 }

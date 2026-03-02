@@ -4,12 +4,7 @@ import { z } from 'zod'
 import { requireAuth } from '@interface/hooks/auth.hook'
 import { createRoomController } from '@interface/factories/room.factory'
 import { createGameController } from '@interface/factories/game.factory'
-import {
-  gameSchema,
-  roomSchema,
-  roomMemberSchema,
-  createRoomInputSchema,
-} from '@squadfinder/schemas'
+import { gameSchema, roomSchema, roomMemberSchema, createRoomInputSchema } from '@squadzr/schemas'
 import { roomCodeParamSchema } from '@application/dtos'
 
 const errorResponse = z.object({

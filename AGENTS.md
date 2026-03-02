@@ -1,6 +1,6 @@
 # Project Overview
 
-**SquadFinder** — real-time web app connecting gamers to complete full teams (premades) for multiplayer games like LoL, Dota, and CS.
+**Squadzr** — real-time web app connecting gamers to complete full teams (premades) for multiplayer games like LoL, Dota, and CS.
 
 ## Tech Stack
 
@@ -10,7 +10,7 @@
 | --------- | --------------------------------------------------------------------- |
 | Server    | Fastify v5, Drizzle ORM, PostgreSQL, Better Auth, Zod                 |
 | Client    | React 18, Vite, TanStack Router, TanStack Query, Tailwind CSS         |
-| Shared    | `@squadfinder/types` (TS types), `@squadfinder/schemas` (Zod schemas) |
+| Shared    | `@squadzr/types` (TS types), `@squadzr/schemas` (Zod schemas) |
 | Real-time | Fastify WebSocket plugin                                              |
 | Auth      | Better Auth with Discord OAuth                                        |
 | Testing   | Vitest (all workspaces)                                               |
@@ -50,7 +50,7 @@
 - **Use cases**: All business logic lives in `application/use-cases/`. They depend only on repository interfaces (domain layer), never on concrete Drizzle implementations.
 - **Factories**: Dependency injection is wired in `interface/factories/`. This is the only place where concrete repositories are instantiated and injected into use cases.
 - **DTOs**: Domain entities are pure interfaces. DTOs in `application/dtos/` handle cross-boundary data transfer.
-- **Shared schemas**: Validation schemas used by both client and server live in `packages/@squadfinder/schemas`, not duplicated per workspace.
+- **Shared schemas**: Validation schemas used by both client and server live in `packages/@squadzr/schemas`, not duplicated per workspace.
 
 ## Agents (only Claude Code)
 
