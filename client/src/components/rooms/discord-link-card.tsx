@@ -50,10 +50,10 @@ export function DiscordLinkCard({ discordLink, isRoomReady }: DiscordLinkCardPro
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-col md:flex-row items-center gap-2 shrink-0">
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 rounded-lg bg-surface border border-border-light px-3 py-2 text-xs font-medium text-muted hover:text-offwhite hover:border-muted/30 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-surface border border-border-light px-5 py-2.5 text-xs font-medium text-muted hover:text-offwhite hover:border-muted/30 transition-colors"
           >
             <Copy className="size-3.5" />
             {copied ? t('rooms.discordCard.copied') : t('rooms.discordCard.copyLink')}
