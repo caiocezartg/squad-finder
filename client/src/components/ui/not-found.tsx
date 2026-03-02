@@ -39,7 +39,7 @@ export function NotFound() {
           <Link to="/" className="btn-accent w-full sm:w-auto text-center">
             {t('notFound.backToHome')}
           </Link>
-          <Link to="/rooms" className="btn-ghost w-full sm:w-auto text-center">
+          <Link to="/rooms" search={{}} className="btn-ghost w-full sm:w-auto text-center">
             {t('notFound.exploreRooms')}
           </Link>
         </div>

@@ -1,4 +1,5 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { z } from 'zod'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -20,8 +21,19 @@ import { AlertBox } from '@/components/ui/alert-box'
 import { Plus } from 'lucide-react'
 import type { RoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@/types'
 
+const roomsSearchSchema = z.object({
+  search: z.string().optional(),
+  filter: z.enum(['all', 'has-space', 'almost-full']).optional(),
+  sort: z.enum(['newest', 'oldest']).optional(),
+  language: z.enum(['all', 'pt-br', 'en']).optional(),
+  tag: z.string().optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  join: z.string().optional(),
+})
+
 export const Route = createFileRoute('/rooms/')({
   component: RoomsPage,
+  validateSearch: (raw) => roomsSearchSchema.parse(raw),
 })
 
 function useAutoJoin({
@@ -31,27 +43,30 @@ function useAutoJoin({
   session: ReturnType<typeof useSession>['data']
   mutate: (code: string, options: { onSettled: () => void }) => void
 }) {
+  const searchParams = useSearch({ from: '/rooms/' })
+  const navigate = useNavigate({ from: '/rooms/' })
   const autoJoinCodeRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!session?.user) return
 
-    const params = new URLSearchParams(window.location.search)
-    const joinCode = params.get('join')
+    const joinCode = searchParams.join
 
     if (!joinCode || autoJoinCodeRef.current === joinCode) return
 
     autoJoinCodeRef.current = joinCode
     mutate(joinCode, {
       onSettled: () => {
-        const nextParams = new URLSearchParams(window.location.search)
-        nextParams.delete('join')
-        const searchString = nextParams.toString()
-        const nextUrl = `${window.location.pathname}${searchString ? `?${searchString}` : ''}`
-        window.history.replaceState({}, '', nextUrl)
+        navigate({
+          search: (prev) => {
+            const { join: _join, ...rest } = prev
+            return rest
+          },
+          replace: true,
+        })
       },
     })
-  }, [session?.user, mutate])
+  }, [session?.user, mutate, searchParams.join, navigate])
 }
 
 function RoomsPage() {
@@ -144,18 +159,48 @@ function RoomsPage() {
   )
 
   const {
-    search,
-    setSearch,
+    search: urlSearch,
+    tagFilter: urlTag,
     filter,
     setFilter,
     sort,
     setSort,
     language,
     setLanguage,
-    tagFilter,
+    setSearch,
     setTagFilter,
+    page,
+    setPage,
     applyFilters,
   } = useRoomFilters(gamesMap)
+
+  // Local state for text inputs (debounced sync to URL)
+  const [localSearch, setLocalSearch] = useState(urlSearch)
+  const [localTag, setLocalTag] = useState(urlTag)
+
+  // Debounce: sync local text → URL after 300ms of inactivity
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(localSearch)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [localSearch, setSearch])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTagFilter(localTag)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [localTag, setTagFilter])
+
+  // Reverse sync: URL → local state (back/forward navigation or shared links)
+  useEffect(() => {
+    setLocalSearch(urlSearch)
+  }, [urlSearch])
+
+  useEffect(() => {
+    setLocalTag(urlTag)
+  }, [urlTag])
 
   const filteredRooms = applyFilters(roomsData?.rooms ?? [])
 
@@ -170,12 +215,16 @@ function RoomsPage() {
     nextPage,
     previousPage,
     pageRange,
-  } = usePagination({ totalItems: filteredRooms.length })
+  } = usePagination({
+    totalItems: filteredRooms.length,
+    currentPage: page,
+    onPageChange: setPage,
+  })
 
   const paginatedRooms = filteredRooms.slice(startIndex, endIndex)
 
-  const handlePageChange = (page: number) => {
-    goToPage(page)
+  const handlePageChange = (p: number) => {
+    goToPage(p)
     document.getElementById('rooms-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -221,43 +270,28 @@ function RoomsPage() {
 
       {/* Filters */}
       <RoomFilters
-        search={search}
-        onSearchChange={(v) => {
-          setSearch(v)
-          goToPage(1)
-        }}
+        search={localSearch}
+        onSearchChange={setLocalSearch}
         filter={filter}
-        onFilterChange={(v) => {
-          setFilter(v)
-          goToPage(1)
-        }}
+        onFilterChange={setFilter}
         sort={sort}
-        onSortChange={(v) => {
-          setSort(v)
-          goToPage(1)
-        }}
+        onSortChange={setSort}
         language={language}
-        onLanguageChange={(v) => {
-          setLanguage(v)
-          goToPage(1)
-        }}
-        tagFilter={tagFilter}
-        onTagFilterChange={(v) => {
-          setTagFilter(v)
-          goToPage(1)
-        }}
+        onLanguageChange={setLanguage}
+        tagFilter={localTag}
+        onTagFilterChange={setLocalTag}
       />
 
       {/* Room cards grid */}
       {filteredRooms.length === 0 ? (
         <EmptyState
           title={
-            search || language !== 'all' || tagFilter.trim()
+            urlSearch || language !== 'all' || urlTag.trim()
               ? t('rooms.page.emptyTitleFiltered')
               : t('rooms.page.emptyTitle')
           }
           description={
-            search || language !== 'all' || tagFilter.trim()
+            urlSearch || language !== 'all' || urlTag.trim()
               ? t('rooms.page.emptyDescriptionFiltered')
               : t('rooms.page.emptyDescription')
           }

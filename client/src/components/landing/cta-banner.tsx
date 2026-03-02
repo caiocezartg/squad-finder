@@ -35,7 +35,7 @@ export function CTABanner() {
         <p className="mt-4 text-muted text-lg max-w-xl mx-auto">{t('cta.subtitle')}</p>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to="/rooms" className="btn-accent gap-2 text-base px-8 py-3">
+          <Link to="/rooms" search={{}} className="btn-accent gap-2 text-base px-8 py-3">
             {t('cta.browseRooms')}
           </Link>
           {!session?.user && (

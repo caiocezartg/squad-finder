@@ -1,11 +1,10 @@
-import { useState } from 'react'
-
 const DEFAULT_PAGE_SIZE = 6
 
 interface UsePaginationOptions {
   totalItems: number
   pageSize?: number
-  initialPage?: number
+  currentPage: number
+  onPageChange: (page: number) => void
 }
 
 interface UsePaginationReturn {
@@ -18,17 +17,15 @@ interface UsePaginationReturn {
   goToPage: (page: number) => void
   nextPage: () => void
   previousPage: () => void
-  resetPage: () => void
   pageRange: number[]
 }
 
 export function usePagination({
   totalItems,
   pageSize = DEFAULT_PAGE_SIZE,
-  initialPage = 1,
+  currentPage,
+  onPageChange,
 }: UsePaginationOptions): UsePaginationReturn {
-  const [currentPage, setCurrentPage] = useState(initialPage)
-
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
 
   // Clamp current page if totalPages shrinks (e.g., filter changes reduce results)
@@ -39,12 +36,11 @@ export function usePagination({
 
   const goToPage = (page: number) => {
     const clamped = Math.max(1, Math.min(page, totalPages))
-    setCurrentPage(clamped)
+    onPageChange(clamped)
   }
 
   const nextPage = () => goToPage(safePage + 1)
   const previousPage = () => goToPage(safePage - 1)
-  const resetPage = () => setCurrentPage(1)
 
   // Generate page numbers to display.
   // For <= 7 pages show all; otherwise show first, last, current +-1 with gaps.
@@ -71,7 +67,6 @@ export function usePagination({
     goToPage,
     nextPage,
     previousPage,
-    resetPage,
     pageRange,
   }
 }

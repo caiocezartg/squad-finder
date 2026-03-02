@@ -46,10 +46,10 @@ export function RoomNotFound({ code }: RoomNotFoundProps) {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          <Link to="/rooms" className="btn-accent w-full sm:w-auto text-center">
+          <Link to="/rooms" search={{}} className="btn-accent w-full sm:w-auto text-center">
             {t('rooms.notFound.backToRooms')}
           </Link>
-          <Link to="/rooms" className="btn-ghost w-full sm:w-auto text-center">
+          <Link to="/rooms" search={{}} className="btn-ghost w-full sm:w-auto text-center">
             {t('rooms.notFound.createRoom')}
           </Link>
         </div>

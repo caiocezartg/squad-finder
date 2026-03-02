@@ -90,7 +90,11 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.45 }}
           >
-            <Link to="/rooms" className="btn-accent gap-2 text-base px-7 py-3 w-full md:w-auto">
+            <Link
+              to="/rooms"
+              search={{}}
+              className="btn-accent gap-2 text-base px-7 py-3 w-full md:w-auto"
+            >
               <Search className="size-5" strokeWidth={2.5} />
               {t('hero.exploreRooms')}
             </Link>

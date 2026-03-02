@@ -115,7 +115,7 @@ function RoomLobbyPage() {
       const data = parseWsPayload(roomDeletedPayloadSchema, raw)
       if (!data) return
       removeRoom(data.roomId)
-      navigate({ to: '/rooms' })
+      navigate({ to: '/rooms', search: {} })
     })
 
     return () => {
@@ -144,7 +144,7 @@ function RoomLobbyPage() {
         removeRoom(room.id)
       }
       await queryClient.invalidateQueries({ queryKey: ['rooms'] })
-      navigate({ to: '/rooms' })
+      navigate({ to: '/rooms', search: {} })
     } catch (err) {
       toast.error(getUserFriendlyError(err))
     }
@@ -192,6 +192,7 @@ function RoomLobbyPage() {
       <div className="flex items-center justify-between mb-6">
         <Link
           to="/rooms"
+          search={{}}
           className="flex items-center gap-2 rounded-lg border border-border-light bg-surface px-4 py-2 text-sm text-muted hover:text-offwhite hover:border-muted/30 hover:bg-surface-hover transition-all"
         >
           <ArrowLeft className="size-4" />

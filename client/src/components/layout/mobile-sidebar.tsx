@@ -62,6 +62,7 @@ export function MobileSidebar({ isOpen, onClose, hasUser }: MobileSidebarProps) 
         <nav className="flex flex-col gap-1 p-3">
           <Link
             to="/rooms"
+            search={{}}
             activeOptions={{ exact: true }}
             className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-muted hover:bg-surface-hover hover:text-offwhite"
             activeProps={{ className: '!text-accent !bg-accent/[0.08]' }}
