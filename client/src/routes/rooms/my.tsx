@@ -84,16 +84,16 @@ function MyRoomsPage() {
   )
 
   const {
-    search,
-    setSearch,
+    localSearch,
+    setLocalSearch,
+    localTag,
+    setLocalTag,
     filter,
     setFilter,
     sort,
     setSort,
     language,
     setLanguage,
-    tagFilter,
-    setTagFilter,
     hasActiveFilters,
     applyFilters,
   } = useRoomFilters(gamesMap, '/rooms/my')
@@ -144,16 +144,16 @@ function MyRoomsPage() {
 
       {/* Filters */}
       <RoomFilters
-        search={search}
-        onSearchChange={setSearch}
+        search={localSearch}
+        onSearchChange={setLocalSearch}
         filter={filter}
         onFilterChange={setFilter}
         sort={sort}
         onSortChange={setSort}
         language={language}
         onLanguageChange={setLanguage}
-        tagFilter={tagFilter}
-        onTagFilterChange={setTagFilter}
+        tagFilter={localTag}
+        onTagFilterChange={setLocalTag}
       />
 
       <Tabs.Root defaultValue="created" className="mt-6">

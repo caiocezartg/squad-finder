@@ -149,48 +149,20 @@ function RoomsPage() {
   )
 
   const {
-    search: urlSearch,
-    tagFilter: urlTag,
+    localSearch,
+    setLocalSearch,
+    localTag,
+    setLocalTag,
     filter,
     setFilter,
     sort,
     setSort,
     language,
     setLanguage,
-    setSearch,
-    setTagFilter,
     page,
     setPage,
     applyFilters,
   } = useRoomFilters(gamesMap)
-
-  // Local state for text inputs (debounced sync to URL)
-  const [localSearch, setLocalSearch] = useState(urlSearch)
-  const [localTag, setLocalTag] = useState(urlTag)
-
-  // Debounce: sync local text → URL after 300ms of inactivity
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearch(localSearch)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [localSearch, setSearch])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTagFilter(localTag)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [localTag, setTagFilter])
-
-  // Reverse sync: URL → local state (back/forward navigation or shared links)
-  useEffect(() => {
-    setLocalSearch(urlSearch)
-  }, [urlSearch])
-
-  useEffect(() => {
-    setLocalTag(urlTag)
-  }, [urlTag])
 
   const filteredRooms = applyFilters(roomsData?.rooms ?? [])
 
@@ -276,12 +248,12 @@ function RoomsPage() {
       {filteredRooms.length === 0 ? (
         <EmptyState
           title={
-            urlSearch || language !== 'all' || urlTag.trim()
+            localSearch || language !== 'all' || localTag.trim()
               ? t('rooms.page.emptyTitleFiltered')
               : t('rooms.page.emptyTitle')
           }
           description={
-            urlSearch || language !== 'all' || urlTag.trim()
+            localSearch || language !== 'all' || localTag.trim()
               ? t('rooms.page.emptyDescriptionFiltered')
               : t('rooms.page.emptyDescription')
           }

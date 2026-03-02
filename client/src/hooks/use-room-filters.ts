@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { Game, Room } from '@/types'
 
@@ -22,17 +22,17 @@ type SearchParams = {
 }
 
 interface UseRoomFiltersReturn {
-  search: string
+  localSearch: string
+  setLocalSearch: (v: string) => void
+  localTag: string
+  setLocalTag: (v: string) => void
   filter: string
-  sort: string
-  language: string
-  tagFilter: string
-  page: number
-  setSearch: (v: string) => void
   setFilter: (v: string) => void
+  sort: string
   setSort: (v: string) => void
+  language: string
   setLanguage: (v: string) => void
-  setTagFilter: (v: string) => void
+  page: number
   setPage: (v: number) => void
   hasActiveFilters: boolean
   applyFilters: (rooms: Room[]) => Room[]
@@ -44,6 +44,13 @@ export function useRoomFilters(
 ): UseRoomFiltersReturn {
   const searchParams = useSearch({ from })
   const navigate = useNavigate({ from })
+
+  const urlSearch = searchParams.search ?? DEFAULTS.search
+  const urlTag = searchParams.tag ?? DEFAULTS.tag
+
+  // Local state for text inputs — decoupled from URL to allow debouncing
+  const [localSearch, setLocalSearch] = useState(urlSearch)
+  const [localTag, setLocalTag] = useState(urlTag)
 
   const setParams = useCallback(
     (updates: Partial<SearchParams>) => {
@@ -67,7 +74,26 @@ export function useRoomFilters(
     [navigate]
   )
 
-  const setSearch = useCallback((v: string) => setParams({ search: v, page: 1 }), [setParams])
+  // Debounce: sync local text → URL after 300ms of inactivity
+  useEffect(() => {
+    const timer = setTimeout(() => setParams({ search: localSearch, page: 1 }), 300)
+    return () => clearTimeout(timer)
+  }, [localSearch, setParams])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setParams({ tag: localTag, page: 1 }), 300)
+    return () => clearTimeout(timer)
+  }, [localTag, setParams])
+
+  // Reverse sync: URL → local state (back/forward navigation or shared links)
+  useEffect(() => {
+    setLocalSearch(urlSearch)
+  }, [urlSearch])
+
+  useEffect(() => {
+    setLocalTag(urlTag)
+  }, [urlTag])
+
   const setFilter = useCallback(
     (v: string) => setParams({ filter: v as SearchParams['filter'], page: 1 }),
     [setParams]
@@ -80,21 +106,19 @@ export function useRoomFilters(
     (v: string) => setParams({ language: v as SearchParams['language'], page: 1 }),
     [setParams]
   )
-  const setTagFilter = useCallback((v: string) => setParams({ tag: v, page: 1 }), [setParams])
   const setPage = useCallback((v: number) => setParams({ page: v }), [setParams])
 
-  const currentSearch = searchParams.search ?? DEFAULTS.search
+  const currentSearch = urlSearch
   const currentFilter = searchParams.filter ?? DEFAULTS.filter
   const currentSort = searchParams.sort ?? DEFAULTS.sort
   const currentLanguage = searchParams.language ?? DEFAULTS.language
-  const currentTag = searchParams.tag ?? DEFAULTS.tag
-  const currentPage = searchParams.page ?? DEFAULTS.page
+  const currentTag = urlTag
 
   const hasActiveFilters =
-    currentSearch.trim().length > 0 ||
+    localSearch.trim().length > 0 ||
     currentFilter !== 'all' ||
     currentLanguage !== 'all' ||
-    currentTag.trim().length > 0
+    localTag.trim().length > 0
 
   function applyFilters(rooms: Room[]): Room[] {
     let result = [...rooms]
@@ -135,17 +159,17 @@ export function useRoomFilters(
   }
 
   return {
-    search: currentSearch,
+    localSearch,
+    setLocalSearch,
+    localTag,
+    setLocalTag,
     filter: currentFilter,
-    sort: currentSort,
-    language: currentLanguage,
-    tagFilter: currentTag,
-    page: currentPage,
-    setSearch,
     setFilter,
+    sort: currentSort,
     setSort,
+    language: currentLanguage,
     setLanguage,
-    setTagFilter,
+    page: searchParams.page ?? DEFAULTS.page,
     setPage,
     hasActiveFilters,
     applyFilters,
