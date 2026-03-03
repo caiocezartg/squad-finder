@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { useSession, signIn, signOut } from '@/lib/auth-client'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Users, Menu } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { DiscordIcon } from '@/components/ui/icons'
 import { NotificationsMenu } from '@/components/layout/notifications-menu'
 import { UserMenu } from '@/components/layout/user-menu'
@@ -66,12 +66,7 @@ export function AppHeader() {
             </button>
 
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="size-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                <Users className="size-4 text-accent" />
-              </div>
-              <span className="hidden sm:block font-heading text-lg font-bold text-offwhite">
-                Squad<span className="text-accent">Finder</span>
-              </span>
+              <img src="/squadzr-logo.svg" alt="Squadzr logo" className="hidden sm:block w-24" />
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">

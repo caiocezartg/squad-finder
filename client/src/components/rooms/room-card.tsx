@@ -93,7 +93,7 @@ export function RoomCard({ room, game, onJoin, isLoading, currentMembers }: Room
 
         {!isDisabled && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/80 opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
-            <span className="font-heading text-xl font-bold uppercase tracking-widest text-accent drop-shadow-[0_0_24px_rgba(0,255,162,0.7)]">
+            <span className="font-body text-xl font-bold uppercase tracking-widest text-accent drop-shadow-[0_0_24px_rgba(0,255,162,0.7)]">
               {room.isMember ? t('rooms.card.seeRoom') : t('rooms.card.joinRoom')}
             </span>
           </div>

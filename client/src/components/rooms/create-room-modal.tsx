@@ -322,7 +322,6 @@ export function CreateRoomModal({
                         type="number"
                         className={errors.maxPlayers ? 'input-field-error' : 'input-field'}
                         min={2}
-                        max={20}
                         placeholder={selectedGame?.maxPlayers?.toString() ?? ''}
                         {...register('maxPlayers', {
                           setValueAs: (value: string) =>

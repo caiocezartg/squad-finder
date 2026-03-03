@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Users, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 interface MobileSidebarProps {
@@ -41,14 +41,9 @@ export function MobileSidebar({ isOpen, onClose, hasUser }: MobileSidebarProps) 
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-border">
+        <div className="flex items-center justify-between pl-6 pr-4 py-4 border-b border-border">
           <Link to="/" className="flex items-center gap-2" onClick={onClose}>
-            <div className="size-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center">
-              <Users className="size-4 text-accent" />
-            </div>
-            <span className="font-heading text-lg font-bold text-offwhite">
-              Squad<span className="text-accent">Finder</span>
-            </span>
+            <img src="/squadzr-logo.svg" alt="Squadzr logo" className="w-20" />
           </Link>
           <button
             onClick={onClose}
