@@ -13,6 +13,7 @@ import { registerRoutes } from '@interface/routes'
 
 async function buildServer() {
   const fastify = Fastify({
+    trustProxy: true,
     logger: {
       level: env.LOG_LEVEL,
       ...(env.NODE_ENV !== 'production' && {
