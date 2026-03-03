@@ -3,6 +3,8 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db } from '@infrastructure/database/drizzle'
 import { env } from '@config/env'
 
+const isProduction = env.NODE_ENV === 'production'
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
@@ -19,6 +21,12 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
+  },
+  advanced: {
+    // Required for cross-origin auth (client and server on different domains)
+    defaultCookieAttributes: isProduction
+      ? { sameSite: 'none', secure: true }
+      : {},
   },
 })
 
