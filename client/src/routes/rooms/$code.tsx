@@ -22,6 +22,7 @@ import {
   roomDeletedPayloadSchema,
 } from '@squadzr/schemas/ws'
 import { ArrowLeft, Copy, LogOut } from 'lucide-react'
+import { WS_URL } from '@/env'
 import type { RoomResponse, GamesResponse, Player } from '@/types'
 
 export const Route = createFileRoute('/rooms/$code')({
@@ -72,9 +73,8 @@ function RoomLobbyPage() {
   const game = gamesData?.games?.find((g) => g.id === room?.gameId)
 
   // WebSocket connection
-  const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
   const { isConnected, send, on } = useWebSocket({
-    url: wsUrl,
+    url: WS_URL,
     autoConnect: true,
   })
 

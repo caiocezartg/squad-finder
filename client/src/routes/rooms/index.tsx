@@ -19,6 +19,7 @@ import { usePagination } from '@/hooks/use-pagination'
 import { AlertBox } from '@/components/ui/alert-box'
 import { Plus } from 'lucide-react'
 import { roomsSearchSchema } from '@/lib/rooms-search'
+import { WS_URL } from '@/env'
 import type { RoomsResponse, GamesResponse, CreateRoomResponse, Game } from '@/types'
 
 export const Route = createFileRoute('/rooms/')({
@@ -70,9 +71,8 @@ function RoomsPage() {
   const queryClient = useQueryClient()
 
   // WebSocket for real-time room list updates
-  const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`
   const { isConnected, send, on } = useWebSocket({
-    url: wsUrl,
+    url: WS_URL,
     autoConnect: true,
   })
 

@@ -20,3 +20,5 @@ function validateEnv() {
 }
 
 export const env = validateEnv()
+
+export const WS_URL = env.VITE_API_URL.replace(/^http/, 'ws') + '/ws'
