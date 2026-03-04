@@ -15,6 +15,10 @@ export type GamesResponse = {
   games: Game[]
 }
 
+export type GameResponse = {
+  game: Game
+}
+
 export type CreateRoomResponse = {
   room: Room
 }

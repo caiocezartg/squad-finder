@@ -4,8 +4,14 @@ import { z } from 'zod'
 import { requireAuth } from '@interface/hooks/auth.hook'
 import { createRoomController } from '@interface/factories/room.factory'
 import { createGameController } from '@interface/factories/game.factory'
-import { gameSchema, roomSchema, roomMemberSchema, playerSchema, createRoomInputSchema } from '@squadzr/schemas'
-import { roomCodeParamSchema } from '@application/dtos'
+import {
+  gameSchema,
+  roomSchema,
+  roomMemberSchema,
+  playerSchema,
+  createRoomInputSchema,
+} from '@squadzr/schemas'
+import { roomCodeParamSchema, gameIdParamSchema } from '@application/dtos'
 
 const errorResponse = z.object({
   error: z.string(),
@@ -29,6 +35,20 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
       },
     },
     handler: gameController.list.bind(gameController),
+  })
+
+  app.get('/api/games/:id', {
+    schema: {
+      tags: ['Games'],
+      summary: 'Get game by ID',
+      description: 'Returns a single game by its UUID.',
+      params: gameIdParamSchema,
+      response: {
+        200: z.object({ game: gameSchema }),
+        404: errorResponse,
+      },
+    },
+    handler: gameController.getById.bind(gameController),
   })
 
   // Rooms

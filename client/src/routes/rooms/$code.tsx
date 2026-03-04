@@ -23,7 +23,7 @@ import {
 } from '@squadzr/schemas/ws'
 import { ArrowLeft, Copy, LogOut } from 'lucide-react'
 import { WS_URL } from '@/env'
-import type { RoomResponse, GamesResponse, Player } from '@/types'
+import type { RoomResponse, GameResponse, Player } from '@/types'
 
 export const Route = createFileRoute('/rooms/$code')({
   component: RoomLobbyPage,
@@ -72,14 +72,15 @@ function RoomLobbyPage() {
 
   const timeAgo = useTimeAgo(room?.createdAt)
 
-  // Fetch games for cover image
-  const { data: gamesData } = useQuery({
-    queryKey: ['games'],
-    queryFn: () => api.get<GamesResponse>('/api/games'),
+  // Fetch game for cover image
+  const { data: gameData } = useQuery({
+    queryKey: ['game', room?.gameId],
+    queryFn: () => api.get<GameResponse>(`/api/games/${room?.gameId}`),
+    enabled: !!room?.gameId,
     staleTime: 60_000,
   })
 
-  const game = gamesData?.games?.find((g) => g.id === room?.gameId)
+  const game = gameData?.game ?? null
 
   // WebSocket connection
   const { isConnected, send, on } = useWebSocket({
