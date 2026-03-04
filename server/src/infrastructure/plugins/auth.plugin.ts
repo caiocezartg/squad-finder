@@ -40,7 +40,18 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
         const response = await auth.handler(req)
 
         reply.status(response.status)
-        response.headers.forEach((value, key) => reply.header(key, value))
+
+        const setCookies: string[] = []
+        response.headers.forEach((value, key) => {
+          if (key.toLowerCase() === 'set-cookie') {
+            setCookies.push(value)
+          } else {
+            reply.header(key, value)
+          }
+        })
+        if (setCookies.length > 0) {
+          reply.raw.setHeader('set-cookie', setCookies)
+        }
 
         const body = response.body ? await response.text() : null
         reply.send(body)
