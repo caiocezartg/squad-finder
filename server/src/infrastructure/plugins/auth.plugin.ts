@@ -22,9 +22,7 @@ async function authPlugin(fastify: FastifyInstance): Promise<void> {
     schema: { hide: true },
     async handler(request: FastifyRequest, reply: FastifyReply) {
       try {
-        const proto =
-          (request.headers['x-forwarded-proto'] as string)?.split(',')[0]?.trim() ?? 'http'
-        const url = new URL(request.url, `${proto}://${request.headers.host}`)
+        const url = new URL(request.url, `http://${request.headers.host}`)
 
         const headers = new Headers()
         Object.entries(request.headers).forEach(([key, value]) => {
