@@ -3,6 +3,9 @@ import { env } from '@/env'
 
 const authClient = createAuthClient({
   baseURL: env.VITE_API_URL,
+  fetchOptions: {
+    credentials: 'include',
+  },
 })
 
 export const { signIn, signOut, useSession } = authClient
