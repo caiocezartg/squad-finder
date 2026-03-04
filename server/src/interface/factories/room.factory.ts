@@ -30,7 +30,11 @@ export function createRoomController(db: Database, broadcaster: IRoomBroadcaster
     roomRepository,
     roomMemberRepository
   )
-  const getRoomByCodeUseCase = new GetRoomByCodeUseCase(roomRepository)
+  const getRoomByCodeUseCase = new GetRoomByCodeUseCase(
+    roomRepository,
+    roomMemberRepository,
+    userRepository
+  )
   const joinRoomUseCase = new JoinRoomUseCase(roomRepository, roomMemberRepository)
   const leaveRoomUseCase = new LeaveRoomUseCase(roomRepository, roomMemberRepository)
   const notifyRoomReadyUseCase = new NotifyRoomReadyUseCase(

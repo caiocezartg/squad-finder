@@ -39,7 +39,7 @@ export class RoomController {
       throw new RoomNotFoundError(params.code)
     }
 
-    await reply.send({ room: result.room })
+    await reply.send({ room: result.room, players: result.players })
   }
 
   async create(request: FastifyRequest, reply: FastifyReply): Promise<void> {

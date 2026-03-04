@@ -49,6 +49,16 @@ export const roomSchema = z.object({
 
 export type RoomDto = z.infer<typeof roomSchema>
 
+// Player schema (used in room lobby)
+export const playerSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string().nullable(),
+  isHost: z.boolean(),
+})
+
+export type PlayerDto = z.infer<typeof playerSchema>
+
 // Room member schema
 export const roomMemberSchema = z.object({
   id: z.uuid(),

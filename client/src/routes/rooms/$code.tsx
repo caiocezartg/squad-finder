@@ -38,6 +38,7 @@ function RoomLobbyPage() {
   const queryClient = useQueryClient()
 
   const [players, setPlayers] = useState<Player[]>([])
+  const [playersInitialized, setPlayersInitialized] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isRoomReady, setIsRoomReady] = useState(false)
   const [codeCopied, setCodeCopied] = useState(false)
@@ -60,6 +61,14 @@ function RoomLobbyPage() {
   })
 
   const room = roomData?.room ?? null
+
+  // Initialize players from HTTP response (before WS is ready)
+  useEffect(() => {
+    if (roomData?.players && !playersInitialized) {
+      setPlayers(roomData.players)
+      setPlayersInitialized(true)
+    }
+  }, [roomData?.players, playersInitialized])
 
   const timeAgo = useTimeAgo(room?.createdAt)
 

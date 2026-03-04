@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { requireAuth } from '@interface/hooks/auth.hook'
 import { createRoomController } from '@interface/factories/room.factory'
 import { createGameController } from '@interface/factories/game.factory'
-import { gameSchema, roomSchema, roomMemberSchema, createRoomInputSchema } from '@squadzr/schemas'
+import { gameSchema, roomSchema, roomMemberSchema, playerSchema, createRoomInputSchema } from '@squadzr/schemas'
 import { roomCodeParamSchema } from '@application/dtos'
 
 const errorResponse = z.object({
@@ -70,7 +70,7 @@ export async function roomRoutes(fastify: FastifyInstance): Promise<void> {
       description: 'Returns a specific room by its 6-character code.',
       params: roomCodeParamSchema,
       response: {
-        200: z.object({ room: roomSchema }),
+        200: z.object({ room: roomSchema, players: z.array(playerSchema) }),
         404: errorResponse,
       },
     },

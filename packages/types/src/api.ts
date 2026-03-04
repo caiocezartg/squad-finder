@@ -1,4 +1,5 @@
 import type { Room, Game, UserNotification } from './index'
+import type { Player } from './ws'
 
 // API Response Types
 export type RoomsResponse = {
@@ -7,6 +8,7 @@ export type RoomsResponse = {
 
 export type RoomResponse = {
   room: Room
+  players: Player[]
 }
 
 export type GamesResponse = {
