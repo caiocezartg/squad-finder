@@ -2,7 +2,5 @@
   "framework": "vite",
   "buildCommand": "cd .. && bun run build:client",
   "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }

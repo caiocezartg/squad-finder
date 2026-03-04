@@ -24,9 +24,7 @@ export const auth = betterAuth({
   },
   advanced: {
     // Required for cross-origin auth (client and server on different domains)
-    defaultCookieAttributes: isProduction
-      ? { sameSite: 'none', secure: true }
-      : {},
+    defaultCookieAttributes: isProduction ? { sameSite: 'none', secure: true } : {},
   },
 })
 
